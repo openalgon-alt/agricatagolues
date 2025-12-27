@@ -1,13 +1,43 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Layout } from '@/components/layout/Layout';
+import { HeroSection } from '@/components/home/HeroSection';
+import { LatestArticles } from '@/components/home/LatestArticles';
+import { PopularArticles } from '@/components/home/PopularArticles';
+import { AboutSection } from '@/components/home/AboutSection';
+import { Helmet } from 'react-helmet-async';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Helmet>
+        <title>AgriScience Research Journal | Peer-Reviewed Agricultural Research</title>
+        <meta 
+          name="description" 
+          content="AgriScience Research Journal publishes peer-reviewed agricultural research on crop science, sustainable farming, soil management, and agribusiness. Access cutting-edge research from global experts." 
+        />
+        <meta name="keywords" content="agricultural research, crop science, sustainable agriculture, farming research, agribusiness, soil management, peer-reviewed journal" />
+        <link rel="canonical" href="https://agrisciencejournal.org" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Periodical",
+            "name": "AgriScience Research Journal",
+            "description": "A peer-reviewed academic journal dedicated to advancing agricultural research and sustainable farming practices worldwide.",
+            "url": "https://agrisciencejournal.org",
+            "publisher": {
+              "@type": "Organization",
+              "name": "AgriScience Publications"
+            },
+            "issn": "1234-5678"
+          })}
+        </script>
+      </Helmet>
+      <Layout>
+        <HeroSection />
+        <LatestArticles />
+        <PopularArticles />
+        <AboutSection />
+      </Layout>
+    </>
   );
 };
 
