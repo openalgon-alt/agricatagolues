@@ -42,7 +42,7 @@ const Contact = () => {
     setErrors({});
 
     const result = contactSchema.safeParse(formData);
-    
+
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
@@ -57,7 +57,7 @@ const Contact = () => {
 
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     setIsSubmitting(false);
     setIsSubmitted(true);
     toast({
@@ -70,9 +70,9 @@ const Contact = () => {
     <>
       <Helmet>
         <title>Contact Us | AgriScience Research Journal</title>
-        <meta 
-          name="description" 
-          content="Contact the editorial team at AgriScience Research Journal. Reach out for manuscript inquiries, collaboration opportunities, or general questions about agricultural research publication." 
+        <meta
+          name="description"
+          content="Contact the editorial team at AgriScience Research Journal. Reach out for manuscript inquiries, collaboration opportunities, or general questions about agricultural research publication."
         />
         <link rel="canonical" href="https://agrisciencejournal.org/contact" />
         <script type="application/ld+json">
@@ -83,17 +83,17 @@ const Contact = () => {
             "url": "https://agrisciencejournal.org",
             "contactPoint": {
               "@type": "ContactPoint",
-              "email": "editor@agrisciencejournal.org",
+              "email": "editor@agricatalogues.in",
               "contactType": "editorial",
               "availableLanguage": "English"
             },
             "address": {
               "@type": "PostalAddress",
-              "streetAddress": "123 Research Avenue",
-              "addressLocality": "University City",
-              "addressRegion": "ST",
-              "postalCode": "12345",
-              "addressCountry": "US"
+              "streetAddress": "Saddahalli, Palicherlu",
+              "addressLocality": "Sidlaghatta- Chikkaballapur",
+              "addressRegion": "Karnataka",
+              "postalCode": "562105",
+              "addressCountry": "IN"
             }
           })}
         </script>
@@ -110,7 +110,7 @@ const Contact = () => {
             >
               <h1 className="text-primary-foreground mb-4">Contact Us</h1>
               <p className="text-primary-foreground/80 text-lg md:text-xl">
-                Have questions about submissions, subscriptions, or collaborations? 
+                Have questions about submissions, subscriptions, or collaborations?
                 We're here to help. Reach out to our editorial team.
               </p>
             </motion.div>
@@ -129,7 +129,7 @@ const Contact = () => {
               >
                 <h2 className="text-foreground mb-6">Get in Touch</h2>
                 <p className="text-muted-foreground mb-8">
-                  Our editorial team is available Monday through Friday, 9:00 AM to 5:00 PM EST. 
+                  Our editorial team is available Monday through Friday, 9:00 AM to 5:00 PM EST.
                   We aim to respond to all inquiries within 48 hours.
                 </p>
 
@@ -138,19 +138,19 @@ const Contact = () => {
                     {
                       icon: Mail,
                       title: 'Email',
-                      content: 'editor@agrisciencejournal.org',
-                      href: 'mailto:editor@agrisciencejournal.org',
+                      content: 'editor@agricatalogues.in',
+                      href: 'mailto:editor@agricatalogues.in',
                     },
                     {
                       icon: Phone,
                       title: 'Phone',
-                      content: '+1 (555) 123-4567',
-                      href: 'tel:+15551234567',
+                      content: '+91 9148942104',
+                      href: 'tel:+919148942104',
                     },
                     {
                       icon: MapPin,
                       title: 'Address',
-                      content: '123 Research Avenue\nAgricultural Campus\nUniversity City, ST 12345\nUnited States',
+                      content: 'Saddahalli, Palicherlu\nSidlaghatta- Chikkaballapur\n562105, Karnataka',
                       href: null,
                     },
                   ].map((item) => (
@@ -161,7 +161,7 @@ const Contact = () => {
                       <div>
                         <h3 className="font-semibold text-foreground">{item.title}</h3>
                         {item.href ? (
-                          <a 
+                          <a
                             href={item.href}
                             className="text-muted-foreground hover:text-primary transition-colors"
                           >
@@ -298,9 +298,9 @@ const Contact = () => {
                         )}
                       </div>
 
-                      <Button 
-                        type="submit" 
-                        size="lg" 
+                      <Button
+                        type="submit"
+                        size="lg"
                         className="w-full gap-2"
                         disabled={isSubmitting}
                       >

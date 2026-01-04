@@ -10,17 +10,15 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center">
-                <Leaf className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="font-display text-xl font-bold">AgriScience</span>
-                <span className="block text-xs opacity-80 -mt-1">Research Journal</span>
-              </div>
+            <Link to="/" className="block mb-4">
+              <img
+                src="/src/assets/main-logo.png"
+                alt="AgriCatalogues Logo"
+                className="h-16 w-auto object-contain bg-white rounded-lg p-1"
+              />
             </Link>
             <p className="text-sm opacity-80 leading-relaxed">
-              A peer-reviewed academic journal dedicated to advancing agricultural research 
+              A peer-reviewed academic journal dedicated to advancing agricultural research
               and sustainable farming practices worldwide.
             </p>
           </div>
@@ -53,18 +51,18 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <Mail className="w-4 h-4 mt-0.5 opacity-80" />
-                <span className="opacity-80">editor@agrisciencejournal.org</span>
+                <span className="opacity-80">editor@agricatalogues.in</span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="w-4 h-4 mt-0.5 opacity-80" />
-                <span className="opacity-80">+1 (555) 123-4567</span>
+                <span className="opacity-80">+91 9148942104</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 mt-0.5 opacity-80" />
                 <span className="opacity-80">
-                  123 Research Avenue<br />
-                  Agricultural Campus<br />
-                  University City, ST 12345
+                  Saddahalli, Palicherlu,<br />
+                  Sidlaghatta- Chikkaballapur,<br />
+                  562105, Karnataka
                 </span>
               </li>
             </ul>
@@ -73,7 +71,7 @@ export const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex flex-col md:flex-row justify-between items-center gap-4 text-sm opacity-80">
-          <p>© {currentYear} AgriScience Research Journal. All rights reserved.</p>
+          <p>© {currentYear} Agri Catalogues. All rights reserved.</p>
           <div className="flex gap-6">
             <Link to="/guidelines#ethics" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
             <Link to="/guidelines" className="hover:opacity-100 transition-opacity">Terms of Use</Link>

@@ -1,82 +1,87 @@
+import { useEffect, useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, ExternalLink, FileText } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import issueCover from '@/assets/current-issue-cover.jpg';
-
-const articles = [
-  {
-    title: 'Climate-Resilient Crop Varieties: A Comprehensive Review of Drought-Tolerant Wheat Genotypes',
-    authors: 'Mitchell, S., Chen, J., & Williams, R.',
-    pages: '1-18',
-    doi: '10.1234/agriscience.2024.001',
-  },
-  {
-    title: 'Sustainable Soil Management Practices in Organic Farming Systems',
-    authors: 'Chen, J., Santos, M., & Kumar, R.',
-    pages: '19-35',
-    doi: '10.1234/agriscience.2024.002',
-  },
-  {
-    title: 'Digital Agriculture: IoT Applications in Precision Farming',
-    authors: 'Santos, M., Park, K., & Thompson, L.',
-    pages: '36-52',
-    doi: '10.1234/agriscience.2024.003',
-  },
-  {
-    title: 'Economic Impact of Sustainable Agriculture Policies in Developing Nations',
-    authors: 'Williams, R., Okonkwo, E., & Mwangi, G.',
-    pages: '53-71',
-    doi: '10.1234/agriscience.2024.004',
-  },
-  {
-    title: 'Integrated Pest Management Strategies for Smallholder Farms',
-    authors: 'Okonkwo, E., Hassan, A., & Bergström, A.',
-    pages: '72-88',
-    doi: '10.1234/agriscience.2024.005',
-  },
-  {
-    title: 'Advances in CRISPR Technology for Crop Improvement: A Critical Analysis',
-    authors: 'Thompson, L., Tanaka, H., & Petrova, E.',
-    pages: '89-112',
-    doi: '10.1234/agriscience.2024.006',
-  },
-  {
-    title: 'Water Conservation Techniques in Semi-Arid Agriculture Systems',
-    authors: 'Hassan, A., Al-Hassan, F., & Diallo, A.',
-    pages: '113-128',
-    doi: '10.1234/agriscience.2024.007',
-  },
-];
+import issueCover from '@/assets/current-issue-cover.jpg'; // Default/Fallback
+import { dataService, Issue } from '@/services/dataService';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CurrentIssue = () => {
+  const [issue, setIssue] = useState<Issue | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchIssue = async () => {
+    try {
+      const current = await dataService.getCurrentIssue();
+      setIssue(current || null);
+    } catch (error) {
+      console.error("Failed to fetch current issue");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchIssue();
+
+    // Listen for updates from other tabs (Admin)
+    const handleStorageChange = () => fetchIssue();
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also poll on focus to be super sure
+    const onFocus = () => fetchIssue();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container-magazine py-20 space-y-8">
+          <Skeleton className="h-40 w-full mb-8" />
+          <div className="grid lg:grid-cols-3 gap-12">
+            <Skeleton className="h-[400px] lg:col-span-1" />
+            <div className="lg:col-span-2 space-y-4">
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!issue) {
+    return (
+      <Layout>
+        <div className="container-magazine py-24 text-center">
+          <h1 className="text-3xl font-bold mb-4">No Current Issue Published</h1>
+          <p className="text-muted-foreground mb-8">Please check back later or view our archives.</p>
+          <Button asChild>
+            <Link to="/archives">View Archives</Link>
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>Current Issue - Volume 12, Issue 4 | AgriScience Research Journal</title>
-        <meta 
-          name="description" 
-          content="Read the latest issue of AgriScience Research Journal (Volume 12, Issue 4, December 2024). Access peer-reviewed agricultural research articles on crop science, sustainable farming, and agribusiness." 
+        <title>Current Issue - {issue.title} | AgriScience Research Journal</title>
+        <meta
+          name="description"
+          content={`Read the latest issue: ${issue.title} (${issue.month} ${issue.year}). ${issue.description}`}
         />
         <link rel="canonical" href="https://agrisciencejournal.org/current-issue" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "PublicationIssue",
-            "issueNumber": "4",
-            "datePublished": "2024-12",
-            "isPartOf": {
-              "@type": "PublicationVolume",
-              "volumeNumber": "12",
-              "isPartOf": {
-                "@type": "Periodical",
-                "name": "AgriScience Research Journal"
-              }
-            }
-          })}
-        </script>
       </Helmet>
       <Layout>
         {/* Header */}
@@ -89,12 +94,11 @@ const CurrentIssue = () => {
               className="max-w-3xl"
             >
               <span className="inline-block px-4 py-1.5 bg-accent/90 text-accent-foreground text-sm font-semibold rounded-full mb-4">
-                December 2024
+                {issue.month} {issue.year}
               </span>
               <h1 className="text-primary-foreground mb-4">Current Issue</h1>
               <p className="text-primary-foreground/80 text-lg md:text-xl">
-                Volume 12, Issue 4 — Featuring the latest peer-reviewed research in 
-                agricultural science and sustainable farming practices.
+                {issue.title} — {issue.description || "Featuring the latest peer-reviewed research."}
               </p>
             </motion.div>
           </div>
@@ -114,25 +118,18 @@ const CurrentIssue = () => {
                 <div className="sticky top-24">
                   <div className="bg-card rounded-xl overflow-hidden shadow-elevated">
                     <img
-                      src={issueCover}
-                      alt="AgriScience Research Journal Volume 12 Issue 4 Cover - December 2024"
+                      src={issue.coverImage || issueCover}
+                      alt={`${issue.title} Cover`}
                       className="w-full aspect-[3/4] object-cover"
                     />
                     <div className="p-6">
                       <h2 className="font-display font-bold text-foreground text-xl mb-2">
-                        Volume 12, Issue 4
+                        {issue.title}
                       </h2>
-                      <p className="text-muted-foreground mb-4">December 2024</p>
-                      <p className="text-sm text-muted-foreground mb-6">
-                        ISSN: 1234-5678 (Print)<br />
-                        ISSN: 1234-5679 (Online)
-                      </p>
+                      <p className="text-muted-foreground mb-4">{issue.month} {issue.year}</p>
+
                       <div className="space-y-3">
-                        <Button className="w-full gap-2">
-                          <Download className="w-4 h-4" />
-                          Download Full Issue (PDF)
-                        </Button>
-                        <Button variant="outline" className="w-full gap-2" asChild>
+                        <Button className="w-full gap-2" variant="outline" asChild>
                           <Link to="/archives">
                             View Past Issues
                           </Link>
@@ -153,11 +150,11 @@ const CurrentIssue = () => {
                   <h2 className="font-display font-bold text-foreground text-2xl mb-8">
                     Table of Contents
                   </h2>
-                  
+
                   <div className="space-y-4">
-                    {articles.map((article, index) => (
+                    {issue.articles?.map((article, index) => (
                       <motion.article
-                        key={article.doi}
+                        key={article.id}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -170,41 +167,35 @@ const CurrentIssue = () => {
                           </div>
                           <div className="flex-1">
                             <h3 className="font-display font-bold text-foreground text-lg group-hover:text-primary transition-colors mb-2">
-                              <a href={`#${article.doi}`} className="hover:underline">
-                                {article.title}
-                              </a>
+                              {article.title}
                             </h3>
                             <p className="text-muted-foreground text-sm mb-3">
                               {article.authors}
                             </p>
-                            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                              <span>Pages: {article.pages}</span>
-                              <span className="flex items-center gap-1">
-                                DOI: 
-                                <a 
-                                  href={`https://doi.org/${article.doi}`}
-                                  className="text-primary hover:underline"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {article.doi}
-                                </a>
-                              </span>
+                            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mb-2">
+                              {article.affiliation && (
+                                <span>{article.affiliation}</span>
+                              )}
                             </div>
                             <div className="flex gap-3 mt-4">
-                              <Button size="sm" variant="outline" className="text-xs h-8">
-                                <ExternalLink className="w-3 h-3 mr-1" />
-                                View Online
-                              </Button>
-                              <Button size="sm" variant="ghost" className="text-xs h-8">
-                                <Download className="w-3 h-3 mr-1" />
-                                PDF
-                              </Button>
+                              {article.pdfUrl ? (
+                                <Button size="sm" variant="ghost" className="text-xs h-8" asChild>
+                                  <a href={article.pdfUrl} target="_blank" rel="noopener noreferrer">
+                                    <Download className="w-3 h-3 mr-1" />
+                                    PDF
+                                  </a>
+                                </Button>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">PDF Coming Soon</span>
+                              )}
                             </div>
                           </div>
                         </div>
                       </motion.article>
                     ))}
+                    {(!issue.articles || issue.articles.length === 0) && (
+                      <p className="text-muted-foreground italic">No articles listed in this issue yet.</p>
+                    )}
                   </div>
                 </motion.div>
               </div>

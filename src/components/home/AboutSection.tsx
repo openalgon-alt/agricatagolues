@@ -23,85 +23,87 @@ const features = [
 
 export const AboutSection = () => {
   return (
-    <section className="section-spacing bg-background">
+    <section className="section-spacing bg-white">
       <div className="container-magazine">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Text Content */}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          {/* Main Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              About Our Journal
-            </span>
-            <h2 className="text-foreground mt-2 mb-6">
-              Pioneering Agricultural Research Since 2012
+            <h2 className="text-[#1a365d] mt-2 mb-6 font-serif text-3xl font-bold border-l-4 border-[#c53030] pl-4">
+              About the Magazine
             </h2>
-            <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-              AgriScience Research Journal is a leading peer-reviewed publication dedicated to 
-              advancing agricultural science, sustainable farming practices, and food security research. 
-              We provide a platform for researchers, academicians, policymakers, and industry 
-              professionals to share groundbreaking discoveries and evidence-based solutions.
+            <p className="text-slate-700 text-lg mb-6 leading-relaxed text-justify">
+              Agri Catalogues – An International Monthly Agriculture E-Magazine aims to serve as a comprehensive
+              digital platform dedicated to agriculture and allied sciences. Our mission is to disseminate the
+              latest advancements, innovative practices, research findings, market trends and success stories
+              in the agricultural sector.
             </p>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              Our journal covers diverse topics including crop science, soil management, 
-              agricultural technology, climate-smart agriculture, agribusiness economics, 
-              and rural development. We are committed to promoting research that addresses 
-              global food challenges while supporting environmental sustainability.
+            <p className="text-slate-700 mb-8 leading-relaxed text-justify">
+              We strive to connect farmers, researchers, agri-entrepreneurs, policymakers and students by
+              providing credible, insightful and practical information. The magazine seeks to promote sustainable
+              farming, agri-innovation and knowledge exchange to empower stakeholders at every level. Through
+              curated articles, expert opinions and interactive features, Agri Catalogues aspires to be a go-to
+              resource for the evolving world of agriculture.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild>
-                <Link to="/current-issue">Read Current Issue</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/guidelines">Author Guidelines</Link>
-              </Button>
-            </div>
+            <a
+              href="https://chat.whatsapp.com/DY9YdMyfufbLbexQfc2Tjc?mode=ems_copy%20%20_c%20"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" className="w-6 h-6" />
+              Join Our WhatsApp Group
+            </a>
           </motion.div>
 
-          {/* Features */}
+          {/* Magazine Details Table */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-6"
+            className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm"
           >
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                className="flex gap-4 p-6 bg-card rounded-xl shadow-subtle"
-              >
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <feature.icon className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-foreground text-xl mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            <div className="bg-[#1a365d] text-white p-4">
+              <h3 className="text-xl font-bold font-serif">Magazine Details</h3>
+            </div>
+            <div className="divide-y divide-slate-200 text-sm">
               {[
-                { label: 'Impact Factor', value: '3.45' },
-                { label: 'Acceptance Rate', value: '28%' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-display font-bold text-primary">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                { label: "Title", value: "Agri Catalogues - An International Monthly Agriculture E-Magazine" },
+                { label: "Frequency", value: "Monthly" },
+                { label: "ISSN", value: "3108-124X" },
+                { label: "Year of Starting", value: "2025" },
+                { label: "Subject", value: "Agriculture and Allied Sciences" },
+                { label: "Language", value: "English" },
+                { label: "Mode of Publication", value: "Online" },
+                { label: "Email", value: "editor@agricatalogues.in", isLink: true, href: "mailto:editor@agricatalogues.in" },
+                { label: "Contact Number", value: "+91 9148942104", isLink: true, href: "tel:+919148942104" },
+                { label: "Website", value: "https://agricatalogues.in/", isLink: true, href: "https://agricatalogues.in/" },
+                { label: "Publisher Address", value: "Saddahalli, Palicherlu, Sidlaghatta- Chikkaballapur, 562105, Karnataka", isLink: true, href: "https://maps.app.goo.gl/CPvR3pLL13tmUA1u9?g_st=ac" },
+              ].map((row, idx) => (
+                <div key={idx} className="grid grid-cols-1 sm:grid-cols-3 hover:bg-slate-100 transition-colors">
+                  <div className="p-3 font-semibold text-[#1a365d] sm:border-r border-slate-200 bg-slate-100/50">{row.label}</div>
+                  <div className="p-3 sm:col-span-2 text-slate-700 break-words">
+                    {row.isLink ? (
+                      <a href={row.href} className="text-blue-600 hover:underline break-all" target="_blank" rel="noopener noreferrer">
+                        {row.value}
+                      </a>
+                    ) : (
+                      row.value
+                    )}
+                  </div>
                 </div>
               ))}
+            </div>
+            <div className="p-4 bg-slate-100 border-t border-slate-200 text-center">
+              <p className="font-bold text-[#1a365d] text-lg">Editorials</p>
+              <p className="text-slate-600">editor@agricatalogues.in</p>
+              <p className="text-slate-600">+91 9148942104</p>
             </div>
           </motion.div>
         </div>

@@ -25,29 +25,25 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-1.5 bg-accent/90 text-accent-foreground text-sm font-semibold rounded-full mb-6">
-              Volume 12 • Issue 4 • December 2024
-            </span>
+            {/* Badge removed to match new clean look or can be kept if desired. Keeping empty for now */}
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-primary-foreground mb-6 leading-tight"
+            className="text-primary-foreground mb-6 leading-tight font-serif"
           >
-            Advancing Agricultural Research for a Sustainable Future
+            Agri Catalogues - An International Monthly Agriculture E-Magazine
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed"
+            className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed font-light"
           >
-            AgriScience Journal publishes cutting-edge research in crop science, 
-            soil management, sustainable agriculture, and agribusiness. Join our 
-            community of researchers, academicians, and industry professionals.
+            Your trusted source for agriculture articles. We serve as a comprehensive digital platform dedicated to agriculture and allied sciences, connecting farmers, researchers, and policymakers.
           </motion.p>
 
           <motion.div
@@ -70,28 +66,7 @@ export const HeroSection = () => {
             </Button>
           </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12 grid grid-cols-3 gap-6 max-w-md"
-          >
-            {[
-              { value: '500+', label: 'Articles Published' },
-              { value: '12', label: 'Years of Excellence' },
-              { value: '50+', label: 'Countries Reached' },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-display font-bold text-accent">
-                  {stat.value}
-                </div>
-                <div className="text-xs md:text-sm text-primary-foreground/70">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </motion.div>
+
         </div>
       </div>
     </section>
