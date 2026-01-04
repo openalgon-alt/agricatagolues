@@ -6,7 +6,8 @@ import {
     Settings,
     LogOut,
     Menu,
-    Users
+    Users,
+    ShoppingBag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,7 @@ export const AdminLayout = () => {
         { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
         { title: "Issues", url: "/admin/issues", icon: FileText },
         { title: "Editorial Board", url: "/admin/editorial-board", icon: Users },
+        { title: "Shop Products", url: "/admin/products", icon: ShoppingBag },
         // { title: "Settings", url: "/admin/settings", icon: Settings }, // Future
     ];
 

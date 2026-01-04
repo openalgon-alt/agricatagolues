@@ -169,8 +169,8 @@ const Archives = () => {
                           className="block bg-card rounded-xl overflow-hidden shadow-subtle hover:shadow-elevated transition-all"
                         >
                           <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-primary/5 flex flex-col items-center justify-center p-6 relative">
-                            {item.coverImage ? (
-                              <img src={item.coverImage} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                            {item.coverUrl ? (
+                              <img src={item.coverUrl} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
                             ) : (
                               <>
                                 <Calendar className="w-12 h-12 text-primary/40 mb-4" />
@@ -208,8 +208,8 @@ const Archives = () => {
                           className="group flex items-center gap-4 bg-card rounded-lg p-4 shadow-subtle hover:shadow-elevated transition-all"
                         >
                           <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-lg flex flex-col items-center justify-center overflow-hidden">
-                            {item.coverImage ? (
-                              <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                            {item.coverUrl ? (
+                              <img src={item.coverUrl} alt={item.title} className="w-full h-full object-cover" />
                             ) : (
                               <>
                                 <span className="text-lg font-display font-bold text-primary">

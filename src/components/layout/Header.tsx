@@ -4,6 +4,7 @@ import { Menu, X, Search, Calendar, User, BookOpen, FileText } from 'lucide-reac
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dataService, SearchResult } from '@/services/dataService';
+import mainLogo from '@/assets/main-logo.png';
 
 const navItems = [
   { name: 'Home', path: '/' },
@@ -11,6 +12,9 @@ const navItems = [
   { name: 'Guidelines', path: '/guidelines' },
   { name: 'Current Issue', path: '/current-issue' },
   { name: 'Archives', path: '/archives' },
+  { name: 'Publish with Us', path: '/publish-with-us' },
+  { name: 'Shop', path: '/shop' },
+  { name: 'Membership', path: '/membership' },
   { name: 'Contact', path: '/contact' },
 ];
 
@@ -85,12 +89,12 @@ export const Header = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 group mr-auto lg:mr-0"
+            className="flex items-center gap-2 group mr-auto lg:mr-0 shrink-0"
             aria-label="AgriScience Journal Home"
             onClick={closeSearch}
           >
             <img
-              src="/src/assets/main-logo.png"
+              src={mainLogo}
               alt="AgriCatalogues Logo"
               className="h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105"
             />
@@ -102,7 +106,7 @@ export const Header = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${location.pathname === item.path
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${location.pathname === item.path
                   ? 'text-primary bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
@@ -123,7 +127,7 @@ export const Header = () => {
             </button>
 
             {/* Desktop Search / Mobile Expandable Search */}
-            <div className={`${showMobileSearch ? 'absolute top-full left-0 right-0 p-4 bg-background border-b border-border shadow-lg animate-in slide-in-from-top-2 max-h-[80vh] overflow-y-auto' : 'hidden'} lg:block lg:relative lg:w-[28rem] lg:bg-transparent lg:border-none lg:shadow-none lg:overflow-visible`}>
+            <div className={`${showMobileSearch ? 'absolute top-full left-0 right-0 p-4 bg-background border-b border-border shadow-lg animate-in slide-in-from-top-2 max-h-[80vh] overflow-y-auto' : 'hidden'} lg:block lg:relative lg:w-48 xl:w-64 lg:bg-transparent lg:border-none lg:shadow-none lg:overflow-visible`}>
               <form onSubmit={handleSearch} className="relative z-50">
                 <Search className="absolute left-6 top-7 lg:left-3 lg:top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -154,9 +158,9 @@ export const Header = () => {
                             className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors flex items-start gap-3 border-b border-border/40 last:border-0"
                           >
                             <div className={`p-2 rounded-md shrink-0 ${result.type === 'issue' ? 'bg-primary/10 text-primary' :
-                                result.type === 'editorial' ? 'bg-purple-100 text-purple-700' :
-                                  result.type === 'page' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-secondary text-secondary-foreground'
+                              result.type === 'editorial' ? 'bg-purple-100 text-purple-700' :
+                                result.type === 'page' ? 'bg-blue-100 text-blue-700' :
+                                  'bg-secondary text-secondary-foreground'
                               }`}>
                               {result.type === 'issue' ? <Calendar className="w-4 h-4" /> :
                                 result.type === 'editorial' ? <User className="w-4 h-4" /> :

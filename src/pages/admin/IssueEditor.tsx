@@ -125,9 +125,26 @@ export default function IssueEditor() {
         setIssue({ ...issue, articles: newArticles });
     };
 
+    const handleCoverUpload = async (file: File) => {
+        try {
+            const url = await dataService.uploadFile(file);
+            setIssue({ ...issue, coverUrl: url });
+            toast.success("Cover image uploaded");
+        } catch (error) {
+            toast.error("Upload failed");
+            console.error(error);
+        }
+    };
+
     const handleFileUpload = async (file: File) => {
-        const url = await dataService.uploadFile(file);
-        setCurrentArticle(prev => ({ ...prev, pdfUrl: url }));
+        try {
+            const url = await dataService.uploadFile(file);
+            setCurrentArticle(prev => ({ ...prev, pdfUrl: url }));
+            toast.success("Article PDF uploaded");
+        } catch (error) {
+            toast.error("Upload failed");
+            console.error(error);
+        }
     };
 
     if (loading) return <div>Loading...</div>;
@@ -196,6 +213,24 @@ export default function IssueEditor() {
                                     onChange={e => setIssue({ ...issue, description: e.target.value })}
                                     className="h-32"
                                 />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Cover Image Path (Local)</Label>
+                                <Input
+                                    value={issue.coverUrl || ""}
+                                    onChange={e => setIssue({ ...issue, coverUrl: e.target.value })}
+                                    placeholder="/pdfs/vol1-issue1-cover.jpg"
+                                />
+                                <div className="mt-2">
+                                    <FileUpload
+                                        onFileSelect={handleCoverUpload}
+                                        label={issue.coverUrl ? "Change Cover Image" : "Upload Cover Image"}
+                                        accept="image/*"
+                                    />
+                                </div>
+                                {issue.coverUrl && (
+                                    <p className="text-xs text-muted-foreground mt-1">Preview: {issue.coverUrl}</p>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

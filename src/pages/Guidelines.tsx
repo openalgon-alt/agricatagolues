@@ -28,7 +28,7 @@ const Guidelines = () => {
             >
               <h1 className="text-white mb-4 font-serif text-4xl md:text-5xl font-bold">Author Guidelines</h1>
               <p className="text-blue-100 text-lg md:text-xl leading-relaxed">
-                A comprehensive guide to preparing, submitting, and publishing your research with Agri Catalogue.
+                A comprehensive guide to preparing, submitting, and publishing your research with AgriCatalogues.
               </p>
             </motion.div>
           </div>
@@ -103,12 +103,12 @@ const Guidelines = () => {
                         <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 text-center">
                           <FileText className="w-8 h-8 mx-auto text-blue-500 mb-2" />
                           <h4 className="font-bold text-slate-700">File Size</h4>
-                          <p className="text-sm text-slate-600">Must be less than <strong>4 MB</strong>.</p>
+                          <p className="text-sm text-slate-600">Must be less than <strong>10 MB</strong>.</p>
                         </div>
                         <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 text-center">
                           <FileCheck className="w-8 h-8 mx-auto text-green-500 mb-2" />
                           <h4 className="font-bold text-slate-700">Length</h4>
-                          <p className="text-sm text-slate-600">Do not exceed <strong>4 pages</strong>.</p>
+                          <p className="text-sm text-slate-600">Do not exceed <strong>5 pages</strong>.</p>
                         </div>
                       </div>
                     </div>

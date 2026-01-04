@@ -100,7 +100,7 @@ const IssueView = () => {
                                 <div className="sticky top-24">
                                     <div className="bg-card rounded-xl overflow-hidden shadow-elevated">
                                         <img
-                                            src={issue.coverImage || issueCover}
+                                            src={issue.coverUrl || issueCover}
                                             alt={`${issue.title} Cover`}
                                             className="w-full aspect-[3/4] object-cover"
                                         />

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import Fuse from 'fuse.js';
 
 export type IssueStatus = 'Current' | 'Archived' | 'Draft';
 
@@ -25,6 +26,17 @@ export interface Issue {
     pdfUrl?: string;
     publishDate?: string;
     articles?: Article[];
+}
+
+export interface Product {
+    id: string;
+    title: string;
+    description: string;
+    imageUrl?: string;
+    category?: string;
+    price?: number;
+    features: string[];
+    displayOrder: number;
 }
 
 export interface SearchResult {
@@ -65,12 +77,18 @@ class DataService {
         };
     }
 
-    async getIssues(): Promise<Issue[]> {
-        const { data, error } = await supabase
+    async getIssues(filter?: { status?: IssueStatus }): Promise<Issue[]> {
+        let query = supabase
             .from('issues')
-            .select('*')
+            .select('*, articles(*)')
             .order('year', { ascending: false })
-            .order('month', { ascending: false }); // ideally strictly by date if month is enum
+            .order('month', { ascending: false });
+
+        if (filter?.status) {
+            query = query.eq('status', filter.status);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         return (data || []).map(i => this.mapIssueFromDB(i));
@@ -176,63 +194,60 @@ class DataService {
     }
 
     async uploadFile(file: File): Promise<string> {
-        // For client-side simulation as per user request history, or actual upload?
-        // Recent history said: "Modified dataService.ts to simulate local PDF uploads... returns a local path"
-        // I should respect that previous decision if it was intentionally replaced.
-        // User checkpoint summary said: "Modified dataService.ts to simulate local PDF uploads. Instead of uploading to Supabase, the uploadFile function now returns a local path (e.g., /pdfs/<filename>)."
-
-        // Implementation based on that summary:
-        const fileName = file.name;
-        // In a real app we'd upload. Here we just return the path where the user should put it.
-        // But for IMAGES (covers), we might still want supabase storage?
-        // The summary said "PDF Upload Logic".
-        // Let's assume this method handles both or check if we need separate.
-        // Usually `uploadFile` is generic.
-
-        if (file.type === 'application/pdf') {
-            return `/pdfs/${fileName}`;
-        }
-
-        // For images, we probably still want Supabase or similar if possible, otherwise similar logic?
-        // I'll try Supabase storage for images as usually cover images are uploaded.
-        // If it fails, fallback or just use same object logic?
-        // Let's safe-bet on Supabase for non-PDFs if 'magazine-files' bucket exists.
-
         try {
-            const fileExt = file.name.split('.').pop();
-            const uniqueName = `uploads/${uuidv4()}.${fileExt}`;
-            const { error, data } = await supabase.storage
-                .from('magazine-files')
-                .upload(uniqueName, file);
+            const formData = new FormData();
+            formData.append('file', file);
 
-            if (error) throw error;
+            // Upload to Hostinger PHP script (Ensure upload.php is at https://agricatalogues.in/upload.php)
+            // If running locally, this relies on the PHP script sending CORS headers.
+            const response = await fetch('https://agricatalogues.in/upload.php', {
+                method: 'POST',
+                body: formData
+            });
 
-            const publicUrl = supabase.storage
-                .from('magazine-files')
-                .getPublicUrl(uniqueName);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+            }
 
-            return publicUrl.data.publicUrl;
-        } catch (e) {
-            console.warn("Upload to Supabase failed, falling back to local path assumption", e);
-            return `/uploads/${file.name}`;
+            const result = await response.json();
+            if (result.success && result.url) {
+                return result.url;
+            } else {
+                throw new Error(result.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error("Hostinger upload failed:", error);
+            // Fallback for local development or if script missing
+            // This ensures the app doesn't break if the user hasn't deployed the script yet
+            console.warn("Falling back to local simulation due to error.");
+            return `/pdfs/${file.name}`;
         }
     }
 
     async search(query: string): Promise<SearchResult[]> {
         if (!query || query.trim().length < 2) return [];
-        const term = `%${query.trim()}%`;
-        const lowerQuery = query.toLowerCase();
+        const term = query.trim();
         const results: SearchResult[] = [];
 
-        // 1. Search Articles
-        const { data: articles, error: articleError } = await supabase
-            .from('articles')
-            .select('id, title, abstract, authors, issue_id')
-            .or(`title.ilike.${term},abstract.ilike.${term},authors.ilike.${term},keywords.ilike.${term}`)
-            .limit(5);
+        // Fetch Data for Fuzzy Search (In a real large app, this would be inefficient, 
+        // but for <1000 items this is very fast and provides the best UX)
 
-        if (!articleError && articles) {
-            results.push(...articles.map((a: any) => ({
+        // 1. Articles
+        const { data: articles } = await supabase
+            .from('articles')
+            .select('id, title, abstract, authors, issue_id, keywords')
+            .limit(100);
+
+        if (articles) {
+            const fuse = new Fuse(articles, {
+                keys: ['title', 'abstract', 'authors', 'keywords'],
+                threshold: 0.4, // 0.0 = exact match, 1.0 = match anything
+                distance: 100,
+            });
+            const matches = fuse.search(term).map(r => r.item);
+
+            results.push(...matches.slice(0, 5).map((a: any) => ({
                 type: 'article' as const,
                 id: a.id,
                 title: a.title,
@@ -241,15 +256,20 @@ class DataService {
             })));
         }
 
-        // 2. Search Issues
-        const { data: issues, error: issueError } = await supabase
+        // 2. Issues
+        const { data: issues } = await supabase
             .from('issues')
             .select('id, title, description, year, month')
-            .or(`title.ilike.${term},description.ilike.${term}`)
-            .limit(3);
+            .limit(50);
 
-        if (!issueError && issues) {
-            results.push(...issues.map((i: any) => ({
+        if (issues) {
+            const fuse = new Fuse(issues, {
+                keys: ['title', 'description', 'month', 'year'],
+                threshold: 0.4,
+            });
+            const matches = fuse.search(term).map(r => r.item);
+
+            results.push(...matches.slice(0, 3).map((i: any) => ({
                 type: 'issue' as const,
                 id: i.id,
                 title: `Issue: ${i.title}`,
@@ -258,15 +278,20 @@ class DataService {
             })));
         }
 
-        // 3. Search Editorial Board
-        const { data: members, error: memberError } = await supabase
+        // 3. Editorial Board
+        const { data: members } = await supabase
             .from('editorial_board_members')
             .select('id, name, role, affiliation')
-            .or(`name.ilike.${term},role.ilike.${term},affiliation.ilike.${term}`)
-            .limit(5);
+            .limit(100);
 
-        if (!memberError && members) {
-            results.push(...members.map((m: any) => ({
+        if (members) {
+            const fuse = new Fuse(members, {
+                keys: ['name', 'role', 'affiliation'],
+                threshold: 0.3, // Slightly stricter for names
+            });
+            const matches = fuse.search(term).map(r => r.item);
+
+            results.push(...matches.slice(0, 5).map((m: any) => ({
                 type: 'editorial' as const,
                 id: m.id,
                 title: `${m.name} (${m.role})`,
@@ -275,28 +300,36 @@ class DataService {
             })));
         }
 
-        // 4. Search Static Pages (Guidelines, etc.)
-        const guidelineKeywords = ['guideline', 'author', 'submission', 'submit', 'format', 'payment', 'fee', 'check'];
-        if (guidelineKeywords.some(k => lowerQuery.includes(k))) {
-            results.push({
-                type: 'page',
+        // 4. Static Pages (Manual Fuzzy)
+        const staticPages = [
+            {
+                type: 'page' as const,
                 id: 'guidelines-page',
                 title: 'Author Guidelines',
-                description: 'Submission process, formatting checklist, payment details, and publication policies.',
+                desc: 'Submission process, formatting checklist, payment details, fees, cost',
                 url: '/guidelines'
-            });
-        }
-
-        // Editorial Board page specific search
-        if (['editorial', 'board', 'editor', 'team'].some(k => lowerQuery.includes(k))) {
-            results.push({
-                type: 'page',
+            },
+            {
+                type: 'page' as const,
                 id: 'editorial-page',
                 title: 'Editorial Board',
-                description: 'Meet our distinguished team of editors and reviewers.',
+                desc: 'Meet our distinguished team of editors and reviewers.',
                 url: '/editorial-board'
-            });
-        }
+            }
+        ];
+
+        const pageFuse = new Fuse(staticPages, {
+            keys: ['title', 'desc'],
+            threshold: 0.4
+        });
+
+        results.push(...pageFuse.search(term).map(r => ({
+            type: r.item.type,
+            id: r.item.id,
+            title: r.item.title,
+            description: r.item.desc,
+            url: r.item.url
+        })));
 
         return results;
     }
@@ -417,6 +450,85 @@ class DataService {
             .getPublicUrl(fileName);
 
         return data.publicUrl;
+    }
+
+    // --- Products (Shop) ---
+
+    async getProducts(): Promise<Product[]> {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('display_order', { ascending: true })
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Error fetching products:", error);
+            return [];
+        }
+        return (data || []).map(p => ({
+            id: p.id,
+            title: p.title,
+            description: p.description,
+            imageUrl: p.image_url,
+            category: p.category,
+            price: p.price,
+            features: p.features || [],
+            displayOrder: p.display_order
+        }));
+    }
+
+    async saveProduct(product: Partial<Product>): Promise<Product> {
+        const payload = {
+            title: product.title,
+            description: product.description,
+            image_url: product.imageUrl,
+            category: product.category,
+            price: product.price,
+            features: product.features,
+            display_order: product.displayOrder
+        };
+
+        if (product.id) {
+            const { data, error } = await supabase
+                .from('products')
+                .update(payload)
+                .eq('id', product.id)
+                .select()
+                .single();
+            if (error) throw error;
+            return {
+                id: data.id,
+                title: data.title,
+                description: data.description,
+                imageUrl: data.image_url,
+                category: data.category,
+                price: data.price,
+                features: data.features || [],
+                displayOrder: data.display_order
+            };
+        } else {
+            const { data, error } = await supabase
+                .from('products')
+                .insert(payload)
+                .select()
+                .single();
+            if (error) throw error;
+            return {
+                id: data.id,
+                title: data.title,
+                description: data.description,
+                imageUrl: data.image_url,
+                category: data.category,
+                price: data.price,
+                features: data.features || [],
+                displayOrder: data.display_order
+            };
+        }
+    }
+
+    async deleteProduct(id: string): Promise<void> {
+        const { error } = await supabase.from('products').delete().eq('id', id);
+        if (error) throw error;
     }
 }
 

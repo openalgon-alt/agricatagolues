@@ -45,18 +45,18 @@ const EditorialBoard = () => {
   const HorizontalCard = ({ member }: { member: EditorialBoardMember }) => (
     <div className="flex flex-col md:flex-row bg-[#dbe8f3] rounded-lg overflow-hidden shadow-md border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 mb-6 group">
       {/* Left Image Section - Fixed layout like before but better object-fit */}
-      <div className="md:w-48 lg:w-56 shrink-0 bg-white flex items-center justify-center p-2">
+      {/* Left Image Section - Fixed layout like before but better object-fit */}
+      <div className="md:w-48 lg:w-56 shrink-0 bg-white flex items-center justify-center p-2 w-full">
         {member.image_url ? (
-          <div className="w-full h-full relative overflow-hidden rounded border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+          <div className="w-full h-auto md:h-64 relative overflow-hidden rounded border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
             <img
               src={member.image_url}
               alt={member.name}
-              className="w-full h-full object-cover absolute inset-0 md:relative md:h-auto"
-              style={{ aspectRatio: '0.8' }}
+              className="w-full h-auto md:h-full md:object-cover md:absolute md:inset-0"
             />
           </div>
         ) : (
-          <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-medium">
+          <div className="w-full h-40 md:h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-medium">
             No Image
           </div>
         )}

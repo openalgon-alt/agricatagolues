@@ -55,15 +55,40 @@ const Contact = () => {
       return;
     }
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/editor@agricatalogues.in", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          _subject: `New Contact: ${formData.subject}`, // FormSubmit specific
+          _template: 'table' // FormSubmit specific
+        })
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast({
-      title: 'Message Sent!',
-      description: 'Thank you for contacting us. We will respond within 48 hours.',
-    });
+      if (!response.ok) throw new Error("Failed to send message");
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      toast({
+        title: 'Message Sent!',
+        description: 'Thank you for contacting us. We will respond within 48 hours.',
+      });
+    } catch (error) {
+      console.error(error);
+      setIsSubmitting(false);
+      toast({
+        title: 'Error sending message',
+        description: 'Please try again later or email us directly.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -178,7 +203,7 @@ const Contact = () => {
                 {/* Map Placeholder */}
                 <div className="mt-8 aspect-video bg-muted rounded-xl overflow-hidden">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.2219901290355!2d-74.00369368400567!3d40.71312937933185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a23e28c1191%3A0x49f75d3281df052a!2sCity%20Hall%20Park%2C%20New%20York%2C%20NY%2010007!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
+                    src="https://maps.google.com/maps?q=13.4821459,77.889948&t=&z=15&ie=UTF8&iwloc=&output=embed"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}

@@ -8,6 +8,9 @@ import EditorialBoard from "./pages/EditorialBoard";
 import Guidelines from "./pages/Guidelines";
 import CurrentIssue from "./pages/CurrentIssue";
 import Archives from "./pages/Archives";
+import Membership from "./pages/Membership";
+import PublishWithUs from "./pages/PublishWithUs";
+import Shop from "./pages/Shop";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
@@ -23,6 +26,8 @@ import IssueEditor from "./pages/admin/IssueEditor";
 import IssueView from "./pages/IssueView";
 import EditorialBoardList from "./pages/admin/EditorialBoardList";
 import EditorialMemberEditor from "./pages/admin/EditorialMemberEditor";
+import ProductList from "./pages/admin/ProductList";
+import ProductEditor from "./pages/admin/ProductEditor";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +45,9 @@ const App = () => (
             <Route path="/guidelines" element={<Guidelines />} />
             <Route path="/current-issue" element={<CurrentIssue />} />
             <Route path="/archives" element={<Archives />} />
+            <Route path="/membership" element={<Membership />} />
+            <Route path="/publish-with-us" element={<PublishWithUs />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/issues/:id" element={<IssueView />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
@@ -58,6 +66,9 @@ const App = () => (
               <Route path="editorial-board" element={<EditorialBoardList />} />
               <Route path="editorial-board/new" element={<EditorialMemberEditor />} />
               <Route path="editorial-board/:id" element={<EditorialMemberEditor />} />
+              <Route path="products" element={<ProductList />} />
+              <Route path="products/new" element={<ProductEditor />} />
+              <Route path="products/:id" element={<ProductEditor />} />
             </Route>
 
             {/* Catch-all */}

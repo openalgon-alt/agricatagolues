@@ -25,7 +25,9 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Badge removed to match new clean look or can be kept if desired. Keeping empty for now */}
+            <span className="inline-block py-1.5 px-4 rounded-full bg-amber-500/90 border border-amber-400 text-white font-bold tracking-wide mb-6 shadow-lg">
+              ISSN: 3108-124X
+            </span>
           </motion.div>
 
           <motion.h1

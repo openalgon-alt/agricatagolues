@@ -36,10 +36,24 @@ export const FileUpload = ({
 
     const validateAndUpload = async (selectedFile: File) => {
         // Validate type
-        if (accept && !selectedFile.type.match(accept.replace('*', '.*'))) {
-            // Simple check, for .pdf it matches application/pdf
-            if (selectedFile.type !== 'application/pdf') {
-                setErrorMessage("Invalid file type. Please upload a PDF.");
+        if (accept && accept !== "*") {
+            const acceptedTypes = accept.split(",").map(type => type.trim());
+            const fileType = selectedFile.type;
+            const fileName = selectedFile.name.toLowerCase();
+
+            const isValid = acceptedTypes.some(type => {
+                if (type.endsWith("/*")) {
+                    const mainType = type.split("/")[0];
+                    return fileType.startsWith(mainType + "/");
+                }
+                if (type.startsWith(".")) {
+                    return fileName.endsWith(type.toLowerCase());
+                }
+                return fileType === type;
+            });
+
+            if (!isValid) {
+                setErrorMessage(`Invalid file type. Accepted: ${accept}`);
                 setStatus('error');
                 return;
             }

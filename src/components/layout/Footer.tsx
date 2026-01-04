@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, Phone, MapPin } from 'lucide-react';
+import mainLogo from '@/assets/main-logo.png';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,14 +13,17 @@ export const Footer = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="block mb-4">
               <img
-                src="/src/assets/main-logo.png"
+                src={mainLogo}
                 alt="AgriCatalogues Logo"
                 className="h-16 w-auto object-contain bg-white rounded-lg p-1"
               />
             </Link>
             <p className="text-sm opacity-80 leading-relaxed">
-              A peer-reviewed academic journal dedicated to advancing agricultural research
+              A peer-reviewed academic magazine dedicated to advancing agricultural research
               and sustainable farming practices worldwide.
+            </p>
+            <p className="mt-4 text-sm font-semibold text-amber-200">
+              ISSN: 3108-124X
             </p>
           </div>
 
@@ -30,6 +34,8 @@ export const Footer = () => {
               <li><Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">Home</Link></li>
               <li><Link to="/current-issue" className="opacity-80 hover:opacity-100 transition-opacity">Current Issue</Link></li>
               <li><Link to="/archives" className="opacity-80 hover:opacity-100 transition-opacity">Archives</Link></li>
+              <li><Link to="/shop" className="opacity-80 hover:opacity-100 transition-opacity">Shop</Link></li>
+              <li><Link to="/membership" className="opacity-80 hover:opacity-100 transition-opacity">Membership</Link></li>
               <li><Link to="/editorial-board" className="opacity-80 hover:opacity-100 transition-opacity">Editorial Board</Link></li>
             </ul>
           </div>
@@ -38,6 +44,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-display text-lg font-bold mb-4">For Authors</h4>
             <ul className="space-y-2 text-sm">
+              <li><Link to="/publish-with-us" className="opacity-80 hover:opacity-100 transition-opacity">Publish with Us</Link></li>
               <li><Link to="/guidelines" className="opacity-80 hover:opacity-100 transition-opacity">Submission Guidelines</Link></li>
               <li><Link to="/guidelines#ethics" className="opacity-80 hover:opacity-100 transition-opacity">Publication Ethics</Link></li>
               <li><Link to="/guidelines#review" className="opacity-80 hover:opacity-100 transition-opacity">Peer Review Process</Link></li>
