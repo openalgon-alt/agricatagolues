@@ -63,14 +63,28 @@ export default function IssueEditor() {
         }
 
         try {
-            await dataService.saveIssue({
+            // 1. Save the Issue first
+            const savedIssue = await dataService.saveIssue({
                 ...issue,
-                id: id // if undefined, it creates new
+                id: id // if undefined, it creates new/upserts based on payload
             });
-            toast.success("Issue saved successfully");
+
+            // 2. Save all articles linked to this issue
+            if (issue.articles && issue.articles.length > 0) {
+                const articlePromises = issue.articles.map(article =>
+                    dataService.saveArticle({
+                        ...article,
+                        issueId: savedIssue.id // Ensure linkage
+                    })
+                );
+                await Promise.all(articlePromises);
+            }
+
+            toast.success(`Issue and ${issue.articles?.length || 0} articles saved successfully`);
             navigate("/admin/issues");
         } catch (error) {
-            toast.error("Failed to save issue");
+            console.error(error);
+            toast.error("Failed to save issue or articles");
         }
     };
 
