@@ -57,7 +57,7 @@ if (move_uploaded_file($file['tmp_name'], $targetPath)) {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
     $publicUrl = "$protocol://$host/pdfs/$filename";
-    
+
     echo json_encode([
         'success' => true,
         'url' => $publicUrl,
