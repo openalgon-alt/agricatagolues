@@ -78,7 +78,7 @@ export const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex flex-col md:flex-row justify-between items-center gap-4 text-sm opacity-80">
-          <p>© {currentYear} Agri Catalogues. All rights reserved.</p>
+          <p>© {currentYear} Agri Catalogues. All rights reserved. <span className="ml-2">Developed by <a href="https://openalgon.com" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-primary-foreground">OpenAlgon</a></span></p>
           <div className="flex gap-6">
             <Link to="/guidelines#ethics" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
             <Link to="/guidelines" className="hover:opacity-100 transition-opacity">Terms of Use</Link>

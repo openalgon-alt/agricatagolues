@@ -14,6 +14,7 @@ import Shop from "./pages/Shop";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
+import ExamPage from "./pages/ExamPage";
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/admin/Login";
 import { AdminLayout } from "./layouts/AdminLayout";
@@ -28,6 +29,7 @@ import EditorialBoardList from "./pages/admin/EditorialBoardList";
 import EditorialMemberEditor from "./pages/admin/EditorialMemberEditor";
 import ProductList from "./pages/admin/ProductList";
 import ProductEditor from "./pages/admin/ProductEditor";
+import ExamSubmissions from "./pages/admin/ExamSubmissions";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,7 @@ const App = () => (
             <Route path="/issues/:id" element={<IssueView />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/exam" element={<ExamPage />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
@@ -69,6 +72,7 @@ const App = () => (
               <Route path="products" element={<ProductList />} />
               <Route path="products/new" element={<ProductEditor />} />
               <Route path="products/:id" element={<ProductEditor />} />
+              <Route path="exam-submissions" element={<ExamSubmissions />} />
             </Route>
 
             {/* Catch-all */}

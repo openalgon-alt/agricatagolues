@@ -39,6 +39,7 @@ export default function IssueEditor() {
     const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
     const [currentArticle, setCurrentArticle] = useState<Partial<Article>>({});
     const [editingArticleIndex, setEditingArticleIndex] = useState<number | null>(null);
+    const [deletedArticleIds, setDeletedArticleIds] = useState<string[]>([]);
 
     useEffect(() => {
         if (id) {
@@ -78,6 +79,13 @@ export default function IssueEditor() {
                     })
                 );
                 await Promise.all(articlePromises);
+            }
+
+            // 3. Delete removed articles
+            if (deletedArticleIds.length > 0) {
+                const deletePromises = deletedArticleIds.map(id => dataService.deleteArticle(id));
+                await Promise.all(deletePromises);
+                setDeletedArticleIds([]); // Clear the list after successful deletion
             }
 
             toast.success(`Issue and ${issue.articles?.length || 0} articles saved successfully`);
@@ -120,6 +128,11 @@ export default function IssueEditor() {
     };
 
     const handleDeleteArticle = (index: number) => {
+        const articleToDelete = issue.articles![index];
+        if (articleToDelete.id) {
+            setDeletedArticleIds([...deletedArticleIds, articleToDelete.id]);
+        }
+
         const newArticles = [...(issue.articles || [])];
         newArticles.splice(index, 1);
         setIssue({ ...issue, articles: newArticles });

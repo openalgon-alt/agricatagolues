@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "question": "Identify the specimen:",
+    "options": [
+      "Mustard",
+      "Ragi",
+      "Proso millet",
+      "Caudo millet"
+    ],
+    "image": "/mock_images/q1.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 2,
+    "question": "Identify the specimen:",
+    "options": [
+      "Sorghum",
+      "Jawar",
+      "Bajra",
+      "Maize"
+    ],
+    "image": "/mock_images/q2.png",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 3,
+    "question": "Identify the specimen:",
+    "options": [
+      "Pumpkin seeds",
+      "Ash guard seeds",
+      "Ridge guard seeds",
+      "Sunflower seeds"
+    ],
+    "image": "/mock_images/q3.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 4,
+    "question": "Identify the specimen:",
+    "options": [
+      "Cowpea",
+      "Toor dal/ Pigeon pea",
+      "Horse gram",
+      "Soya bean"
+    ],
+    "image": "/mock_images/q4.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 5,
+    "question": "Identify the specimen:",
+    "options": [
+      "Moringa seeds",
+      "Drumstick seeds",
+      "Both a and b",
+      "None of the above"
+    ],
+    "image": "/mock_images/q5.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 6,
+    "question": "Identify the specimen:",
+    "options": [
+      "Jersy",
+      "Holstein Friesian",
+      "Brown Swiss",
+      "Guernsey"
+    ],
+    "image": "/mock_images/q6.png",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 7,
+    "question": "Identify the specimen:",
+    "options": [
+      "Bannur sheep",
+      "Rambouillet",
+      "Suffolk",
+      "Merino"
+    ],
+    "image": "/mock_images/q7.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 8,
+    "question": "Identify the specimen:",
+    "options": [
+      "Yorkshire",
+      "Hampshire",
+      "Berkshire",
+      "Chester white"
+    ],
+    "image": "/mock_images/q8.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 9,
+    "question": "Identify the specimen:",
+    "options": [
+      "Swarnadhara",
+      "Giriraja",
+      "Kadaknath",
+      "Aseel"
+    ],
+    "image": "/mock_images/q9.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 10,
+    "question": "Identify the specimen:",
+    "options": [
+      "Rohu",
+      "Common carp",
+      "Salmon",
+      "Catla"
+    ],
+    "image": "/mock_images/q10.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 11,
+    "question": "Identify the specimen:",
+    "options": [
+      "Ash guard",
+      "Ridge guard",
+      "Bottle guard",
+      "Cucumber"
+    ],
+    "image": "/mock_images/q11.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 12,
+    "question": "Identify the specimen:",
+    "options": [
+      "Parthenium",
+      "Potato",
+      "Chilly",
+      "Tomato"
+    ],
+    "image": "/mock_images/q12.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 13,
+    "question": "Identify the specimen:",
+    "options": [
+      "Mould board plough",
+      "Disc plough",
+      "Rotovator",
+      "Cultivator"
+    ],
+    "image": "/mock_images/q13.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 14,
+    "question": "Identify the specimen:",
+    "options": [
+      "Rotovator",
+      "Seed cum fertilizer machine",
+      "Leveller",
+      "Transplanting machine"
+    ],
+    "image": "/mock_images/q14.png",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 15,
+    "question": "Identify the specimen:",
+    "options": [
+      "Kurpi",
+      "Sickle",
+      "Secateur",
+      "Cutting plier"
+    ],
+    "image": "/mock_images/q15.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 16,
+    "question": "Identify the specimen:",
+    "options": [
+      "Urea",
+      "DAP ( Diammonium phosphate)",
+      "MOP ( Muriate of potash)",
+      "SSP ( Single super phosphate)"
+    ],
+    "image": "/mock_images/q16.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 17,
+    "question": "Identify the specimen:",
+    "options": [
+      "Urea",
+      "DAP ( Diammonium phosphate)",
+      "MOP ( Muriate of potash)",
+      "SSP ( Single super phosphate)"
+    ],
+    "image": "/mock_images/q17.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 18,
+    "question": "Identify the specimen:",
+    "options": [
+      "Urea",
+      "DAP ( Diammonium phosphate)",
+      "MOP ( Muriate of potash)",
+      "SSP ( Single super phosphate)"
+    ],
+    "image": "/mock_images/q18.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 19,
+    "question": "Identify the specimen:",
+    "options": [
+      "Mulberry Silkworm larvae",
+      "Lac insect",
+      "Honey bee",
+      "Tasar silkworm larvae"
+    ],
+    "image": "/mock_images/q19.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 20,
+    "question": "Identify the specimen:",
+    "options": [
+      "Silkworm",
+      "Wasp",
+      "Ant",
+      "Honey bee"
+    ],
+    "image": "/mock_images/q20.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 21,
+    "question": "Identify the specimen:",
+    "options": [
+      "Wax",
+      "Lac",
+      "Gum",
+      "Rubber"
+    ],
+    "image": "/mock_images/q21.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 22,
+    "question": "Identify the specimen:",
+    "options": [
+      "Red gram",
+      "Dhaincha",
+      "Mustard",
+      "Sunn hemp"
+    ],
+    "image": "/mock_images/q22.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 23,
+    "question": "Identify the specimen:",
+    "options": [
+      "Dhaincha",
+      "Sunn hemp",
+      "Gliricidia",
+      "Mustard"
+    ],
+    "image": "/mock_images/q23.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 24,
+    "question": "Identify the specimen:",
+    "options": [
+      "Algae",
+      "Bryophyllum",
+      "Fungi",
+      "Azolla"
+    ],
+    "image": "/mock_images/q24.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 25,
+    "question": "Identify the specimen:",
+    "options": [
+      "Bird of paradise flower",
+      "Bird",
+      "Insect",
+      "None of the above"
+    ],
+    "image": "/mock_images/q25.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 26,
+    "question": "Identify the specimen:",
+    "options": [
+      "Jasmine",
+      "Marigold",
+      "Suganda raja",
+      "Crossandra"
+    ],
+    "image": "/mock_images/q26.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 27,
+    "question": "Identify the specimen:",
+    "options": [
+      "Chrysanthemum",
+      "Marigold",
+      "Mexican sunflower",
+      "Gerbera"
+    ],
+    "image": "/mock_images/q27.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 28,
+    "question": "Identify the specimen:",
+    "options": [
+      "Coconut",
+      "Arecanut",
+      "Palm trees",
+      "Date palm"
+    ],
+    "image": "/mock_images/q28.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 29,
+    "question": "Identify the specimen:",
+    "options": [
+      "Cashew nut tree",
+      "Mango",
+      "Almond tree",
+      "Arecanut"
+    ],
+    "image": "/mock_images/q29.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 30,
+    "question": "Identify the specimen:",
+    "options": [
+      "Okra",
+      "Cluster been",
+      "Castor",
+      "Brinjal"
+    ],
+    "image": "/mock_images/q30.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 31,
+    "question": "Identify the specimen:",
+    "options": [
+      "Neem oil cake",
+      "Pongamia oil cake",
+      "Jatropa oil cake",
+      "Ground nut oil cake"
+    ],
+    "image": "/mock_images/q31.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 32,
+    "question": "Identify the specimen:",
+    "options": [
+      "Neem oil cake",
+      "Pongamia oil cake",
+      "Jatropa oil cake",
+      "Ground nut oil cake"
+    ],
+    "image": "/mock_images/q32.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 33,
+    "question": "Identify the specimen:",
+    "options": [
+      "Neem tree",
+      "Teak",
+      "Mahogany",
+      "Sandle wood"
+    ],
+    "image": "/mock_images/q33.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 34,
+    "question": "Identify the specimen:",
+    "options": [
+      "Neem tree",
+      "Teak",
+      "Mahogany",
+      "Sandle wood"
+    ],
+    "image": "/mock_images/q34.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 35,
+    "question": "Identify the specimen:",
+    "options": [
+      "Sprinkler irrigation",
+      "Flood irrigation",
+      "Ring basin irrigation",
+      "Drip irrigation"
+    ],
+    "image": "/mock_images/q35.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 36,
+    "question": "Identify the specimen:",
+    "options": [
+      "Sprinkler irrigation",
+      "Flood irrigation",
+      "Ring basin irrigation",
+      "Drip irrigation"
+    ],
+    "image": "/mock_images/q36.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 37,
+    "question": "Identify the specimen:",
+    "options": [
+      "Maize",
+      "Jawar",
+      "Sorghum",
+      "Bajra"
+    ],
+    "image": "/mock_images/q37.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 38,
+    "question": "Identify the specimen:",
+    "options": [
+      "Bengal dram",
+      "Chick pea",
+      "Toor dal",
+      "Both a and b"
+    ],
+    "image": "/mock_images/q38.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 39,
+    "question": "Identify the specimen:",
+    "options": [
+      "Red soil",
+      "Laterite soil",
+      "Black cotton soil",
+      "Alluvial soil"
+    ],
+    "image": "/mock_images/q39.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 40,
+    "question": "Identify the specimen:",
+    "options": [
+      "Ground nut",
+      "Soyabean",
+      "Chick pea",
+      "Cow pea"
+    ],
+    "image": "/mock_images/q40.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 41,
+    "question": "Identify the specimen:",
+    "options": [
+      "Australorp",
+      "Rhode island red",
+      "White leghorn",
+      "ISA brown"
+    ],
+    "image": "/mock_images/q41.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 42,
+    "question": "Identify the specimen:",
+    "options": [
+      "Beetle",
+      "Jamunapari",
+      "Sirohi",
+      "Jumma pari"
+    ],
+    "image": "/mock_images/q42.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 43,
+    "question": "Identify the specimen:",
+    "options": [
+      "Garlic",
+      "Radish",
+      "Onion",
+      "Carrot"
+    ],
+    "image": "/mock_images/q43.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 44,
+    "question": "Identify the specimen:",
+    "options": [
+      "Carrot",
+      "Carrot grass/ parthenium/ congress weed",
+      "Gharike",
+      "Jeku/ cyprus weed"
+    ],
+    "image": "/mock_images/q44.jpeg",
+    "correctOptionIndex": 1
+  },
+  {
+    "id": 45,
+    "question": "Identify the specimen:",
+    "options": [
+      "Coriander",
+      "Palak",
+      "Carrot",
+      "Parthenium"
+    ],
+    "image": "/mock_images/q45.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 46,
+    "question": "Identify the specimen:",
+    "options": [
+      "Cardamom",
+      "Ginger",
+      "Clove",
+      "Pepper"
+    ],
+    "image": "/mock_images/q46.jpeg",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 47,
+    "question": "Identify the specimen:",
+    "options": [
+      "Cardamom",
+      "Ginger",
+      "Clove",
+      "Pepper"
+    ],
+    "image": "/mock_images/q47.jpeg",
+    "correctOptionIndex": 3
+  },
+  {
+    "id": 48,
+    "question": "Identify the specimen:",
+    "options": [
+      "Feeder",
+      "Drinker",
+      "Both a and b",
+      "None of the above"
+    ],
+    "image": "/mock_images/q48.jpeg",
+    "correctOptionIndex": 0
+  },
+  {
+    "id": 49,
+    "question": "Identify the specimen:",
+    "options": [
+      "Ant",
+      "Wasp",
+      "Termite",
+      "Cricket"
+    ],
+    "image": "/mock_images/q49.png",
+    "correctOptionIndex": 2
+  },
+  {
+    "id": 50,
+    "question": "Identify the specimen:",
+    "options": [
+      "Strawberry",
+      "Blue berry",
+      "Cherry",
+      "Mulberry"
+    ],
+    "image": "/mock_images/q50.jpeg",
+    "correctOptionIndex": 3
+  }
+]
