@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import ExamPage from "./pages/ExamPage";
 import { AuthProvider } from "./context/AuthContext";
+import { ExamAuthProvider } from "./context/ExamAuthContext";
 import Login from "./pages/admin/Login";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { RequireAuth } from "./components/admin/RequireAuth";
@@ -30,6 +31,9 @@ import EditorialMemberEditor from "./pages/admin/EditorialMemberEditor";
 import ProductList from "./pages/admin/ProductList";
 import ProductEditor from "./pages/admin/ProductEditor";
 import ExamSubmissions from "./pages/admin/ExamSubmissions";
+import ExamList from "./pages/admin/ExamList";
+import ExamEditor from "./pages/admin/ExamEditor";
+import UserAccess from "./pages/admin/UserAccess";
 
 const queryClient = new QueryClient();
 
@@ -39,9 +43,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
+        <ExamAuthProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/editorial-board" element={<EditorialBoard />} />
             <Route path="/guidelines" element={<Guidelines />} />
@@ -72,13 +77,17 @@ const App = () => (
               <Route path="products" element={<ProductList />} />
               <Route path="products/new" element={<ProductEditor />} />
               <Route path="products/:id" element={<ProductEditor />} />
+              <Route path="exams" element={<ExamList />} />
+              <Route path="exams/new" element={<ExamEditor />} />
+              <Route path="exams/:id" element={<ExamEditor />} />
               <Route path="exam-submissions" element={<ExamSubmissions />} />
+              <Route path="user-access" element={<UserAccess />} />
             </Route>
 
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ExamAuthProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

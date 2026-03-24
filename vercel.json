@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/mock-tests", "destination": "/api/mock-tests" },
+    { "source": "/api/mock-questions", "destination": "/api/mock-questions" },
+    { "source": "/api", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

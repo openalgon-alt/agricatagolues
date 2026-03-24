@@ -1,14 +1,41 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, BellRing } from 'lucide-react';
 import { motion } from 'framer-motion';
 import heroImage from '@/assets/hero-wheat.jpg';
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0">
+    <section className="relative min-h-[85vh] flex flex-col">
+      {/* Mock Test Notice Scrolling Banner - Dark Green */}
+      <Link to="/exam" className="block bg-forest text-white py-2 overflow-hidden relative z-40 w-full shrink-0 shadow-md border-b border-forest-light/30 hover:bg-forest/90 transition-colors cursor-pointer group">
+        <div className="whitespace-nowrap animate-marquee flex items-center h-full">
+            <span className="font-bold text-sm md:text-base mr-10 inline-flex items-center gap-2">
+                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+                Karnataka state agriculture practical mock test - 2026 is Live! 
+                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                    Click Here
+                </span>
+            </span>
+            <span className="font-bold text-sm md:text-base mr-10 inline-flex items-center gap-2" aria-hidden="true">
+                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+                Karnataka state agriculture practical mock test - 2026 is Live! 
+                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                    Click Here
+                </span>
+            </span>
+             <span className="font-bold text-sm md:text-base inline-flex items-center gap-2" aria-hidden="true">
+                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+                Karnataka state agriculture practical mock test - 2026 is Live! 
+                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                    Click Here
+                </span>
+            </span>
+        </div>
+      </Link>
+
+      {/* Background Image Container */}
+      <div className="absolute inset-0 top-10">
         <img
           src={heroImage}
           alt="Golden wheat field stretching to the horizon under morning light - representing agricultural research and sustainable farming"

@@ -1,36 +1,42 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { MockTest, MockQuestion, examDataService, UserPurchase } from "@/services/examDataService";
+import { MockTest, MockQuestion, examDataService, UserPurchase, API_BASE_URL } from "@/services/examDataService";
+// import { handleRazorpayPayment } from "@/utils/razorpay"; // Removed as per instruction
 import { QuestionCard } from "@/components/exam/QuestionCard";
 import { ZoomableImage } from "@/components/exam/ZoomableImage";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { CheckCircle2, Circle, XCircle, HelpCircle, BookOpen, Clock, Award, BrainCircuit, ArrowRight, Maximize2, Minimize2, Lock, LogOut, Printer, Crown, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+// import { AuthModal } from "@/components/auth/AuthModal";
+// import { ProfileCompletionModal } from "@/components/auth/ProfileCompletionModal";
 import { ExamAuthModal } from "@/components/auth/ExamAuthModal";
 import { ExamLanding } from "@/components/exam/ExamLanding";
 import { ExamDashboard } from "@/components/exam/ExamDashboard";
 import { ExamPurchaseView } from "@/components/exam/ExamPurchaseView";
 import { PremiumTestsList } from "@/components/exam/PremiumTestsList";
+import { toast } from "sonner";
 import { useExamAuth } from "@/context/ExamAuthContext";
 import mainLogoImg from "@/assets/main-logo.png";
 
+// --- Main Component ---
 export default function ExamPage() {
+    // State
     const [activeTests, setActiveTests] = useState<MockTest[]>([]);
     const [selectedTest, setSelectedTest] = useState<MockTest | null>(null);
     const [questions, setQuestions] = useState<MockQuestion[]>([]);
     const [purchases, setPurchases] = useState<UserPurchase[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
     
+    // User Details & Registration
     const { examUser: user, isExamAuthenticated: isAuthenticated, isExamLoading: isAuthLoading, examLogout: logout } = useExamAuth();
     
     const [userDetails, setUserDetails] = useState<any>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
     const [showLanding, setShowLanding] = useState(true);
+    // const [isAuthChecking, setIsAuthChecking] = useState(true); // Removed in favor of useAuth loading
     const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -38,7 +44,6 @@ export default function ExamPage() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [score, setScore] = useState(0);
     const [submissionId, setSubmissionId] = useState<number | null>(null);
-
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [timeLeft, setTimeLeft] = useState<number>(0); // Timer State moved here
@@ -135,7 +140,7 @@ export default function ExamPage() {
         toast.info("Logged out successfully");
     };
 
-
+    const [submissions, setSubmissions] = useState<any[]>([]);
 
     useEffect(() => {
         if (userDetails?.id) {
@@ -326,7 +331,7 @@ export default function ExamPage() {
         } catch (e) { console.warn("Fullscreen error", e); }
 
         try {
-             const response = await fetch(`/api/index`, {
+             const response = await fetch(`${API_BASE_URL}/api`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -361,9 +366,9 @@ export default function ExamPage() {
                 setSubmissionId(responseData.id);
                 sessionStorage.setItem("submissionId", responseData.id.toString());
             }
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error starting test session:", err);
-            toast.error("Failed to initialize session: " + (err.message || String(err)));
+            toast.error("Failed to initialize session.");
             return;
         }
 
@@ -377,26 +382,15 @@ export default function ExamPage() {
 
         const qId = questions[currentQuestionIndex].id;
         setAnswers(prev => ({ ...prev, [qId]: option }));
+
+        // REMOVED: API call to save-answer on every click to save resources.
+        // The app already relies on the localStorage autosave below,
+        // and sends all answers in a single batch during handleSubmitExam.
     };
 
     const handleNavigate = (index: number) => {
         setCurrentQuestionIndex(index);
     };
-
-    const [submissions, setSubmissions] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (userDetails?.id) {
-            examDataService.getUserPurchases(userDetails.id).then(setPurchases);
-            if (userDetails.email) {
-                examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
-            }
-        } else {
-            setPurchases([]);
-            setSubmissions([]);
-        }
-    }, [userDetails?.id, userDetails?.email]);
-
 
     const handleSubmitExam = async () => {
         if (window.confirm("Are you sure you want to submit the exam?")) {
@@ -412,7 +406,7 @@ export default function ExamPage() {
             // Save Result & Calculate Score via Backend
             if (submissionId) {
                 try {
-                     const response = await fetch(`/api/index`, {
+                     const response = await fetch(`${API_BASE_URL}/api`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1001,8 +995,6 @@ export default function ExamPage() {
                     </div>
                 </div>
 
-
-
                 {/* Sidebar: Question Palette */}
                 <div className="w-72 bg-white border-l border-gray-200 hidden lg:flex flex-col shrink-0 z-10">
                     <div className="p-4 border-b border-gray-100 font-semibold text-gray-800 bg-gray-50/50 flex items-center gap-2">
@@ -1052,3 +1044,4 @@ export default function ExamPage() {
         </div>
     );
 }
+

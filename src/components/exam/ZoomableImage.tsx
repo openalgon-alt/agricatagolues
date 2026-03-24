@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,8 @@ export function ZoomableImage({ src, alt, className, imageClassName }: ZoomableI
                 </div>
             </DialogTrigger>
             <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden bg-transparent border-none shadow-none flex items-center justify-center pointer-events-none">
+                <DialogTitle className="sr-only">Zoomed Image</DialogTitle>
+                <DialogDescription className="sr-only">Detailed view of the image</DialogDescription>
                 <div className="relative w-full h-full flex items-center justify-center p-4 pointer-events-auto">
                     <DialogClose asChild>
                         <Button
