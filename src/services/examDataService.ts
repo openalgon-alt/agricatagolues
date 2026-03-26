@@ -171,10 +171,10 @@ class ExamDataService {
 
     async saveMockTest(test: Partial<MockTest>): Promise<MockTest> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/save-mock-test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'save-mock-test', payload: test })
+                body: JSON.stringify(test)
             });
             const textData = await response.text();
             let data;
@@ -189,10 +189,10 @@ class ExamDataService {
 
     async saveMockQuestion(question: Partial<MockQuestion>): Promise<MockQuestion> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/save-mock-question`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'save-mock-question', payload: question })
+                body: JSON.stringify(question)
             });
             const textData = await response.text();
             let data;
@@ -207,10 +207,10 @@ class ExamDataService {
 
     async deleteMockTest(id: number | string): Promise<void> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/delete-mock-test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'delete-mock-test', payload: { id } })
+                body: JSON.stringify({ id })
             });
             if (!response.ok) {
                 const text = await response.text();
@@ -224,10 +224,10 @@ class ExamDataService {
 
     async deleteMockQuestion(id: number | string): Promise<void> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/delete-mock-question`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'delete-mock-question', payload: { id } })
+                body: JSON.stringify({ id })
             });
             if (!response.ok) {
                 const text = await response.text();
