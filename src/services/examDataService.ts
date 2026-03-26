@@ -40,8 +40,11 @@ export interface ExamSubmission {
     answers?: Record<string, number>;
 }
 
-// Use relative URL so it works on any domain (Vercel, local dev proxy, etc.)
-export const API_BASE_URL = '';
+// On localhost, use relative URLs (Vite proxy handles them).
+// On any other domain (e.g. Hostinger), fetch from the Vercel backend directly.
+const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+export const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
 
 class ExamDataService {
     public readonly BUNDLE_PRICE = 2000;
@@ -49,7 +52,7 @@ class ExamDataService {
 
     async getMockTests(activeOnly: boolean = true): Promise<MockTest[]> {
         try {
-            const response = await fetch(`/api/mock-tests`, {
+            const response = await fetch(`${API_BASE_URL}/api/mock-tests`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ activeOnly })
@@ -72,7 +75,7 @@ class ExamDataService {
 
     async getMockTestById(id: string | number): Promise<MockTest | null> {
         try {
-            const response = await fetch(`/api/mock-questions`, {
+            const response = await fetch(`${API_BASE_URL}/api/mock-questions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ test_id: id })
@@ -109,7 +112,7 @@ class ExamDataService {
     async getUserPurchases(userId: string): Promise<UserPurchase[]> {
         if (!userId) return [];
         try {
-            const response = await fetch(`/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'get-user-purchases', payload: { userId } })
@@ -139,7 +142,7 @@ class ExamDataService {
     }
 
     hasBundleAccess(purchases: UserPurchase[]): boolean {
-        return purchases.some(p => p.mockTestId === this.BUNDLE_ACCESS_ID && p.status === 'active');
+        return purchases.some(p => Number(p.mockTestId) === Number(this.BUNDLE_ACCESS_ID) && p.status === 'active');
     }
 
     // --- Admin Operations ---
@@ -168,7 +171,7 @@ class ExamDataService {
 
     async saveMockTest(test: Partial<MockTest>): Promise<MockTest> {
         try {
-            const response = await fetch(`/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'save-mock-test', payload: test })
@@ -186,7 +189,7 @@ class ExamDataService {
 
     async saveMockQuestion(question: Partial<MockQuestion>): Promise<MockQuestion> {
         try {
-            const response = await fetch(`/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'save-mock-question', payload: question })
@@ -204,7 +207,7 @@ class ExamDataService {
 
     async deleteMockTest(id: number | string): Promise<void> {
         try {
-            const response = await fetch(`/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'delete-mock-test', payload: { id } })
@@ -221,7 +224,7 @@ class ExamDataService {
 
     async deleteMockQuestion(id: number | string): Promise<void> {
         try {
-            const response = await fetch(`/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'delete-mock-question', payload: { id } })

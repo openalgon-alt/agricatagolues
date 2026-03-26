@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { MockTest, MockQuestion, examDataService, UserPurchase } from "@/services/examDataService";
+import { MockTest, MockQuestion, examDataService, UserPurchase, API_BASE_URL } from "@/services/examDataService";
 import { QuestionCard } from "@/components/exam/QuestionCard";
 import { ZoomableImage } from "@/components/exam/ZoomableImage";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { ExamLanding } from "@/components/exam/ExamLanding";
 import { ExamDashboard } from "@/components/exam/ExamDashboard";
 import { ExamPurchaseView } from "@/components/exam/ExamPurchaseView";
 import { PremiumTestsList } from "@/components/exam/PremiumTestsList";
+import { UserDetailsModal } from "@/components/exam/UserDetailsModal";
 import { useExamAuth } from "@/context/ExamAuthContext";
 import mainLogoImg from "@/assets/main-logo.png";
 
@@ -25,13 +26,14 @@ export default function ExamPage() {
     const [purchases, setPurchases] = useState<UserPurchase[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
     
-    const { examUser: user, isExamAuthenticated: isAuthenticated, isExamLoading: isAuthLoading, examLogout: logout } = useExamAuth();
+    const { examUser: user, isExamAuthenticated: isAuthenticated, isExamLoading: isAuthLoading, examLogout: logout, updateUserDisplayName } = useExamAuth();
     
     const [userDetails, setUserDetails] = useState<any>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
     const [showLanding, setShowLanding] = useState(true);
     const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+    const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -50,22 +52,19 @@ export default function ExamPage() {
             if (user) {
                 mapSessionToUser(user);
                 setShowLanding(false);
-                setIsAuthOpen(false); // Close modal if open
+                setIsAuthOpen(false);
             } else {
                 setUserDetails(null);
-                // Only show landing if we aren't already there? 
-                // Actually, if no user, we should show landing.
-                // But we check searchParams first.
-                 const shouldOpenLogin = searchParams.get('login') === 'true';
-                 if (shouldOpenLogin) {
+                const shouldOpenLogin = searchParams.get('login') === 'true';
+                if (shouldOpenLogin) {
                     setIsAuthOpen(true);
                     setSearchParams(params => {
                         params.delete('login');
                         return params;
                     });
-                 } else {
-                     setShowLanding(true);
-                 }
+                } else {
+                    setShowLanding(true);
+                }
             }
         }
     }, [user, isAuthLoading, searchParams]);
@@ -94,27 +93,117 @@ export default function ExamPage() {
         };
     }, []);
 
-    const mapSessionToUser = (user: any) => {
-        const meta = user.user_metadata || {};
-        const userData = {
-            id: user.id,
-            email: user.email,
-            name: meta.full_name || user.email?.split('@')[0],
-            phone: meta.phone || "",
-            college: meta.college || ""
+    const mapSessionToUser = async (firebaseUser: any) => {
+        const baseData = {
+            id: firebaseUser.uid || firebaseUser.id,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "",
+            phone: "",
+            mobile: "",
+            college: "",
+            district: "",
+            guardianName: "",
+            guardianProfession: "",
+            guardianContact: "",
         };
-        setUserDetails(userData);
+        setUserDetails(baseData);
 
-        // Check for completeness
-        if (!userData.phone || !userData.college || !userData.name) {
-            setIsProfileIncomplete(true);
-        } else {
-            setIsProfileIncomplete(false);
+        // Fetch saved profile from the database
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/save-profile?firebase_uid=${encodeURIComponent(baseData.id)}`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.profile) {
+                    const p = json.profile;
+                    const merged = {
+                        ...baseData,
+                        name: p.name || baseData.name,
+                        phone: p.mobile || "",
+                        mobile: p.mobile || "",
+                        college: p.college || "",
+                        district: p.district || "",
+                        guardianName: p.guardian_name || "",
+                        guardianProfession: p.guardian_profession || "",
+                        guardianContact: p.guardian_contact || "",
+                    };
+                    setUserDetails(merged);
+                    // Profile complete if all essential fields are filled
+                    const isComplete = !!(merged.mobile && merged.college && merged.district && merged.guardianName);
+                    setIsProfileIncomplete(!isComplete);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not fetch saved profile:", e);
         }
+
+        // No saved profile — mark incomplete so modal opens
+        setIsProfileIncomplete(true);
     };
 
     const handleProfileComplete = (user: any) => {
         mapSessionToUser(user); // Re-map to update state and clear modal
+    };
+
+    const handleSignupSuccess = () => {
+        setIsAuthOpen(false);
+        setShowLanding(false);
+        setShowUserDetailsModal(true);
+    };
+
+    const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
+        // 1. Persist display name to Firebase
+        try {
+            await updateUserDisplayName(data.name);
+        } catch (e) {
+            console.warn("Could not update Firebase display name", e);
+        }
+
+        // 2. Save profile to Supabase via API
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/save-profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firebase_uid: user?.uid || userDetails?.id,
+                    name: data.name,
+                    mobile: data.mobile,
+                    email: data.email || userDetails?.email,
+                    college: data.college,
+                    district: data.district,
+                    guardian_name: data.guardianName,
+                    guardian_profession: data.guardianProfession,
+                    guardian_contact: data.guardianContact,
+                })
+            });
+            const json = await res.json();
+            if (!res.ok) {
+                console.error('Profile save failed:', json.error);
+                toast.error('Failed to save profile. Please try again.');
+                return; // Don't proceed if save failed
+            }
+            toast.success('Profile created successfully!');
+        } catch (e) {
+            console.error('Network error saving profile:', e);
+            toast.error('Network error. Please check your connection.');
+            return;
+        }
+
+        // 3. Update local userDetails state
+        setUserDetails((prev: any) => ({
+            ...prev,
+            name: data.name,
+            phone: data.mobile,
+            mobile: data.mobile,
+            email: data.email || prev?.email,
+            college: data.college,
+            district: data.district,
+            guardianName: data.guardianName,
+            guardianProfession: data.guardianProfession,
+            guardianContact: data.guardianContact,
+        }));
+        setIsProfileIncomplete(false);
+        setShowUserDetailsModal(false);
     };
 
     const handleStartFromLanding = () => {
@@ -138,8 +227,18 @@ export default function ExamPage() {
 
 
     useEffect(() => {
-        if (userDetails?.id) {
-            examDataService.getUserPurchases(userDetails.id).then(setPurchases);
+        if (userDetails?.id || userDetails?.email) {
+            Promise.all([
+                userDetails.id ? examDataService.getUserPurchases(userDetails.id) : Promise.resolve([]),
+                userDetails.email ? examDataService.getUserPurchases(userDetails.email) : Promise.resolve([])
+            ]).then(([p1, p2]) => {
+                const map = new Map();
+                p1.forEach(p => map.set(p.mockTestId, p));
+                p2.forEach(p => map.set(p.mockTestId, p));
+                const finalPurchases = Array.from(map.values());
+                setPurchases(finalPurchases);
+            });
+
             // Fetch submissions using email as the key (as per current DB schema)
             if (userDetails.email) {
                 examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
@@ -237,10 +336,11 @@ export default function ExamPage() {
             return;
         }
 
-        // if (isProfileIncomplete) { // Commented out as per instruction
-        //     toast.warning("Please complete your profile to continue.");
-        //     return;
-        // }
+        if (isProfileIncomplete) {
+            toast.warning("Please complete your profile before starting an exam.");
+            setShowUserDetailsModal(true);
+            return;
+        }
 
         // RESET STATE IMMEDIATELY to prevent crosstalk between tests
         setQuestions([]); 
@@ -326,7 +426,7 @@ export default function ExamPage() {
         } catch (e) { console.warn("Fullscreen error", e); }
 
         try {
-             const response = await fetch(`/api/index`, {
+             const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -386,8 +486,17 @@ export default function ExamPage() {
     const [submissions, setSubmissions] = useState<any[]>([]);
 
     useEffect(() => {
-        if (userDetails?.id) {
-            examDataService.getUserPurchases(userDetails.id).then(setPurchases);
+        // Redundant fetch block, keeping in sync just in case
+        if (userDetails?.id || userDetails?.email) {
+            Promise.all([
+                userDetails.id ? examDataService.getUserPurchases(userDetails.id) : Promise.resolve([]),
+                userDetails.email ? examDataService.getUserPurchases(userDetails.email) : Promise.resolve([])
+            ]).then(([p1, p2]) => {
+                const map = new Map();
+                p1.forEach(p => map.set(p.mockTestId, p));
+                p2.forEach(p => map.set(p.mockTestId, p));
+                setPurchases(Array.from(map.values()));
+            });
             if (userDetails.email) {
                 examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
             }
@@ -412,7 +521,7 @@ export default function ExamPage() {
             // Save Result & Calculate Score via Backend
             if (submissionId) {
                 try {
-                     const response = await fetch(`/api/index`, {
+                     const response = await fetch(`${API_BASE_URL}/api/index`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -532,7 +641,13 @@ export default function ExamPage() {
                 <ExamAuthModal 
                     isOpen={isAuthOpen} 
                     onClose={() => setIsAuthOpen(false)} 
+                    onSignupSuccess={handleSignupSuccess}
                     initialMode={authMode} 
+                />
+                <UserDetailsModal
+                    isOpen={showUserDetailsModal}
+                    userEmail={userDetails?.email || user?.email || ""}
+                    onComplete={handleDetailsComplete}
                 />
                 <ExamLanding 
                     onStart={handleStartFromLanding} 
@@ -587,10 +702,15 @@ export default function ExamPage() {
                 <ExamAuthModal 
                     isOpen={isAuthOpen} 
                     onClose={() => setIsAuthOpen(false)} 
+                    onSignupSuccess={handleSignupSuccess}
                     initialMode={authMode} 
                 />
-                
-                {!isAuthOpen && (
+                <UserDetailsModal
+                    isOpen={showUserDetailsModal}
+                    userEmail={userDetails?.email || user?.email || ""}
+                    onComplete={handleDetailsComplete}
+                />
+                {!isAuthOpen && !showUserDetailsModal && (
                     <ExamDashboard 
                         userDetails={userDetails}
                         onLogout={handleLogout}
@@ -778,27 +898,16 @@ export default function ExamPage() {
                                             {isSkipped && <HelpCircle className="w-6 h-6 text-gray-400" />}
                                         </div>
                                         <div className="flex-1 space-y-3 min-w-0">
-                                            {/* The images are in agricatalogues.in/mock_images, there are 50 images, 1 to 50, extension as jpeg */}
-                                            {(() => {
-                                                // We need the index of the question in the test, not the ID necessarily. 
-                                                // Assuming questions array is in order 1 to 50
-                                                const qIndex = questions.indexOf(q) + 1;
-                                                if (qIndex > 0 && qIndex <= 50) {
-                                                    const imgUrl = `https://agricatalogues.in/mock_images/${qIndex}.jpeg`;
-                                                    
-                                                    return (
-                                                        <div className="flex flex-wrap gap-4 mb-4">
-                                                            <ZoomableImage
-                                                                src={imgUrl}
-                                                                alt={`Question ${qIndex} Image`}
-                                                                className="block"
-                                                                imageClassName="max-h-48 rounded border border-gray-200 object-contain w-auto bg-white"
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                                return null;
-                                            })()}
+                                            {q.image && (
+                                                <div className="flex flex-wrap gap-4 mb-4">
+                                                    <ZoomableImage
+                                                        src={q.image}
+                                                        alt="Question Image"
+                                                        className="block"
+                                                        imageClassName="max-h-48 rounded border border-gray-200 object-contain w-auto bg-white"
+                                                    />
+                                                </div>
+                                            )}
 
                                             <div className="flex justify-between items-start gap-4">
                                                 <h3 className="font-semibold text-lg text-gray-900 leading-snug">

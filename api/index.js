@@ -127,18 +127,21 @@ export default async function handler(req, res) {
         // ---- save-mock-question (admin) ----
         if (action === 'save-mock-question') {
             const { id, mockTestId, question, options, correctOptionIndex, marks, topic } = payload || {};
-            const imageUrl = payload.image || payload.imageUrl || payload.image_url;
+            const imageUrl = payload.image || payload.imageUrl || payload.image_url || null;
             
             if (id) {
                 const r = await client.query(
                     `UPDATE mock_questions SET question_text=$1, options=$2, correct_option_index=$3, image_url=$4, marks=$5, topic=$6 WHERE id=$7 RETURNING *`,
-                    [question, JSON.stringify(options), correctOptionIndex, imageUrl, marks ?? 1, topic, id]
+                    [question, JSON.stringify(options), correctOptionIndex, imageUrl, marks ?? 4, topic, parseInt(id)]
                 );
+                if (r.rows.length === 0) {
+                    return res.status(404).json({ error: `Question with id ${id} not found.` });
+                }
                 return res.status(200).json(r.rows[0]);
             } else {
                 const r = await client.query(
                     `INSERT INTO mock_questions (mock_test_id, question_text, options, correct_option_index, image_url, marks, topic) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-                    [mockTestId, question, JSON.stringify(options), correctOptionIndex, imageUrl, marks ?? 1, topic]
+                    [mockTestId, question, JSON.stringify(options), correctOptionIndex, imageUrl, marks ?? 4, topic]
                 );
                 return res.status(200).json(r.rows[0]);
             }

@@ -129,7 +129,7 @@ export default function UserAccess() {
                 body: JSON.stringify({
                     action: 'grant-access',
                     payload: {
-                        userId: foundUser.user_id,
+                        userId: foundUser.user_id || foundUser.email,
                         mockTestId: parseInt(selectedTestId),
                         amount: parseFloat(amount || "0"),
                         paymentMethod: paymentMethod
@@ -208,7 +208,9 @@ export default function UserAccess() {
                                     <div>
                                         <p className="font-semibold text-green-900">{foundUser.name || "No Name"}</p>
                                         <p className="text-sm text-green-700 flex items-center gap-1"><Mail className="w-3 h-3"/> {foundUser.email}</p>
-                                        <p className="text-xs text-green-600 font-mono mt-1">ID: {foundUser.user_id}</p>
+                                        <p className="text-xs text-green-600 font-mono mt-1">
+                                            ID: {foundUser.user_id || <span className="text-yellow-600 font-bold">MISSING (Email will be used as ID)</span>}
+                                        </p>
                                     </div>
                                 </div>
                             )}

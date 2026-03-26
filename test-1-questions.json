@@ -1,0 +1,702 @@
+[
+  {
+    "id": 1,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Mustard",
+      "Ragi",
+      "Proso millet",
+      "Kodo millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259035537_1.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 2,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Sorghum",
+      "Jowar",
+      "Bajra",
+      "Maize"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259039499_2.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 3,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Pumpkin seeds",
+      "Ash guard seeds",
+      "Ridge guard seeds",
+      "Sunflower seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259042035_3.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 4,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Cowpea",
+      "Toor dal / Pigeon pea",
+      "Horse gram",
+      "Soya bean"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259044379_4.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 5,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Moringa seeds",
+      "Drumstick seeds",
+      "Both a and b",
+      "None of the above"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259046798_5.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 6,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Jersy",
+      "Holstein Friesian",
+      "Brown Swiss",
+      "Guernsey"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259048935_6.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 7,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Bannur sheep",
+      "Rambouillet",
+      "Suffolk",
+      "Merino"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259051007_7.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 8,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Yorkshire",
+      "Hampshire",
+      "Berkshire",
+      "Chester white"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259053369_8.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 9,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Swarnadhara",
+      "Giriraja",
+      "Kadaknath",
+      "Aseel"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259055455_9.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 10,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Rohu",
+      "Common carp",
+      "Salmon",
+      "Catla"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259057826_10.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 11,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Ash guard",
+      "Ridge guard",
+      "Bottle guard",
+      "Cucumber"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259059989_11.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 12,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Parthenium",
+      "Potato",
+      "Chilly",
+      "Tomato"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259062247_12.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 13,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Mould board plough",
+      "Disc plough",
+      "Rotovator",
+      "Cultivator"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259064373_13.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 14,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Rotovator",
+      "Seed cum fertilizer machine",
+      "Leveller",
+      "Transplanting machine"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259066480_14.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 15,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Kurpi",
+      "Sickle",
+      "Secateur",
+      "Cutting plier"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259068654_15.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 16,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Urea",
+      "DAP (Diammonium phosphate)",
+      "MOP (Muriate of potash)",
+      "SSP (Single super phosphate)"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259070780_16.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 17,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Urea",
+      "DAP (Diammonium phosphate)",
+      "MOP (Muriate of potash)",
+      "SSP (Single super phosphate)"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259072855_17.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 18,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Urea",
+      "DAP (Diammonium phosphate)",
+      "MOP (Muriate of potash)",
+      "SSP (Single super phosphate)"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259075048_18.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 19,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Mulberry Silkworm larvae",
+      "Lac insect",
+      "Honey bee",
+      "Tasar silkworm larvae"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259077228_19.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 20,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Silkworm",
+      "Wasp",
+      "Ant",
+      "Honey bee"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259079424_20.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 21,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Wax",
+      "Lac",
+      "Gum",
+      "Rubber"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259081523_21.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 22,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Red gram",
+      "Dhaincha",
+      "Mustard",
+      "Sun hemp"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259083653_22.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 23,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Dhaincha",
+      "Sunn hemp",
+      "Gliricidia",
+      "Mustard"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259085810_23.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 24,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Algae",
+      "Bryophyllum",
+      "Fungi",
+      "Azolla"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259087986_24.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 25,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Bird of paradise flower",
+      "Bird",
+      "Insect",
+      "None of the above"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259090125_25.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 26,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Jasmine",
+      "Marigold",
+      "Suganda raja",
+      "Crossandra"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259092249_26.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 27,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Chrysanthemum",
+      "Marigold",
+      "Mexican sunflower",
+      "Gerbera"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259094368_27.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 28,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Coconut",
+      "Arecanut",
+      "Palm trees",
+      "Date palm"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259096505_28.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 29,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Cashew nut tree",
+      "Mango",
+      "Almond tree",
+      "Arecanut"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259098620_29.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 30,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Okra",
+      "Cluster been",
+      "Castor",
+      "Brinjal"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259100720_30.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 31,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Neem oil cake",
+      "Pongamia oil cake",
+      "Jatropa oil cake",
+      "Ground nut oil cake"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259102924_31.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 32,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Neem oil cake",
+      "Pongamia oil cake",
+      "Jatropa oil cake",
+      "Ground nut oil cake"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259105240_32.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 33,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Neem tree",
+      "Tea",
+      "Mahogany",
+      "Sandle wood"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259107368_33.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 34,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Neem tree",
+      "Teak",
+      "Mahogany",
+      "Sandle wood"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259109465_34.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 35,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Sprinkler irrigation",
+      "Flood irrigation",
+      "Ring basin irrigation",
+      "Drip irrigation"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259111677_35.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 36,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Sprinkler irrigation",
+      "Flood irrigation",
+      "Ring basin irrigation",
+      "Drip irrigation"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259113815_36.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 37,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Maize",
+      "Jowar",
+      "Sorghum",
+      "Bajra"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259115941_37.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 38,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Bengal dram",
+      "Chick pea",
+      "Toor dal",
+      "Both a and b"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259118082_38.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 39,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Red soil",
+      "Laterite soil",
+      "Black cotton soil",
+      "Alluvial soil"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259120275_39.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 40,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Ground nut",
+      "Soyabean",
+      "Chick pea",
+      "Cow pea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259122385_40.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 41,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Australorp",
+      "Rhode Island red",
+      "White leghorn",
+      "ISA brown"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259124496_41.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 42,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Beetle",
+      "Jamunapari",
+      "Sirohi",
+      "Jumma pari"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259126570_42.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 43,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Garlic",
+      "Radish",
+      "Onion",
+      "Carrot"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259128686_43.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 44,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Carrot",
+      "Carrot grass / parthenium / congress weed",
+      "Gharike",
+      "Jeku / cyprus weed"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259130945_44.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 45,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Coriander",
+      "Palak",
+      "Carrot",
+      "Parthenium"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259133061_45.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 46,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Cardamom",
+      "Ginger",
+      "Clove",
+      "Pepper"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259135159_46.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 47,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Cardamom",
+      "Ginger",
+      "Clove",
+      "Pepper"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259137566_47.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 48,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Feeder",
+      "Drinker",
+      "Both a and b",
+      "None of the above"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259139696_48.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 49,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Ant",
+      "Wasp",
+      "Termite",
+      "Cricket"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259141817_49.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 50,
+    "mock_test_id": 1,
+    "question_text": "Practical Question",
+    "options": [
+      "Strawberry",
+      "Blue berry",
+      "Cherry",
+      "Mulberry"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774259143900_50.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  }
+]

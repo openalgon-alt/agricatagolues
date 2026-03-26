@@ -1,0 +1,702 @@
+[
+  {
+    "id": 51,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Paddy grains",
+      "Rice",
+      "Jeera seeds",
+      "Wheat"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351264047_1.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 52,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Bajra",
+      "Jowar",
+      "Wheat",
+      "Barley"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351267647_2.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 53,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Bajra",
+      "Jowar",
+      "Wheat",
+      "Maize"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351269892_3.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 54,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Kodo millet",
+      "Foxtail millet",
+      "Little millet",
+      "Proso millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351271996_4.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 55,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Kodo millet",
+      "Foxtail millet",
+      "Little millet",
+      "Proso millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351274133_5.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 56,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Kodo millet",
+      "Foxtail millet",
+      "Little millet",
+      "Proso millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351276235_6.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 57,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Kodo millet",
+      "Foxtail millet",
+      "Little millet",
+      "Proso millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351278392_7.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 58,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Kodo millet",
+      "Foxtail millet",
+      "Little millet",
+      "Barnyard millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351280798_8.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 59,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Amaranth seeds",
+      "Foxtail millet",
+      "Little millet",
+      "Barnyard millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351282856_9.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 60,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Mustard",
+      "Ragi",
+      "Proso millet",
+      "Kodo millet"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351284931_10.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 61,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sorghum",
+      "Jowar",
+      "Bajra",
+      "Maize"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351287012_11.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 62,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sorghum",
+      "Ragi",
+      "Bajra",
+      "Maize"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351289171_12.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 63,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Bajra",
+      "Jowar",
+      "Wheat",
+      "Barley"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351291352_13.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 64,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sunflower seeds",
+      "Safflower seeds",
+      "Sesame seeds",
+      "Castor seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351293520_14.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 65,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sunflower seeds",
+      "Safflower seeds",
+      "Sesame seeds",
+      "Castor seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351295619_15.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 66,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sunflower seeds",
+      "Safflower seeds",
+      "Sesame seeds",
+      "Castor seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351297736_16.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 67,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sunflower seeds",
+      "Safflower seeds",
+      "Sesame seeds",
+      "Castor seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351299909_17.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 68,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Castor seeds",
+      "Neem seeds",
+      "Cotton seeds",
+      "Papaya seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351302009_18.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 69,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Castor seeds",
+      "Neem seeds",
+      "Cotton seeds",
+      "Jatropha seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351304069_19.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 70,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Castor seeds",
+      "Neem seeds",
+      "Cotton seeds",
+      "Jatropha seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351306349_20.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 71,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Castor seeds",
+      "Neem seeds",
+      "Pongamia seeds",
+      "Jatropha seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351308782_21.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 72,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Oil palm seeds",
+      "Castor seeds",
+      "Mustard",
+      "Pongamia seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351310942_22.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 73,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Ragi",
+      "Sun hemp",
+      "Gliricidia",
+      "Mustard"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351313069_23.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 74,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Groundnut/peanut seeds",
+      "Chickpea seeds",
+      "Sunflower seeds",
+      "Bengal gram seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351315220_24.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 75,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Soybean",
+      "Kidney bean",
+      "Pinto bean",
+      "Chickpeas"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351317322_25.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 76,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Soybean",
+      "Kidney bean",
+      "Pinto bean",
+      "Chickpeas"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351319858_26.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 77,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Soybean",
+      "Kidney bean",
+      "Pinto bean",
+      "Chickpeas"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351324326_27.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 78,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Soybean",
+      "Kidney bean",
+      "Pinto bean",
+      "Chickpeas"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351326531_28.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 79,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Black gram",
+      "Green gram",
+      "Cowpea",
+      "Pea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351328625_29.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 80,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Black gram",
+      "Green gram",
+      "Cowpea",
+      "Pea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351330718_30.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 81,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Black gram",
+      "Green gram",
+      "Cowpea",
+      "Pea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351332863_31.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 82,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Black gram",
+      "Green gram",
+      "Cowpea",
+      "Pea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351334981_32.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 83,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Black gram",
+      "Green gram",
+      "Cowpea",
+      "Horse gram"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351337149_33.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 84,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Soybean",
+      "Kidney bean",
+      "Pinto bean",
+      "Winged bean"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351339315_34.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 85,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Flax seeds",
+      "Niger seeds",
+      "Berseem seeds",
+      "Lentil seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351341663_35.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 86,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Flax seeds",
+      "Niger seeds",
+      "Berseem seeds",
+      "Lentil seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351343807_36.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 87,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Flax seeds",
+      "Niger seeds",
+      "Berseem seeds",
+      "Lentil seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351345924_37.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 88,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Flax seeds",
+      "Niger seeds",
+      "Berseem seeds",
+      "Lentil seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351348074_38.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 89,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sun hemp seeds",
+      "Lucerne seeds",
+      "Jute seeds",
+      "Linseed"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351350207_39.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 90,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sun hemp seeds",
+      "Lucerne seeds",
+      "Jute seeds",
+      "Linseed"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351352385_40.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 91,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sun hemp seeds",
+      "Lucerne seeds",
+      "Jute seeds",
+      "Linseed"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351354520_41.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 92,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Oat seeds",
+      "Wheat",
+      "Barely",
+      "Jeera seeds"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351356665_42.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 93,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Arecanut",
+      "Coconut",
+      "Beans",
+      "Pepper"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351358787_43.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 94,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Coriander seeds",
+      "Pepper",
+      "Chilly seeds",
+      "Clove"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351360933_44.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 95,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Coriander seeds",
+      "Pepper",
+      "Chilly seeds",
+      "Clove"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351363131_45.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 96,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Sesamum",
+      "Cowpea",
+      "Chia seeds",
+      "Pepper"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351365268_46.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 97,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Cardamom",
+      "Ginger",
+      "Clove",
+      "Pepper"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351367417_47.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 98,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Pea",
+      "Tur",
+      "Black chickpea",
+      "Kabul chickpea"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351369494_48.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 99,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Rajma",
+      "Red beans",
+      "Black beans",
+      "Black gram"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351371636_49.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  },
+  {
+    "id": 100,
+    "mock_test_id": 4,
+    "question_text": "Practical Question",
+    "options": [
+      "Red gram/ Tur",
+      "Cow pea",
+      "Green gram",
+      "Horse gram"
+    ],
+    "image_url": "https://tqssenyemstlqpionqyp.supabase.co/storage/v1/object/public/magazine-files/exam_images/1774351374198_50.jpeg",
+    "marks": 4,
+    "topic": "Practical Specimen"
+  }
+]

@@ -13,10 +13,11 @@ import mainLogoImg from "@/assets/main-logo.png";
 interface ExamAuthModalProps {
     isOpen: boolean;
     onClose?: () => void;
+    onSignupSuccess?: () => void;
     initialMode?: "signin" | "signup";
 }
 
-export function ExamAuthModal({ isOpen, onClose, initialMode = "signin" }: ExamAuthModalProps) {
+export function ExamAuthModal({ isOpen, onClose, onSignupSuccess, initialMode = "signin" }: ExamAuthModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [mode, setMode] = useState<"signin" | "signup">(initialMode);
     
@@ -38,8 +39,14 @@ export function ExamAuthModal({ isOpen, onClose, initialMode = "signin" }: ExamA
         try {
             const result = await examGoogleLogin();
             if (result.success) {
-                toast.success("Signed in with Google successfully!");
-                if (onClose) onClose();
+                if (result.isNewUser && onSignupSuccess) {
+                    toast.success("Account created! Please complete your profile.");
+                    if (onClose) onClose();
+                    onSignupSuccess();
+                } else {
+                    toast.success("Signed in with Google successfully!");
+                    if (onClose) onClose();
+                }
             } else {
                 toast.error(result.error || "Google Login failed.");
             }
@@ -55,14 +62,23 @@ export function ExamAuthModal({ isOpen, onClose, initialMode = "signin" }: ExamA
         e.preventDefault();
         setIsLoading(true);
         try {
-            const method = mode === "signin" ? examLogin : examSignup;
-            const result = await method(email, password);
-
-            if (result.success) {
-                toast.success(mode === "signin" ? "Signed in successfully!" : "Account created successfully!");
-                if (onClose) onClose();
+            if (mode === "signup") {
+                const result = await examSignup(email, password);
+                if (result.success) {
+                    toast.success("Account created! Please complete your profile.");
+                    if (onClose) onClose();
+                    if (onSignupSuccess) onSignupSuccess();
+                } else {
+                    toast.error(result.error || "Signup Failed");
+                }
             } else {
-                toast.error(result.error || "Authentication Failed");
+                const result = await examLogin(email, password);
+                if (result.success) {
+                    toast.success("Signed in successfully!");
+                    if (onClose) onClose();
+                } else {
+                    toast.error(result.error || "Authentication Failed");
+                }
             }
         } catch (error: any) {
              console.error(error);

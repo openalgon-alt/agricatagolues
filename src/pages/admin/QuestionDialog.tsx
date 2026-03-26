@@ -56,13 +56,16 @@ export default function QuestionDialog({ open, onOpenChange, mockTestId, questio
 
         setLoading(true);
         try {
-            await examDataService.saveMockQuestion(question as MockQuestion);
+            await examDataService.saveMockQuestion({
+                ...question,
+                correctOptionIndex: question.correctOptionIndex ?? 0
+            } as MockQuestion);
             toast.success(questionToEdit ? "Question updated" : "Question added");
             onSave();
             onOpenChange(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to save question");
+            toast.error(`Save failed: ${error?.message || 'Unknown error'}`);
         } finally {
             setLoading(false);
         }
@@ -129,7 +132,8 @@ export default function QuestionDialog({ open, onOpenChange, mockTestId, questio
                                         setLoading(true);
                                         toast.loading("Uploading image...", { id: "upload-toast" });
                                         const url = await examDataService.uploadImage(file, 'question_images');
-                                        setQuestion({ ...question, image: url });
+                                        // Use functional update to avoid stale closure overwriting other fields
+                                        setQuestion(prev => ({ ...prev, image: url }));
                                         toast.success("Image uploaded!");
                                     } catch (error) {
                                         toast.error("Failed to upload image");

@@ -44,33 +44,24 @@ export function QuestionCard({ question, selectedOption, onSelect, currentQuesti
             </CardHeader>
             <CardContent className="flex-1 p-4 md:p-8 overflow-y-auto">
                 <div className="space-y-6 md:space-y-8">
-                    {/* The images are in agricatalogues.in/mock_images, there are 50 images, 1 to 50, extension as jpeg */}
-                    {(() => {
-                        const qIndex = currentQuestionIndex + 1;
-                        if (qIndex > 0 && qIndex <= 50) {
-                            const imgUrl = `https://agricatalogues.in/mock_images/${qIndex}.jpeg`;
-                            
-                            return (
-                                <div className="flex flex-wrap gap-4 mb-4 justify-center">
-                                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex flex-col items-center p-2">
-                                         <div className="relative w-full flex justify-center">
-                                            <ZoomableImage
-                                                src={imgUrl}
-                                                alt={`Question ${qIndex} Image`}
-                                                className="block"
-                                                imageClassName="max-h-[250px] md:max-h-[300px] object-contain bg-white"
-                                            />
-                                        </div>
-                                        <span className="text-xs text-blue-600 font-medium mt-2 flex items-center gap-1 cursor-pointer hover:underline">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
-                                            Click image to zoom
-                                        </span>
-                                    </div>
+                    {question.image && (
+                        <div className="flex flex-wrap gap-4 mb-4 justify-center">
+                            <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex flex-col items-center p-2">
+                                 <div className="relative w-full flex justify-center">
+                                    <ZoomableImage
+                                        src={question.image}
+                                        alt={`Question Image`}
+                                        className="block"
+                                        imageClassName="max-h-[250px] md:max-h-[300px] object-contain bg-white"
+                                    />
                                 </div>
-                            );
-                        }
-                        return null;
-                    })()}
+                                <span className="text-xs text-blue-600 font-medium mt-2 flex items-center gap-1 cursor-pointer hover:underline">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+                                    Click image to zoom
+                                </span>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="text-lg md:text-xl font-semibold text-gray-800 leading-relaxed max-w-4xl">
                         {question.question}

@@ -8,7 +8,7 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-[85vh] flex flex-col">
       {/* Mock Test Notice Scrolling Banner - Dark Green */}
-      <Link to="/exam" className="block bg-forest text-white py-2 overflow-hidden relative z-40 w-full shrink-0 shadow-md border-b border-forest-light/30 hover:bg-forest/90 transition-colors cursor-pointer group">
+      <a href="/exam" target="_blank" rel="noopener noreferrer" className="block bg-forest text-white py-2 overflow-hidden relative z-40 w-full shrink-0 shadow-md border-b border-forest-light/30 hover:bg-forest/90 transition-colors cursor-pointer group">
         <div className="whitespace-nowrap animate-marquee flex items-center h-full">
             <span className="font-bold text-sm md:text-base mr-10 inline-flex items-center gap-2">
                 <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
@@ -32,7 +32,7 @@ export const HeroSection = () => {
                 </span>
             </span>
         </div>
-      </Link>
+      </a>
 
       {/* Background Image Container */}
       <div className="absolute inset-0 top-10">

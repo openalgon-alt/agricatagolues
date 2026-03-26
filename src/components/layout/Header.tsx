@@ -7,15 +7,16 @@ import { dataService, SearchResult } from '@/services/dataService';
 import mainLogo from '@/assets/main-logo.png';
 
 const navItems = [
-  { name: 'Home', path: '/' },
-  { name: 'Editorial Board', path: '/editorial-board' },
-  { name: 'Guidelines', path: '/guidelines' },
-  { name: 'Current Issue', path: '/current-issue' },
-  { name: 'Archives', path: '/archives' },
-  { name: 'Publish with Us', path: '/publish-with-us' },
-  { name: 'Shop', path: '/shop' },
-  { name: 'Membership', path: '/membership' },
-  { name: 'Contact', path: '/contact' },
+  { name: 'Home', path: '/', newTab: false },
+  { name: 'Editorial Board', path: '/editorial-board', newTab: false },
+  { name: 'Guidelines', path: '/guidelines', newTab: false },
+  { name: 'Current Issue', path: '/current-issue', newTab: false },
+  { name: 'Archives', path: '/archives', newTab: false },
+  { name: 'Publish with Us', path: '/publish-with-us', newTab: false },
+  { name: 'Mock Tests', path: '/exam', newTab: true },
+  { name: 'Shop', path: '/shop', newTab: false },
+  { name: 'Membership', path: '/membership', newTab: false },
+  { name: 'Contact', path: '/contact', newTab: false },
 ];
 
 export const Header = () => {
@@ -102,18 +103,30 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${location.pathname === item.path
-                  ? 'text-primary bg-muted'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.newTab ? (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${location.pathname === item.path
+                    ? 'text-primary bg-muted'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
           </div>
 
           {/* Search Bar */}
@@ -199,19 +212,32 @@ export const Header = () => {
             >
               <div className="py-4 space-y-1 border-t border-border">
                 {/* Search removed from inside menu as it's now accessible via icon in header */}
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
-                    className={`block px-4 py-4 text-lg font-medium rounded-md transition-colors ${location.pathname === item.path
-                      ? 'text-primary bg-muted'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                      }`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                {navItems.map((item) =>
+                  item.newTab ? (
+                    <a
+                      key={item.path}
+                      href={item.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-4 text-lg font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className={`block px-4 py-4 text-lg font-medium rounded-md transition-colors ${location.pathname === item.path
+                        ? 'text-primary bg-muted'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        }`}
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                )}
               </div>
             </motion.div>
           )}
