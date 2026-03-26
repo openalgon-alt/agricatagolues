@@ -699,6 +699,7 @@ export default function ExamPage() {
              <ExamDashboard 
                  userDetails={userDetails}
                  onLogout={handleLogout}
+                 onEditProfile={() => setShowUserDetailsModal(true)}
                  activeTests={activeTests}
                  purchases={purchases}
                  onSelectTest={handleSelectTest}
@@ -1156,8 +1157,18 @@ export default function ExamPage() {
             <UserDetailsModal
                 isOpen={showUserDetailsModal}
                 userEmail={userDetails?.email || user?.email || ""}
+                initialData={!isProfileIncomplete && userDetails ? {
+                    name: userDetails.name || "",
+                    mobile: userDetails.mobile || "",
+                    email: userDetails.email || "",
+                    college: userDetails.college || "",
+                    district: userDetails.district || "",
+                    guardianName: userDetails.guardianName || "",
+                    guardianProfession: userDetails.guardianProfession || "",
+                    guardianContact: userDetails.guardianContact || "",
+                } : undefined}
                 onComplete={handleDetailsComplete}
-                onCancel={handleLogoutFromModal}
+                onCancel={isProfileIncomplete ? handleLogoutFromModal : () => setShowUserDetailsModal(false)}
             />
             {renderContent()}
         </>

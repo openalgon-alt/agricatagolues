@@ -1,8 +1,8 @@
 // Import Trophy/TrendingUp for stats
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, History, BarChart3, Layers, ChevronLeft } from "lucide-react";
+import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, History, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +23,7 @@ import mainLogoImg from "@/assets/main-logo.png";
 interface ExamDashboardProps {
     userDetails: any;
     onLogout: () => void;
+    onEditProfile?: () => void;
     activeTests: MockTest[];
     purchases: UserPurchase[];
     submissions?: ExamSubmission[];
@@ -34,7 +35,8 @@ interface ExamDashboardProps {
 
 export function ExamDashboard({ 
     userDetails, 
-    onLogout, 
+    onLogout,
+    onEditProfile,
     activeTests = [], 
     purchases = [], 
     submissions = [],
@@ -43,7 +45,20 @@ export function ExamDashboard({
     onOpenPremium,
     userId
 }: ExamDashboardProps) {
+    const [profileOpen, setProfileOpen] = useState(false);
+    const profileRef = useRef<HTMLDivElement>(null);
     const hasBundleAccess = examDataService.hasBundleAccess(purchases);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+                setProfileOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     
     const freeTests = activeTests.filter(t => Number(t.price) === 0 && Number(t.id) !== -1);
     
@@ -81,41 +96,91 @@ export function ExamDashboard({
                          />
                     </div>
                     {userDetails && (
-                        <div className="flex items-center gap-4">
-                            <div className="text-right hidden sm:block">
-                                <div className="text-sm font-bold text-gray-900 leading-tight">
-                                    {userDetails.name}
+                        <div className="relative" ref={profileRef}>
+                            {/* Avatar Button */}
+                            <button
+                                onClick={() => setProfileOpen(!profileOpen)}
+                                className="flex items-center gap-2 rounded-full px-3 py-1.5 hover:bg-gray-100 transition-colors"
+                            >
+                                <div className="h-9 w-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                                    {userDetails.name?.charAt(0)?.toUpperCase() || '?'}
                                 </div>
-                                <div className="text-xs text-gray-500">
-                                    {userDetails.college || "Agriculture Student"}
+                                <div className="text-left hidden sm:block">
+                                    <div className="text-sm font-bold text-gray-900 leading-tight line-clamp-1 max-w-[120px]">
+                                        {userDetails.name}
+                                    </div>
+                                    <div className="text-xs text-gray-500 line-clamp-1 max-w-[120px]">
+                                        {userDetails.college || "Agriculture Student"}
+                                    </div>
                                 </div>
-                            </div>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-2 rounded-full px-4"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        <span className="hidden sm:inline">Logout</span>
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            You will need to sign in again to access your dashboard and exams.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={onLogout} className="bg-red-600 hover:bg-red-700 text-white">
-                                            Logout
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                            </button>
+
+                            {/* Dropdown */}
+                            {profileOpen && (
+                                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                                    {/* Profile Summary */}
+                                    <div className="p-4 bg-gradient-to-br from-green-50 to-white border-b border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-12 w-12 rounded-full bg-green-600 text-white flex items-center justify-center text-lg font-bold shrink-0">
+                                                {userDetails.name?.charAt(0)?.toUpperCase() || '?'}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="font-bold text-gray-900 truncate">{userDetails.name}</div>
+                                                <div className="text-xs text-gray-500 truncate">{userDetails.email}</div>
+                                                <div className="text-xs text-green-700 font-medium truncate">{userDetails.college || "Agriculture Student"}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Info Rows */}
+                                    <div className="px-4 py-3 space-y-1 border-b border-gray-100">
+                                        {userDetails.mobile && (
+                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Mobile:</span> {userDetails.mobile}</div>
+                                        )}
+                                        {userDetails.district && (
+                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">District:</span> {userDetails.district}</div>
+                                        )}
+                                        {userDetails.guardianName && (
+                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Guardian:</span> {userDetails.guardianName}</div>
+                                        )}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="p-2 space-y-1">
+                                        {onEditProfile && (
+                                            <button
+                                                onClick={() => { setProfileOpen(false); onEditProfile(); }}
+                                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-700 transition-colors text-left"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                                Edit Profile
+                                            </button>
+                                        )}
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors text-left">
+                                                    <LogOut className="w-4 h-4" />
+                                                    Logout
+                                                </button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        You will need to sign in again to access your dashboard and exams.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={onLogout} className="bg-red-600 hover:bg-red-700 text-white">
+                                                        Logout
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

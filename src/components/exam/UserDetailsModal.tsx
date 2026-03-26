@@ -25,11 +25,12 @@ export type ProfileFormData = z.infer<typeof formSchema>;
 interface UserDetailsModalProps {
     isOpen: boolean;
     userEmail?: string;
+    initialData?: Partial<ProfileFormData>;
     onComplete: (data: ProfileFormData) => void;
     onCancel?: () => void;
 }
 
-export function UserDetailsModal({ isOpen, userEmail, onComplete, onCancel }: UserDetailsModalProps) {
+export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, onCancel }: UserDetailsModalProps) {
     const form = useForm<ProfileFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -50,6 +51,22 @@ export function UserDetailsModal({ isOpen, userEmail, onComplete, onCancel }: Us
             form.setValue("email", userEmail);
         }
     }, [userEmail, form]);
+
+    // Pre-fill form with existing profile data when opened in edit mode
+    useEffect(() => {
+        if (isOpen && initialData) {
+            form.reset({
+                name: initialData.name || "",
+                mobile: initialData.mobile || "",
+                email: initialData.email || userEmail || "",
+                college: initialData.college || "",
+                district: initialData.district || "",
+                guardianName: initialData.guardianName || "",
+                guardianProfession: initialData.guardianProfession || "",
+                guardianContact: initialData.guardianContact || "",
+            });
+        }
+    }, [isOpen, initialData, userEmail]);
 
     function onSubmit(values: ProfileFormData) {
         onComplete(values);
@@ -300,7 +317,7 @@ export function UserDetailsModal({ isOpen, userEmail, onComplete, onCancel }: Us
                                         type="submit"
                                         className="w-full h-12 text-base bg-green-700 hover:bg-green-800 font-semibold shadow-sm text-white"
                                     >
-                                        Create Profile
+                                        {initialData ? 'Save Changes' : 'Create Profile'}
                                     </Button>
                                     {onCancel && (
                                         <Button
@@ -309,7 +326,7 @@ export function UserDetailsModal({ isOpen, userEmail, onComplete, onCancel }: Us
                                             onClick={onCancel}
                                             className="w-full h-12 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                                         >
-                                            Cancel & Logout
+                                            {initialData ? 'Close' : 'Cancel & Logout'}
                                         </Button>
                                     )}
                                 </div>
