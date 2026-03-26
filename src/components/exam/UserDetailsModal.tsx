@@ -26,9 +26,10 @@ interface UserDetailsModalProps {
     isOpen: boolean;
     userEmail?: string;
     onComplete: (data: ProfileFormData) => void;
+    onCancel?: () => void;
 }
 
-export function UserDetailsModal({ isOpen, userEmail, onComplete }: UserDetailsModalProps) {
+export function UserDetailsModal({ isOpen, userEmail, onComplete, onCancel }: UserDetailsModalProps) {
     const form = useForm<ProfileFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -294,12 +295,24 @@ export function UserDetailsModal({ isOpen, userEmail, onComplete }: UserDetailsM
                                     </div>
                                 </div>
 
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 text-base bg-green-700 hover:bg-green-800 font-semibold shadow-sm text-white mt-2"
-                                >
-                                    Create Profile
-                                </Button>
+                                <div className="flex flex-col gap-3 mt-8">
+                                    <Button
+                                        type="submit"
+                                        className="w-full h-12 text-base bg-green-700 hover:bg-green-800 font-semibold shadow-sm text-white"
+                                    >
+                                        Create Profile
+                                    </Button>
+                                    {onCancel && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={onCancel}
+                                            className="w-full h-12 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                                        >
+                                            Cancel & Logout
+                                        </Button>
+                                    )}
+                                </div>
 
                             </form>
                         </Form>

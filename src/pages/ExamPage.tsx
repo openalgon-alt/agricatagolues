@@ -149,6 +149,11 @@ export default function ExamPage() {
         mapSessionToUser(user); // Re-map to update state and clear modal
     };
 
+    const handleLogoutFromModal = async () => {
+        await handleLogout();
+        setShowUserDetailsModal(false);
+    };
+
     const handleSignupSuccess = () => {
         setIsAuthOpen(false);
         setShowLanding(false);
@@ -1152,6 +1157,7 @@ export default function ExamPage() {
                 isOpen={showUserDetailsModal}
                 userEmail={userDetails?.email || user?.email || ""}
                 onComplete={handleDetailsComplete}
+                onCancel={handleLogoutFromModal}
             />
             {renderContent()}
         </>
