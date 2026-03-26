@@ -34,6 +34,7 @@ import ExamSubmissions from "./pages/admin/ExamSubmissions";
 import ExamList from "./pages/admin/ExamList";
 import ExamEditor from "./pages/admin/ExamEditor";
 import UserAccess from "./pages/admin/UserAccess";
+import StudentList from "./pages/admin/StudentList";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="exams/:id" element={<ExamEditor />} />
               <Route path="exam-submissions" element={<ExamSubmissions />} />
               <Route path="user-access" element={<UserAccess />} />
+              <Route path="students" element={<StudentList />} />
             </Route>
 
               <Route path="*" element={<NotFound />} />

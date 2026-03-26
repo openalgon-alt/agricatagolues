@@ -37,6 +37,7 @@ export const AdminLayout = () => {
         { title: "Manage Exams", url: "/admin/exams", icon: GraduationCap },
         { title: "Exam Submissions", url: "/admin/exams/submissions", icon: GraduationCap },
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
+        { title: "Students", url: "/admin/students", icon: Users },
         // { title: "Settings", url: "/admin/settings", icon: Settings }, // Future
     ];
 
