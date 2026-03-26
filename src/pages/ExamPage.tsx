@@ -628,6 +628,8 @@ export default function ExamPage() {
 
     // --- RENDER MODES ---
 
+    const renderContent = () => {
+
     // -2. Auth Check Loading
     if (isAuthLoading) {
         return (
@@ -641,24 +643,11 @@ export default function ExamPage() {
     // -1. Landing Page
     if (showLanding) {
         return (
-            <>
-                <ExamAuthModal 
-                    isOpen={isAuthOpen} 
-                    onClose={() => setIsAuthOpen(false)} 
-                    onSignupSuccess={handleSignupSuccess}
-                    initialMode={authMode} 
-                />
-                <UserDetailsModal
-                    isOpen={showUserDetailsModal}
-                    userEmail={userDetails?.email || user?.email || ""}
-                    onComplete={handleDetailsComplete}
-                />
-                <ExamLanding 
-                    onStart={handleStartFromLanding} 
-                    onLogin={() => { setAuthMode("signin"); setIsAuthOpen(true); }}
-                    onSignup={() => { setAuthMode("signup"); setIsAuthOpen(true); }}
-                />
-            </>
+            <ExamLanding 
+                onStart={handleStartFromLanding} 
+                onLogin={() => { setAuthMode("signin"); setIsAuthOpen(true); }}
+                onSignup={() => { setAuthMode("signup"); setIsAuthOpen(true); }}
+            />
         );
     }
 
@@ -702,33 +691,18 @@ export default function ExamPage() {
     // 1. Test Selection Mode (Dashboard)
     if (!selectedTest) {
          return (
-             <>
-                <ExamAuthModal 
-                    isOpen={isAuthOpen} 
-                    onClose={() => setIsAuthOpen(false)} 
-                    onSignupSuccess={handleSignupSuccess}
-                    initialMode={authMode} 
-                />
-                <UserDetailsModal
-                    isOpen={showUserDetailsModal}
-                    userEmail={userDetails?.email || user?.email || ""}
-                    onComplete={handleDetailsComplete}
-                />
-                {!isAuthOpen && !showUserDetailsModal && (
-                    <ExamDashboard 
-                        userDetails={userDetails}
-                        onLogout={handleLogout}
-                        activeTests={activeTests}
-                        purchases={purchases}
-                        onSelectTest={handleSelectTest}
-                        onBuyBundle={handleBuyBundle}
-                        onOpenPremium={() => {
-                            setSearchParams({ view: 'premium' });
-                        }}
-                        userId={userDetails?.id}
-                    />
-                )}
-             </>
+             <ExamDashboard 
+                 userDetails={userDetails}
+                 onLogout={handleLogout}
+                 activeTests={activeTests}
+                 purchases={purchases}
+                 onSelectTest={handleSelectTest}
+                 onBuyBundle={handleBuyBundle}
+                 onOpenPremium={() => {
+                     setSearchParams({ view: 'premium' });
+                 }}
+                 userId={userDetails?.id}
+             />
          );
     }
 
@@ -1163,5 +1137,23 @@ export default function ExamPage() {
                 </div>
             </div>
         </div>
+    );
+    };
+
+    return (
+        <>
+            <ExamAuthModal 
+                isOpen={isAuthOpen} 
+                onClose={() => setIsAuthOpen(false)} 
+                onSignupSuccess={handleSignupSuccess}
+                initialMode={authMode} 
+            />
+            <UserDetailsModal
+                isOpen={showUserDetailsModal}
+                userEmail={userDetails?.email || user?.email || ""}
+                onComplete={handleDetailsComplete}
+            />
+            {renderContent()}
+        </>
     );
 }
