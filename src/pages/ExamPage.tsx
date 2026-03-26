@@ -131,7 +131,7 @@ export default function ExamPage() {
                     const isComplete = !!(merged.mobile && merged.college && merged.district && merged.guardianName);
                     setIsProfileIncomplete(!isComplete);
                     if (!isComplete) {
-                        setShowUserDetailsModal(true);
+                        setTimeout(() => setShowUserDetailsModal(true), 250);
                     }
                     return;
                 }
@@ -142,7 +142,7 @@ export default function ExamPage() {
 
         // No saved profile — mark incomplete so modal opens
         setIsProfileIncomplete(true);
-        setShowUserDetailsModal(true);
+        setTimeout(() => setShowUserDetailsModal(true), 250);
     };
 
     const handleProfileComplete = (user: any) => {
@@ -152,7 +152,7 @@ export default function ExamPage() {
     const handleSignupSuccess = () => {
         setIsAuthOpen(false);
         setShowLanding(false);
-        setShowUserDetailsModal(true);
+        setTimeout(() => setShowUserDetailsModal(true), 250);
     };
 
     const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
