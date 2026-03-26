@@ -130,6 +130,9 @@ export default function ExamPage() {
                     // Profile complete if all essential fields are filled
                     const isComplete = !!(merged.mobile && merged.college && merged.district && merged.guardianName);
                     setIsProfileIncomplete(!isComplete);
+                    if (!isComplete) {
+                        setShowUserDetailsModal(true);
+                    }
                     return;
                 }
             }
@@ -139,6 +142,7 @@ export default function ExamPage() {
 
         // No saved profile — mark incomplete so modal opens
         setIsProfileIncomplete(true);
+        setShowUserDetailsModal(true);
     };
 
     const handleProfileComplete = (user: any) => {
