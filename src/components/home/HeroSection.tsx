@@ -8,26 +8,33 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-[85vh] flex flex-col">
       {/* Mock Test Notice Scrolling Banner - Dark Green */}
-      <a href="/exam" target="_blank" rel="noopener noreferrer" className="block bg-forest text-white py-2 overflow-hidden relative z-40 w-full shrink-0 shadow-md border-b border-forest-light/30 hover:bg-forest/90 transition-colors cursor-pointer group">
+      <a href="/exam" target="_blank" rel="noopener noreferrer" className="block bg-forest text-white py-1.5 sm:py-2 overflow-hidden relative z-40 w-full shrink-0 shadow-md border-b border-forest-light/30 hover:bg-forest/90 transition-colors cursor-pointer group">
         <div className="whitespace-nowrap animate-marquee flex items-center h-full">
-            <span className="font-bold text-sm md:text-base mr-10 inline-flex items-center gap-2">
-                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+            <span className="font-bold text-xs sm:text-sm md:text-base mr-6 sm:mr-10 inline-flex items-center gap-1.5 sm:gap-2">
+                <BellRing className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-[bounce_2s_infinite] shrink-0" /> 
                 Karnataka state agriculture practical mock test - 2026 is Live! 
-                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                <span className="ml-1 sm:ml-2 bg-yellow-500 text-forest-light px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
                     Click Here
                 </span>
             </span>
-            <span className="font-bold text-sm md:text-base mr-10 inline-flex items-center gap-2" aria-hidden="true">
-                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+            <span className="font-bold text-xs sm:text-sm md:text-base mr-6 sm:mr-10 inline-flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+                <BellRing className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-[bounce_2s_infinite] shrink-0" /> 
                 Karnataka state agriculture practical mock test - 2026 is Live! 
-                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                <span className="ml-1 sm:ml-2 bg-yellow-500 text-forest-light px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
                     Click Here
                 </span>
             </span>
-             <span className="font-bold text-sm md:text-base inline-flex items-center gap-2" aria-hidden="true">
-                <BellRing className="w-4 h-4 text-yellow-500 animate-[bounce_2s_infinite]" /> 
+            <span className="font-bold text-xs sm:text-sm md:text-base mr-6 sm:mr-10 inline-flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+                <BellRing className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-[bounce_2s_infinite] shrink-0" /> 
                 Karnataka state agriculture practical mock test - 2026 is Live! 
-                <span className="ml-2 bg-yellow-500 text-forest-light px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                <span className="ml-1 sm:ml-2 bg-yellow-500 text-forest-light px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
+                    Click Here
+                </span>
+            </span>
+            <span className="font-bold text-xs sm:text-sm md:text-base mr-6 sm:mr-10 inline-flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+                <BellRing className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-[bounce_2s_infinite] shrink-0" /> 
+                Karnataka state agriculture practical mock test - 2026 is Live! 
+                <span className="ml-1 sm:ml-2 bg-yellow-500 text-forest-light px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider group-hover:bg-yellow-400 transition-colors inline-block animate-[pulse_1.5s_infinite]">
                     Click Here
                 </span>
             </span>
