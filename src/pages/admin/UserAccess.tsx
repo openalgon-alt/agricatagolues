@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { examDataService, MockTest } from "@/services/examDataService";
-import { Search, ShieldAlert, UserCheck, ShieldCheck, Mail, Database } from "lucide-react";
+import { examDataService, MockTest, API_BASE_URL } from "@/services/examDataService";
+import { Search, ShieldAlert, UserCheck, ShieldCheck, Mail, Database, AlertTriangle } from "lucide-react";
 
 interface AccessRecord {
     id: number;
@@ -26,7 +26,7 @@ interface AccessRecord {
 
 export default function UserAccess() {
     const [email, setEmail] = useState("");
-    const [foundUser, setFoundUser] = useState<{ user_id: string; name: string; email: string; phone: string } | null>(null);
+    const [foundUser, setFoundUser] = useState<{ user_id: string; name: string | null; email: string | null; phone: string | null; _synthetic?: boolean } | null>(null);
     const [loadingLookup, setLoadingLookup] = useState(false);
     
     const [tests, setTests] = useState<MockTest[]>([]);
@@ -37,6 +37,7 @@ export default function UserAccess() {
 
     const [accessList, setAccessList] = useState<AccessRecord[]>([]);
     const [loadingList, setLoadingList] = useState(true);
+    const [listError, setListError] = useState<string | null>(null);
 
     useEffect(() => {
         loadTests();
@@ -60,21 +61,29 @@ export default function UserAccess() {
 
     const loadAccessList = async () => {
         setLoadingList(true);
+        setListError(null);
         try {
-            const response = await fetch('/api/index', {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'list-user-access' })
             });
-            if (!response.ok) throw new Error("Failed to load list");
             const data = await response.json();
-            
+            if (!response.ok) {
+                const errMsg = data.error || `Server error ${response.status}`;
+                setListError(errMsg);
+                toast.error(`Failed to load list: ${errMsg}`);
+                setAccessList([]);
+                return;
+            }
             // Ensure data is an array
             const arr = Array.isArray(data) ? data : (data.data || []);
             setAccessList(Array.isArray(arr) ? arr : []);
-        } catch (error) {
-            toast.error("Failed to load access list");
-            setAccessList([]); // Fallback to avoid crash
+        } catch (error: any) {
+            const errMsg = error?.message || 'Network error';
+            setListError(errMsg);
+            toast.error(`Failed to load access list: ${errMsg}`);
+            setAccessList([]);
         } finally {
             setLoadingList(false);
         }
@@ -87,7 +96,7 @@ export default function UserAccess() {
         setLoadingLookup(true);
         setFoundUser(null);
         try {
-            const response = await fetch('/api/index', {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'lookup-user-by-email', payload: { email: email.trim() } })
@@ -99,7 +108,11 @@ export default function UserAccess() {
                 return;
             }
             setFoundUser(data);
-            toast.success("User found!");
+            if (data._synthetic) {
+                toast.warning("User not found in database. Access will be granted to this ID directly — it will apply when they sign in.");
+            } else {
+                toast.success("User found!");
+            }
         } catch (error) {
             toast.error("Error looking up user");
         } finally {
@@ -123,13 +136,13 @@ export default function UserAccess() {
 
         setGranting(true);
         try {
-            const response = await fetch('/api/index', {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'grant-access',
                     payload: {
-                        userId: foundUser.user_id || foundUser.email,
+                        userId: foundUser.user_id || foundUser.email || email.trim(),
                         mockTestId: parseInt(selectedTestId),
                         amount: parseFloat(amount || "0"),
                         paymentMethod: paymentMethod
@@ -154,7 +167,7 @@ export default function UserAccess() {
         if (!window.confirm("Are you sure you want to revoke access?")) return;
         
         try {
-            const response = await fetch('/api/index', {
+            const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -191,8 +204,7 @@ export default function UserAccess() {
                         <CardContent>
                             <form onSubmit={handleLookup} className="flex gap-2">
                                 <Input 
-                                    placeholder="Enter user registered email" 
-                                    type="email" 
+                                    placeholder="Enter email or Firebase UID" 
                                     required 
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -203,14 +215,23 @@ export default function UserAccess() {
                             </form>
 
                             {foundUser && (
-                                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md flex items-start gap-3">
-                                    <UserCheck className="w-5 h-5 text-green-600 mt-0.5" />
+                                <div className={`mt-4 p-4 border rounded-md flex items-start gap-3 ${foundUser._synthetic ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
+                                    {foundUser._synthetic
+                                        ? <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
+                                        : <UserCheck className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />}
                                     <div>
-                                        <p className="font-semibold text-green-900">{foundUser.name || "No Name"}</p>
-                                        <p className="text-sm text-green-700 flex items-center gap-1"><Mail className="w-3 h-3"/> {foundUser.email}</p>
-                                        <p className="text-xs text-green-600 font-mono mt-1">
-                                            ID: {foundUser.user_id || <span className="text-yellow-600 font-bold">MISSING (Email will be used as ID)</span>}
+                                        <p className={`font-semibold ${foundUser._synthetic ? 'text-yellow-900' : 'text-green-900'}`}>
+                                            {foundUser.name || <span className="italic text-gray-500">Name not on file</span>}
                                         </p>
+                                        {foundUser.email && (
+                                            <p className="text-sm text-gray-700 flex items-center gap-1"><Mail className="w-3 h-3"/>{foundUser.email}</p>
+                                        )}
+                                        <p className="text-xs font-mono mt-1 text-gray-600">
+                                            ID: {foundUser.user_id}
+                                        </p>
+                                        {foundUser._synthetic && (
+                                            <p className="text-xs text-yellow-700 mt-1 font-medium">⚠ Not yet in database. Access will be saved and will apply when they log in.</p>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -286,6 +307,15 @@ export default function UserAccess() {
                         <CardContent>
                             {loadingList ? (
                                 <div className="text-center py-8 text-gray-500">Loading access list...</div>
+                            ) : listError ? (
+                                <div className="text-center py-8 space-y-2">
+                                    <p className="text-red-600 font-medium text-sm">⚠ Error loading list</p>
+                                    <p className="text-xs text-gray-500 font-mono break-all px-2">{listError}</p>
+                                    <button 
+                                        onClick={loadAccessList}
+                                        className="text-xs underline text-blue-600 hover:text-blue-800"
+                                    >Retry</button>
+                                </div>
                             ) : accessList.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500">No manual access records found.</div>
                             ) : (

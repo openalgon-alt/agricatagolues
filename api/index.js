@@ -278,31 +278,60 @@ export default async function handler(req, res) {
                 );
             `);
 
-            // Add email column if missing (for older tables)
+            // Add email column if missing (safe migration)
             try { await client.query(`ALTER TABLE user_purchases ADD COLUMN IF NOT EXISTS email TEXT`); } catch(e) {}
 
-            // Fetch purchases with user info from multiple sources:
-            // 1. email stored directly on the purchase (admin-granted by email)
-            // 2. user_profiles (users who have signed in)
-            // 3. exam_submissions (users who have taken tests)
-            const r = await client.query(`
-                SELECT 
-                    up.*,
-                    mt.title as test_title,
-                    COALESCE(
-                        up.email,
-                        (SELECT email FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
-                        (SELECT email FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1)
-                    ) as user_email,
-                    COALESCE(
-                        (SELECT name FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
-                        (SELECT name FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1),
-                        up.user_id
-                    ) as user_name
-                FROM user_purchases up
-                LEFT JOIN mock_tests mt ON up.mock_test_id = mt.id
-                ORDER BY up.purchased_at DESC
+            // Check if user_profiles table exists
+            const profilesExist = await client.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' AND table_name = 'user_profiles'
+                ) as exists
             `);
+            const hasProfiles = profilesExist.rows[0]?.exists === true;
+
+            let r;
+            if (hasProfiles) {
+                r = await client.query(`
+                    SELECT 
+                        up.*,
+                        mt.title as test_title,
+                        COALESCE(
+                            up.email,
+                            (SELECT email FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
+                            (SELECT email FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1)
+                        ) as user_email,
+                        COALESCE(
+                            (SELECT name FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
+                            (SELECT name FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1),
+                            up.user_id
+                        ) as user_name
+                    FROM user_purchases up
+                    LEFT JOIN mock_tests mt ON up.mock_test_id = mt.id
+                    ORDER BY up.purchased_at DESC
+                `);
+            } else {
+                // Safe fallback: no user_profiles table
+                r = await client.query(`
+                    SELECT 
+                        up.*,
+                        mt.title as test_title,
+                        COALESCE(
+                            up.email,
+                            (SELECT email FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1)
+                        ) as user_email,
+                        COALESCE(
+                            (SELECT name FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1),
+                            up.email,
+                            up.user_id
+                        ) as user_name
+                    FROM user_purchases up
+                    LEFT JOIN mock_tests mt ON up.mock_test_id = mt.id
+                    ORDER BY up.purchased_at DESC
+                `);
+            }
+
+            console.log(`[list-user-access] Found ${r.rows.length} records (hasProfiles=${hasProfiles})`);
             return res.status(200).json(r.rows);
         }
 
