@@ -175,71 +175,130 @@ export default async function handler(req, res) {
             const { email } = payload || {};
             if (!email) return res.status(400).json({ error: 'Missing email' });
 
+            const trimmed = email.trim();
+
+            // 1. Try user_profiles table first (most up-to-date, populated on signup)
+            try {
+                const profileResult = await client.query(
+                    `SELECT firebase_uid AS user_id, name, email, mobile AS phone FROM user_profiles WHERE email = $1 OR firebase_uid = $1 LIMIT 1`,
+                    [trimmed]
+                );
+                if (profileResult.rows.length > 0) {
+                    return res.status(200).json(profileResult.rows[0]);
+                }
+            } catch (e) { /* user_profiles table may not exist, ignore */ }
+
+            // 2. Fallback: search exam_submissions (users who have taken at least one test)
             const r = await client.query(
-                `SELECT user_id, name, email, phone FROM exam_submissions WHERE email = $1 ORDER BY submitted_at DESC LIMIT 1`,
-                [email]
+                `SELECT user_id, name, email, phone FROM exam_submissions WHERE email = $1 OR user_id = $1 ORDER BY submitted_at DESC LIMIT 1`,
+                [trimmed]
             );
             if (r.rows.length === 0) {
-                return res.status(404).json({ error: 'User not found in exam records' });
+                // 3. Last resort: the input might be a raw Firebase UID or email — create a synthetic record
+                // so admin can still grant access without the user having taken any test yet.
+                return res.status(200).json({
+                    user_id: trimmed,
+                    name: null,
+                    email: trimmed.includes('@') ? trimmed : null,
+                    phone: null,
+                    _synthetic: true  // flag for frontend to show a warning
+                });
             }
             return res.status(200).json(r.rows[0]);
         }
 
         if (action === 'grant-access') {
             const { userId, mockTestId, amount, paymentMethod } = payload || {};
-            if (!userId || !mockTestId || !paymentMethod) return res.status(400).json({ error: 'Missing required fields' });
+            if (!userId || mockTestId === undefined || mockTestId === null || !paymentMethod) {
+                return res.status(400).json({ error: `Missing required fields. Got: userId=${userId}, mockTestId=${mockTestId}, paymentMethod=${paymentMethod}` });
+            }
 
-            // Ensure table exists with our columns
+            const parsedTestId = parseInt(mockTestId);
+            if (isNaN(parsedTestId)) {
+                return res.status(400).json({ error: `Invalid mockTestId: ${mockTestId}` });
+            }
+
+            // Ensure table exists with all required columns
             await client.query(`
                 CREATE TABLE IF NOT EXISTS user_purchases (
                     id SERIAL PRIMARY KEY,
                     user_id TEXT NOT NULL,
                     mock_test_id INTEGER NOT NULL,
-                    amount NUMERIC NOT NULL,
+                    amount NUMERIC NOT NULL DEFAULT 0,
                     status TEXT NOT NULL DEFAULT 'active',
                     purchased_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     payment_method TEXT DEFAULT 'Online',
-                    granted_by_admin BOOLEAN DEFAULT false,
-                    UNIQUE (user_id, mock_test_id)
+                    granted_by_admin BOOLEAN DEFAULT false
                 );
             `);
 
-            // Check if column exists, add if not (for existing tables)
+            // Add columns/constraints if missing on older tables (ignore errors if already exist)
+            const migrations = [
+                `ALTER TABLE user_purchases ADD COLUMN IF NOT EXISTS payment_method TEXT DEFAULT 'Online'`,
+                `ALTER TABLE user_purchases ADD COLUMN IF NOT EXISTS granted_by_admin BOOLEAN DEFAULT false`,
+                `ALTER TABLE user_purchases ADD COLUMN IF NOT EXISTS email TEXT`,
+            ];
+            for (const sql of migrations) {
+                try { await client.query(sql); } catch (e) { /* ignore */ }
+            }
+
+            // Add unique constraint if missing
             try {
-                await client.query(`ALTER TABLE user_purchases ADD COLUMN payment_method TEXT DEFAULT 'Online'`);
-                await client.query(`ALTER TABLE user_purchases ADD COLUMN granted_by_admin BOOLEAN DEFAULT false`);
-                await client.query(`ALTER TABLE user_purchases ADD UNIQUE (user_id, mock_test_id)`);
-            } catch (e) { /* Ignore if already exists */ }
+                await client.query(`ALTER TABLE user_purchases ADD CONSTRAINT user_purchases_user_test_unique UNIQUE (user_id, mock_test_id)`);
+            } catch (e) { /* already exists, ignore */ }
+
+            // Store email separately so list can display it even if user hasn't done exam_submissions
+            const emailToStore = userId.includes('@') ? userId : null;
 
             const r = await client.query(`
-                INSERT INTO user_purchases (user_id, mock_test_id, amount, status, payment_method, granted_by_admin)
-                VALUES ($1, $2, $3, 'active', $4, true)
+                INSERT INTO user_purchases (user_id, mock_test_id, amount, status, payment_method, granted_by_admin, email)
+                VALUES ($1, $2, $3, 'active', $4, true, $5)
                 ON CONFLICT (user_id, mock_test_id) DO UPDATE
-                SET status = 'active', payment_method = $4, granted_by_admin = true, amount = $3
+                SET status = 'active', payment_method = $4, granted_by_admin = true, amount = $3,
+                    email = COALESCE(EXCLUDED.email, user_purchases.email)
                 RETURNING *
-            `, [userId, mockTestId, amount || 0, paymentMethod]);
+            `, [userId, parsedTestId, amount || 0, paymentMethod, emailToStore]);
 
+            console.log(`[grant-access] Granted access for user=${userId}, test=${parsedTestId}, method=${paymentMethod}`);
             return res.status(200).json(r.rows[0]);
         }
 
         if (action === 'list-user-access') {
-             await client.query(`
+            // Ensure table exists
+            await client.query(`
                 CREATE TABLE IF NOT EXISTS user_purchases (
                     id SERIAL PRIMARY KEY,
                     user_id TEXT NOT NULL,
                     mock_test_id INTEGER NOT NULL,
-                    amount NUMERIC NOT NULL,
+                    amount NUMERIC NOT NULL DEFAULT 0,
                     status TEXT NOT NULL DEFAULT 'active',
                     purchased_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     payment_method TEXT DEFAULT 'Online',
-                    granted_by_admin BOOLEAN DEFAULT false,
-                    UNIQUE (user_id, mock_test_id)
+                    granted_by_admin BOOLEAN DEFAULT false
                 );
             `);
 
+            // Add email column if missing (for older tables)
+            try { await client.query(`ALTER TABLE user_purchases ADD COLUMN IF NOT EXISTS email TEXT`); } catch(e) {}
+
+            // Fetch purchases with user info from multiple sources:
+            // 1. email stored directly on the purchase (admin-granted by email)
+            // 2. user_profiles (users who have signed in)
+            // 3. exam_submissions (users who have taken tests)
             const r = await client.query(`
-                SELECT up.*, mt.title as test_title, (SELECT name FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1) as user_name,
-                (SELECT email FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1) as user_email
+                SELECT 
+                    up.*,
+                    mt.title as test_title,
+                    COALESCE(
+                        up.email,
+                        (SELECT email FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
+                        (SELECT email FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1)
+                    ) as user_email,
+                    COALESCE(
+                        (SELECT name FROM user_profiles WHERE firebase_uid = up.user_id LIMIT 1),
+                        (SELECT name FROM exam_submissions es WHERE es.user_id = up.user_id LIMIT 1),
+                        up.user_id
+                    ) as user_name
                 FROM user_purchases up
                 LEFT JOIN mock_tests mt ON up.mock_test_id = mt.id
                 ORDER BY up.purchased_at DESC
