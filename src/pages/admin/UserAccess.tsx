@@ -63,22 +63,54 @@ export default function UserAccess() {
         setLoadingList(true);
         setListError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'list-user-access' })
+            // Fetch both purchases and users to map names/emails
+            const [purchasesRes, usersRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/index`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'admin/all-purchases' })
+                }),
+                fetch(`${API_BASE_URL}/api/index`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'admin/users' })
+                })
+            ]);
+            
+            const purchasesData = await purchasesRes.json();
+            const usersData = await usersRes.json();
+            
+            if (!purchasesRes.ok) throw new Error(purchasesData.error || "Failed to load purchases");
+            if (!usersRes.ok) throw new Error(usersData.error || "Failed to load users");
+            
+            // Map users for fast lookup
+            const userMap: Record<string, any> = {};
+            const userArray = Array.isArray(usersData) ? usersData : (usersData.data || []);
+            userArray.forEach((u: any) => {
+                const uid = u.id || u.firebase_uid || u.email;
+                if (uid) userMap[uid] = u;
             });
-            const data = await response.json();
-            if (!response.ok) {
-                const errMsg = data.error || `Server error ${response.status}`;
-                setListError(errMsg);
-                toast.error(`Failed to load list: ${errMsg}`);
-                setAccessList([]);
-                return;
-            }
-            // Ensure data is an array
-            const arr = Array.isArray(data) ? data : (data.data || []);
-            setAccessList(Array.isArray(arr) ? arr : []);
+            
+            // Build access list
+            const pArray = Array.isArray(purchasesData) ? purchasesData : (purchasesData.data || []);
+            const formattedList: AccessRecord[] = pArray.map((p: any) => {
+                const mappedUser = userMap[p.user_id] || {};
+                return {
+                    id: p.id,
+                    user_id: p.user_id,
+                    user_name: mappedUser.name || 'Unknown',
+                    user_email: mappedUser.email || p.user_id,
+                    mock_test_id: p.mock_test_id,
+                    test_title: p.mock_tests?.title || `Test ID: ${p.mock_test_id}`,
+                    amount: p.amount || p.price || "0",
+                    status: p.status || 'active',
+                    payment_method: p.payment_method || 'Online',
+                    granted_by_admin: p.granted_by_admin ?? (p.status === 'active'),
+                    purchased_at: p.purchased_at || p.created_at
+                };
+            });
+            
+            setAccessList(formattedList);
         } catch (error: any) {
             const errMsg = error?.message || 'Network error';
             setListError(errMsg);
@@ -99,20 +131,31 @@ export default function UserAccess() {
             const response = await fetch(`${API_BASE_URL}/api/index`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'lookup-user-by-email', payload: { email: email.trim() } })
+                body: JSON.stringify({ action: 'admin/user-by-email', payload: { email: email.trim() } })
             });
             const data = await response.json();
             
-            if (!response.ok) {
-                toast.error(data.error || "User not found");
+            if (!response.ok || !data) {
+                // If not found in database, allow synthetic creation for manual grant
+                setFoundUser({
+                    user_id: email.trim(),
+                    name: null,
+                    email: email.trim(),
+                    phone: null,
+                    _synthetic: true
+                });
+                toast.warning("User not found in database. Access will be granted to this email directly.");
                 return;
             }
-            setFoundUser(data);
-            if (data._synthetic) {
-                toast.warning("User not found in database. Access will be granted to this ID directly — it will apply when they sign in.");
-            } else {
-                toast.success("User found!");
-            }
+            
+            setFoundUser({
+                user_id: data.id || data.firebase_uid || email.trim(),
+                name: data.name,
+                email: data.email || email.trim(),
+                phone: data.phone,
+                _synthetic: false
+            });
+            toast.success("User found!");
         } catch (error) {
             toast.error("Error looking up user");
         } finally {
@@ -140,12 +183,14 @@ export default function UserAccess() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'grant-access',
+                    action: 'create-order',
                     payload: {
-                        userId: foundUser.user_id || foundUser.email || email.trim(),
-                        mockTestId: parseInt(selectedTestId),
+                        user_id: foundUser.user_id || foundUser.email || email.trim(),
+                        mock_test_id: parseInt(selectedTestId),
                         amount: parseFloat(amount || "0"),
-                        paymentMethod: paymentMethod
+                        payment_method: paymentMethod,
+                        status: 'active',
+                        granted_by_admin: true
                     }
                 })
             });
@@ -163,7 +208,7 @@ export default function UserAccess() {
         }
     };
 
-    const handleRevoke = async (userId: string, mockTestId: number) => {
+    const handleRevoke = async (purchaseId: number) => {
         if (!window.confirm("Are you sure you want to revoke access?")) return;
         
         try {
@@ -171,8 +216,8 @@ export default function UserAccess() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'revoke-access',
-                    payload: { userId, mockTestId }
+                    action: 'admin/revoke-access',
+                    payload: { purchaseId }
                 })
             });
             if (!response.ok) throw new Error("Failed to revoke access");
@@ -355,7 +400,7 @@ export default function UserAccess() {
                                                                 variant="outline" 
                                                                 size="sm" 
                                                                 className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                                                                onClick={() => handleRevoke(record.user_id, record.mock_test_id)}
+                                                                onClick={() => handleRevoke(record.id)}
                                                             >
                                                                 Revoke
                                                             </Button>
