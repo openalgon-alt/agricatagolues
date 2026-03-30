@@ -40,6 +40,8 @@ export default function ExamPage() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [score, setScore] = useState(0);
     const [submissionId, setSubmissionId] = useState<number | null>(null);
+    // For "View Result" — holds a past submission to display without running the exam
+    const [viewResultData, setViewResultData] = useState<{ submission: any; questions: MockQuestion[] } | null>(null);
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -236,9 +238,9 @@ export default function ExamPage() {
 
 
     useEffect(() => {
-        if (userDetails?.id || userDetails?.email) {
+        if (userDetails?.id) {
             Promise.all([
-                userDetails.id ? examDataService.getUserPurchases(userDetails.id) : Promise.resolve([]),
+                examDataService.getUserPurchases(userDetails.id),
                 userDetails.email ? examDataService.getUserPurchases(userDetails.email) : Promise.resolve([])
             ]).then(([p1, p2]) => {
                 const map = new Map();
@@ -248,10 +250,15 @@ export default function ExamPage() {
                 setPurchases(finalPurchases);
             });
 
-            // Fetch submissions using email as the key (as per current DB schema)
-            if (userDetails.email) {
-                examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
-            }
+            // Fetch submissions using firebase_uid (primary key in exam_submissions)
+            examDataService.getUserSubmissions(userDetails.id).then(subs => {
+                // Also try by email if uid yields nothing
+                if (subs.length === 0 && userDetails.email) {
+                    examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
+                } else {
+                    setSubmissions(subs);
+                }
+            });
         } else {
             setPurchases([]);
             setSubmissions([]);
@@ -338,7 +345,27 @@ export default function ExamPage() {
         // );
     };
 
-    const handleSelectTest = async (test: MockTest) => {
+    // "View Result" — load a past submission's questions and skip straight to results view
+    const handleViewResult = async (submission: any) => {
+        setLoading(true);
+        try {
+            const test = await examDataService.getMockTestById(submission.mockTestId);
+            if (test && test.questions) {
+                setSelectedTest(test);
+                setAnswers(submission.answers || {});
+                setScore(submission.score || 0);
+                setIsSubmitted(true);
+                setViewResultData({ submission, questions: test.questions });
+                setQuestions(test.questions);
+            }
+        } catch (e) {
+            toast.error('Failed to load result');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSelectTest = async (test: MockTest, retake = false) => {
         setSearchParams({}); // Clear 'view=premium' to ensure exam view renders
         if (!userDetails) {
             setIsAuthOpen(true);
@@ -352,12 +379,13 @@ export default function ExamPage() {
         }
 
         // RESET STATE IMMEDIATELY to prevent crosstalk between tests
-        setQuestions([]); 
-        setAnswers({}); 
+        setQuestions([]);
+        setAnswers({});
         setCurrentQuestionIndex(0);
         setIsSubmitted(false);
         setSubmissionId(null);
         setTimeLeft(0);
+        setViewResultData(null);
 
         const isPurchased = purchases.some(p => p.mockTestId === test.id && p.status === 'active');
         const hasBundle = examDataService.hasBundleAccess(purchases);
@@ -392,7 +420,12 @@ export default function ExamPage() {
             return;
         }
 
+        // Clear local autosave if retaking
         const storageKey = `exam_progress_${userDetails.id}_${test.id}`;
+        if (retake) {
+            localStorage.removeItem(storageKey);
+        }
+
         const savedState = localStorage.getItem(storageKey);
 
         if (savedState) {
@@ -426,58 +459,36 @@ export default function ExamPage() {
             }
         }
 
-        // Start New Test Logic
-        // State is already reset above
+        // Start New Test — call REST endpoint directly
         setSelectedTest(test);
-        sessionStorage.setItem("examTestId", test.id.toString());
-        try {
-            await document.documentElement.requestFullscreen();
-        } catch (e) { console.warn("Fullscreen error", e); }
+        sessionStorage.setItem('examTestId', test.id.toString());
+        try { await document.documentElement.requestFullscreen(); } catch (e) { console.warn(e); }
 
         try {
-             const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/start-test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'start-test',
-                    payload: {
-                        user_id: userDetails.id,
-                        test_id: test.id,
-                        name: userDetails.name,
-                        phone: userDetails.phone,
-                        email: userDetails.email,
-                        college: userDetails.college,
-                        score: 0,
-                        total_questions: test.questions?.length || 50
-                    }
-                })
-             });
-             const responseData = await response.json();
+                body: JSON.stringify({ user_id: userDetails.id, test_id: test.id, retake })
+            });
+            const responseData = await response.json();
 
             if (!response.ok) {
-                console.error("API Error starting test:", responseData.error || response.statusText);
-                toast.error(`Error: ${responseData.error || "Could not start session"}`);
+                toast.error(`Error: ${responseData.error || 'Could not start session'}`);
                 return;
             }
 
-            if (responseData && responseData.attempt_id) {
-                setSubmissionId(responseData.attempt_id);
-                sessionStorage.setItem("submissionId", responseData.attempt_id.toString());
-            } else if (responseData && responseData.submission_id) {
-                setSubmissionId(responseData.submission_id);
-                sessionStorage.setItem("submissionId", responseData.submission_id.toString());
-            } else if (responseData && responseData.id) {
-                setSubmissionId(responseData.id);
-                sessionStorage.setItem("submissionId", responseData.id.toString());
+            const aid = responseData.attempt_id;
+            if (aid) {
+                setSubmissionId(aid);
+                sessionStorage.setItem('submissionId', aid.toString());
             }
         } catch (err: any) {
-            console.error("Error starting test session:", err);
-            toast.error("Failed to initialize session: " + (err.message || String(err)));
+            toast.error('Failed to initialize session: ' + (err.message || String(err)));
             return;
         }
 
         loadTestQuestions(test.id);
-        setTimeLeft(50 * 60); // 50 minutes
+        setTimeLeft(50 * 60);
     };
 
     const handleOptionSelect = (option: string) => {
@@ -527,22 +538,19 @@ export default function ExamPage() {
                 } catch (e) { console.warn(e); }
             }
 
-            // Save Result & Calculate Score via Backend
+            // Save Result & Calculate Score via REST endpoint
             if (submissionId) {
                 try {
-                     const response = await fetch(`${API_BASE_URL}/api/index`, {
+                    const response = await fetch(`${API_BASE_URL}/api/submit-test`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            action: 'submit-test',
-                            payload: {
-                                submission_id: submissionId,
-                                answers: answers, // Send all answers mapping { question_id: option_text }
-                                total_questions: questions.length,
-                                user_id: userDetails.id
-                            }
+                            submission_id: submissionId,
+                            answers,
+                            total_questions: questions.length,
+                            user_id: userDetails.id
                         })
-                     });
+                    });
                     
                     if (response.ok) {
                         const data = await response.json();
@@ -567,6 +575,17 @@ export default function ExamPage() {
                         toast.success("Exam submitted successfully!");
                         sessionStorage.removeItem("examTestId");
                         sessionStorage.removeItem("submissionId");
+
+                        // Re-fetch submissions to update dashboard
+                        if (userDetails?.id) {
+                            examDataService.getUserSubmissions(userDetails.id).then(subs => {
+                                if (subs.length === 0 && userDetails.email) {
+                                    examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
+                                } else {
+                                    setSubmissions(subs);
+                                }
+                            });
+                        }
                     } else {
                         toast.error("Failed to submit exam via API.");
                     }
@@ -685,7 +704,9 @@ export default function ExamPage() {
         return (
             <PremiumTestsList 
                 tests={activeTests.filter(t => t.price > 0)}
+                submissions={submissions}
                 onSelectTest={handleSelectTest}
+                onViewResult={handleViewResult}
                 onBack={() => setSearchParams({})}
                 userId={userDetails?.id}
             />
@@ -702,7 +723,9 @@ export default function ExamPage() {
                  onEditProfile={() => setShowUserDetailsModal(true)}
                  activeTests={activeTests}
                  purchases={purchases}
+                 submissions={submissions}
                  onSelectTest={handleSelectTest}
+                 onViewResult={handleViewResult}
                  onBuyBundle={handleBuyBundle}
                  onOpenPremium={() => {
                      setSearchParams({ view: 'premium' });

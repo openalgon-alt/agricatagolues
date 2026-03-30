@@ -27,7 +27,8 @@ interface ExamDashboardProps {
     activeTests: MockTest[];
     purchases: UserPurchase[];
     submissions?: ExamSubmission[];
-    onSelectTest: (test: MockTest) => void;
+    onSelectTest: (test: MockTest, retake?: boolean) => void;
+    onViewResult: (submission: any) => void;
     onBuyBundle: () => void;
     onOpenPremium: () => void;
     userId?: string;
@@ -41,6 +42,7 @@ export function ExamDashboard({
     purchases = [], 
     submissions = [],
     onSelectTest,
+    onViewResult,
     onBuyBundle,
     onOpenPremium,
     userId
@@ -237,7 +239,13 @@ export function ExamDashboard({
                                         </div>
                                     </CardContent>
                                     <CardFooter className="p-4 pt-0">
-                                        <ResumeButton userId={userId} test={test} onSelectTest={onSelectTest} />
+                                        <TestActionButton 
+                                            userId={userId} 
+                                            test={test} 
+                                            submissions={submissions} 
+                                            onSelectTest={onSelectTest}
+                                            onViewResult={onViewResult}
+                                        />
                                     </CardFooter>
                                 </Card>
                             ))}
@@ -380,32 +388,88 @@ export function ExamDashboard({
     );
 }
 
-{/* Helper Component for Resume Logic */}
-function ResumeButton({ userId, test, onSelectTest }: { userId?: string, test: MockTest, onSelectTest: (t: MockTest) => void }) {
+{/* Advanced Action Button for Resume/Retake/View Result Logic */}
+function TestActionButton({ 
+    userId, 
+    test, 
+    submissions, 
+    onSelectTest, 
+    onViewResult 
+}: { 
+    userId?: string, 
+    test: MockTest, 
+    submissions: any[],
+    onSelectTest: (t: MockTest, retake?: boolean) => void,
+    onViewResult: (s: any) => void
+}) {
     const [hasProgress, setHasProgress] = useState(false);
+    
+    // Find if this specific test has been submitted before
+    const pastSubmission = submissions.find(s => 
+        String(s.mockTestId) === String(test.id) || s.testTitle === test.title
+    );
 
     useEffect(() => {
-        if (userId && test) {
+        if (userId && test && !pastSubmission) {
             const storageKey = `exam_progress_${userId}_${test.id}`;
             const exists = !!localStorage.getItem(storageKey);
             setHasProgress(exists);
         }
-    }, [userId, test]);
+    }, [userId, test, pastSubmission]);
 
+    // Case 1: Already Submitted
+    if (pastSubmission) {
+        return (
+            <div className="flex gap-2 w-full">
+                <Button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewResult(pastSubmission);
+                    }}
+                    className="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
+                >
+                    View Result
+                </Button>
+                <Button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm("Do you want to retake this test? Current progress will be lost.")) {
+                            onSelectTest(test, true);
+                        }
+                    }}
+                    className="flex-1 bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                >
+                    Retake
+                </Button>
+            </div>
+        );
+    }
+
+    // Case 2: Resume Test
+    if (hasProgress) {
+        return (
+            <Button 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectTest(test);
+                }}
+                className="w-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-200"
+            >
+                Resume Test
+            </Button>
+        );
+    }
+
+    // Case 3: Start Fresh
     return (
         <Button 
             onClick={(e) => {
                 e.stopPropagation();
                 onSelectTest(test);
             }}
-            className={cn(
-                "w-full border",
-                hasProgress 
-                    ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200" 
-                    : "bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
-            )}
+            className="w-full bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
         >
-            {hasProgress ? "Resume Test" : "Take Test"}
+            Take Test
         </Button>
     );
 }

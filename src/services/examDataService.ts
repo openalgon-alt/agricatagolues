@@ -132,8 +132,19 @@ class ExamDataService {
         }
     }
 
-    async getUserSubmissions(email: string): Promise<any[]> {
-        return [];
+    async getUserSubmissions(userId: string): Promise<any[]> {
+        if (!userId) return [];
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/user-submissions?userId=${encodeURIComponent(userId)}`,
+                { method: 'GET' }
+            );
+            if (!response.ok) return [];
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        } catch {
+            return [];
+        }
     }
 
     async grantUserAccess(userId: string, testId: string | number, amount: number): Promise<void> {
