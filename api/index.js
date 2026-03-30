@@ -11,8 +11,9 @@ const corsHeaders = {
 };
 
 async function getClient() {
+    const connectionString = process.env.DATABASE_URL || process.env.VITE_CLOUD_SQL_URL;
     const client = new Client({
-        connectionString: process.env.DATABASE_URL,
+        connectionString,
         ssl: { rejectUnauthorized: false },
     });
     await client.connect();
@@ -27,8 +28,9 @@ export default async function handler(req, res) {
 
     Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
 
-    if (!process.env.DATABASE_URL) {
-        return res.status(500).json({ error: 'DATABASE_URL not set.' });
+    const dbUrl = process.env.DATABASE_URL || process.env.VITE_CLOUD_SQL_URL;
+    if (!dbUrl) {
+        return res.status(500).json({ error: 'DATABASE_URL or VITE_CLOUD_SQL_URL not set.' });
     }
 
     if (req.method !== 'POST') {
