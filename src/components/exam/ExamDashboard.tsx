@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, History, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X } from "lucide-react";
+import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,19 +46,21 @@ export function ExamDashboard({
     userId
 }: ExamDashboardProps) {
     const [profileOpen, setProfileOpen] = useState(false);
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
     const hasBundleAccess = examDataService.hasBundleAccess(purchases);
 
-    // Close dropdown when clicking outside
+    // Close dropdown when clicking outside (but not when the logout dialog is open)
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
+            if (logoutDialogOpen) return; // keep dropdown rendered while dialog is up
             if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
                 setProfileOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [logoutDialogOpen]);
     
     const freeTests = activeTests.filter(t => Number(t.price) === 0 && Number(t.id) !== -1);
     
@@ -156,9 +158,13 @@ export function ExamDashboard({
                                                 Edit Profile
                                             </button>
                                         )}
-                                        <AlertDialog>
+                                        <AlertDialog open={logoutDialogOpen} onOpenChange={(open) => { setLogoutDialogOpen(open); if (!open) setProfileOpen(false); }}>
                                             <AlertDialogTrigger asChild>
-                                                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors text-left">
+                                                <button
+                                                    onMouseDown={(e) => e.stopPropagation()}
+                                                    onClick={() => setLogoutDialogOpen(true)}
+                                                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors text-left"
+                                                >
                                                     <LogOut className="w-4 h-4" />
                                                     Logout
                                                 </button>
@@ -366,32 +372,6 @@ export function ExamDashboard({
                             </div>
                         </div>
 
-                        {/* Recent History */}
-                        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                            <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-                                <History className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm font-bold text-gray-700">Recent Activity</span>
-                            </div>
-                            <div className="divide-y divide-gray-100">
-                                {submissions.length > 0 ? (
-                                    submissions.slice(0, 5).map(sub => (
-                                        <div key={sub.id} className="p-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900 line-clamp-1">{sub.testTitle}</div>
-                                                <div className="text-xs text-gray-500">{new Date(sub.submittedAt).toLocaleDateString()}</div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-sm font-bold text-gray-900">{sub.score} <span className="text-gray-400 font-normal">/ {sub.totalQuestions}</span></div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="p-8 text-center text-gray-400 text-sm">
-                                        No tests attempted yet.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
 
