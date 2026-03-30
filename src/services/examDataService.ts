@@ -112,14 +112,13 @@ class ExamDataService {
     async getUserPurchases(userId: string): Promise<UserPurchase[]> {
         if (!userId) return [];
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'get-user-purchases', payload: { userId } })
-            });
+            const response = await fetch(
+                `${API_BASE_URL}/api/user-purchases?userId=${encodeURIComponent(userId)}`,
+                { method: 'GET' }
+            );
             if (!response.ok) return [];
             const data = await response.json();
-            const arr = Array.isArray(data) ? data : (data.data || []);
+            const arr = Array.isArray(data) ? data : [];
             return arr.map((item: any) => ({
                 id: item.id,
                 userId: item.userId,

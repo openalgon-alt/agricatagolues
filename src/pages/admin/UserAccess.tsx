@@ -63,10 +63,9 @@ export default function UserAccess() {
         setLoadingList(true);
         setListError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'list-user-access' })
+            const response = await fetch(`${API_BASE_URL}/api/admin/all-purchases`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
             const data = await response.json();
             if (!response.ok) {
@@ -76,10 +75,8 @@ export default function UserAccess() {
                 setAccessList([]);
                 return;
             }
-            
-            // The Postgres backend already returns joined user_name and test_title
-            const arr = Array.isArray(data) ? data : (data.data || []);
-            setAccessList(Array.isArray(arr) ? arr : []);
+            const arr = Array.isArray(data) ? data : [];
+            setAccessList(arr);
         } catch (error: any) {
             const errMsg = error?.message || 'Network error';
             setListError(errMsg);
@@ -97,23 +94,22 @@ export default function UserAccess() {
         setLoadingLookup(true);
         setFoundUser(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'lookup-user-by-email', payload: { email: email.trim() } })
-            });
+            const response = await fetch(
+                `${API_BASE_URL}/api/admin/lookup-user?email=${encodeURIComponent(email.trim())}`,
+                { method: 'GET' }
+            );
             const data = await response.json();
-            
+
             if (!response.ok) {
-                toast.error(data.error || "User not found");
+                toast.error(data.error || 'Lookup failed');
                 return;
             }
-            
+
             setFoundUser(data);
             if (data._synthetic) {
-                toast.warning("User not found in database. Access will be granted to this ID directly — it will apply when they sign in.");
+                toast.warning("User not in database. Access will be granted to this email and apply when they log in.");
             } else {
-                toast.success("User found!");
+                toast.success(`User found: ${data.name || data.email}`);
             }
         } catch (error) {
             toast.error("Error looking up user");
@@ -138,26 +134,22 @@ export default function UserAccess() {
 
         setGranting(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/grant-access`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'grant-access',
-                    payload: {
-                        userId: foundUser.user_id || foundUser.email || email.trim(),
-                        mockTestId: parseInt(selectedTestId),
-                        amount: parseFloat(amount || "0"),
-                        paymentMethod: paymentMethod
-                    }
+                    userId: foundUser.user_id || foundUser.email || email.trim(),
+                    mockTestId: parseInt(selectedTestId),
+                    amount: parseFloat(amount || '0'),
+                    paymentMethod: paymentMethod
                 })
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Failed to grant access");
-            
-            toast.success("Access granted successfully!");
-            // Reset form partly
-            setSelectedTestId("");
-            loadAccessList(); // Refresh list
+            if (!response.ok) throw new Error(data.error || 'Failed to grant access');
+
+            toast.success('Access granted successfully!');
+            setSelectedTestId('');
+            loadAccessList();
         } catch (error: any) {
             toast.error(error.message || "Failed to grant access");
         } finally {
@@ -169,18 +161,17 @@ export default function UserAccess() {
         if (!window.confirm("Are you sure you want to revoke access?")) return;
         
         try {
-            const response = await fetch(`${API_BASE_URL}/api/index`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'revoke-access',
-                    payload: { userId: accessList.find(r => r.id === purchaseId)?.user_id, mockTestId: accessList.find(r => r.id === purchaseId)?.mock_test_id }
-                })
-            });
-            if (!response.ok) throw new Error("Failed to revoke access");
-            toast.success("Access revoked");
+            const response = await fetch(
+                `${API_BASE_URL}/api/admin/revoke-access?id=${purchaseId}`,
+                { method: 'DELETE' }
+            );
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to revoke access');
+            }
+            toast.success('Access revoked');
             loadAccessList();
-        } catch (error) {
+        } catch (error: any) {
             toast.error("Error revoking access");
         }
     };
