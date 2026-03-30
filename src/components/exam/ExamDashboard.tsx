@@ -337,7 +337,7 @@ export function ExamDashboard({
                             </div>
                             
                             <div className="space-y-3">
-                                {activeTests.map((test, index: number) => {
+                                {activeTests.slice().reverse().map((test, index: number) => {
                                     const title = test.title;
                                     const testSubmissions = submissions.filter(s => s.testTitle === title);
                                     
