@@ -587,7 +587,12 @@ export default function ExamPage() {
                             });
                         }
                     } else {
-                        toast.error("Failed to submit exam via API.");
+                        try {
+                            const errData = await response.json();
+                            toast.error(`Submit Failed: ${errData.error || response.statusText}`);
+                        } catch(e) {
+                            toast.error("Failed to submit exam via API.");
+                        }
                     }
                     
                 } catch (err) {
