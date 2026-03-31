@@ -53,7 +53,7 @@ export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseVi
                 <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 space-y-4">
                     <div className="flex items-center gap-2 text-yellow-900 font-bold text-base">
                         <ShieldCheck className="w-5 h-5 text-yellow-700" />
-                        Complete Practice Access – ₹2000
+                        Complete Practice Access – ₹4000
                     </div>
                     <ul className="space-y-3">
                         <li className="flex items-start gap-2 text-sm text-yellow-900/90">
@@ -78,9 +78,6 @@ export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseVi
                         </li>
                     </ul>
                     <div className="pt-2 border-t border-yellow-200/50 space-y-1">
-                        <p className="text-sm font-semibold text-yellow-800">
-                            ₹100 per full mock test. Less than ₹2 per question.
-                        </p>
                         <p className="text-xs text-yellow-700">
                             One-time payment. Full access. No hidden charges.
                         </p>

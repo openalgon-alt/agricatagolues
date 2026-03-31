@@ -47,7 +47,7 @@ const isLocalhost = typeof window !== 'undefined' &&
 export const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
 
 class ExamDataService {
-    public readonly BUNDLE_PRICE = 2000;
+    public readonly BUNDLE_PRICE = 4000;
     public readonly BUNDLE_ACCESS_ID = -1;
 
     async getMockTests(activeOnly: boolean = true): Promise<MockTest[]> {
