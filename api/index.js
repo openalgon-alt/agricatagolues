@@ -668,7 +668,7 @@ export default async function handler(req, res) {
                             FROM exam_submissions
                             WHERE user_id = $1 AND is_completed = true AND score IS NOT NULL
                         ) s
-                        LEFT JOIN mock_tests t ON s.test_id = cast(t.id as varchar)
+                        LEFT JOIN mock_tests t ON s.test_id = t.id
                         WHERE s.rn = 1
                         ORDER BY s.submitted_at DESC
                     `, [userId]);
