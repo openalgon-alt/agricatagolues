@@ -591,20 +591,7 @@ export default function ExamPage() {
 
     const [submissions, setSubmissions] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (userDetails?.id) {
-            // Always use Firebase UID — never email — for consistent identity
-            Promise.all([
-                examDataService.getUserPurchases(userDetails.id),
-            ]).then(([p1]) => {
-                setPurchases(p1);
-            });
-            examDataService.getUserSubmissions(userDetails.id).then(setSubmissions);
-        } else {
-            setPurchases([]);
-            setSubmissions([]);
-        }
-    }, [userDetails?.id]);
+
 
 
     const handleSubmitExam = async () => {
