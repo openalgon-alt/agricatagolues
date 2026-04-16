@@ -600,6 +600,7 @@ export default async function handler(req, res) {
                 console.log('[DEBUG] Rows WHERE user_id =', JSON.stringify(userId), ':',
                     JSON.stringify(filteredRows.rows));
 
+
                 // ════════════════════════════════════════════════════════════
                 // DEBUG STEP 3: Rows that pass the metrics filter
                 // ════════════════════════════════════════════════════════════
@@ -817,6 +818,57 @@ export default async function handler(req, res) {
                 );
             }
             return res.status(200).json({ success: true });
+        }
+
+        if (action === 'students' || action === 'admin-students') {
+            try {
+                // Return all student profiles safely
+                const result = await client.query(`
+                    SELECT 
+                        firebase_uid, 
+                        name, 
+                        email, 
+                        mobile, 
+                        college, 
+                        district, 
+                        guardian_name, 
+                        guardian_profession, 
+                        guardian_contact, 
+                        created_at 
+                    FROM student_profiles 
+                    ORDER BY created_at DESC
+                `);
+                return res.status(200).json({ students: result.rows });
+            } catch (err) {
+                console.error('[students] Error:', err);
+                // Return empty safely
+                return res.status(200).json({ students: [] });
+            }
+        }
+
+        if (action === 'student-history') {
+            const { userId } = payload || {};
+            if (!userId) return res.status(400).json({ error: 'userId required' });
+
+            try {
+                const history = await client.query(`
+                    SELECT 
+                        s.id,
+                        t.title        AS "testTitle",
+                        s.test_id      AS "testId",
+                        s.score,
+                        s.total_questions AS "totalQuestions",
+                        s.submitted_at AS "submittedAt"
+                    FROM exam_submissions s
+                    LEFT JOIN mock_tests t ON s.test_id = t.id
+                    WHERE s.user_id = $1 AND s.is_completed = true
+                    ORDER BY s.submitted_at DESC
+                `, [userId]);
+                return res.status(200).json(history.rows);
+            } catch (err) {
+                console.error('[student-history] Error:', err);
+                return res.status(200).json([]);
+            }
         }
 
         return res.status(200).json({ success: true, message: 'Default action completed successfully' });
