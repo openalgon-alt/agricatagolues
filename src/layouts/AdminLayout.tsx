@@ -27,10 +27,12 @@ import {
 } from "@/components/ui/sidebar"
 
 export const AdminLayout = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const location = useLocation();
 
-    const menuItems = [
+    const isMasterUser = user?.email === "mrcombride@gmail.com" || user?.email === "mrcombride@gmil.com";
+
+    const allMenuItems = [
         { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
         { title: "Issues", url: "/admin/issues", icon: FileText },
         { title: "Editorial Board", url: "/admin/editorial-board", icon: Users },
@@ -40,8 +42,13 @@ export const AdminLayout = () => {
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
         { title: "Students", url: "/admin/students", icon: Users },
         { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
-        // { title: "Settings", url: "/admin/settings", icon: Settings }, // Future
     ];
+
+    const menuItems = isMasterUser 
+        ? allMenuItems 
+        : allMenuItems.filter(item => 
+            ["Dashboard", "Issues", "Editorial Board", "Shop Products"].includes(item.title)
+        );
 
 
     return (
