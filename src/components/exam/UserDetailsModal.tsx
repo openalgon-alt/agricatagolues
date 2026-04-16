@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { User, Phone, Mail, GraduationCap, MapPin, Users, Briefcase, Shield } from "lucide-react";
+import { User, Phone, Mail, GraduationCap, MapPin, Users, Briefcase, Shield, Loader2 } from "lucide-react";
 import mainLogoImg from "@/assets/main-logo.png";
 
 const formSchema = z.object({
@@ -26,7 +26,7 @@ interface UserDetailsModalProps {
     isOpen: boolean;
     userEmail?: string;
     initialData?: Partial<ProfileFormData>;
-    onComplete: (data: ProfileFormData) => void;
+    onComplete: (data: ProfileFormData) => Promise<void> | void;
     onCancel?: () => void;
 }
 
@@ -68,8 +68,8 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
         }
     }, [isOpen, initialData, userEmail]);
 
-    function onSubmit(values: ProfileFormData) {
-        onComplete(values);
+    async function onSubmit(values: ProfileFormData) {
+        await onComplete(values);
     }
 
     return (
@@ -315,9 +315,14 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
                                 <div className="flex flex-col gap-3 mt-8">
                                     <Button
                                         type="submit"
+                                        disabled={form.formState.isSubmitting}
                                         className="w-full h-12 text-base bg-green-700 hover:bg-green-800 font-semibold shadow-sm text-white"
                                     >
-                                        {initialData ? 'Save Changes' : 'Create Profile'}
+                                        {form.formState.isSubmitting ? (
+                                            <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Saving...</>
+                                        ) : (
+                                            initialData ? 'Save Changes' : 'Create Profile'
+                                        )}
                                     </Button>
                                     {onCancel && (
                                         <Button
