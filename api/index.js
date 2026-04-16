@@ -652,55 +652,32 @@ export default async function handler(req, res) {
                     ORDER BY s.submitted_at DESC
                 `, [userId]);
 
-                // ── 3. Subject Analysis — by mock_questions.topic ────────────────
+                // ── 3. Subject Analysis — latest score per mock test ────────────────
                 let subjectPerformance = [];
                 try {
-                    const topicQuery = await client.query(`
-                        SELECT
-                            COALESCE(NULLIF(TRIM(q.topic), ''), 'General') AS topic,
-                            COUNT(*)                                         AS total,
-                            SUM(
-                                CASE
-                                    WHEN a.answer = (q.options::jsonb ->> q.correct_option_index::int)
-                                    THEN 1 ELSE 0
-                                END
-                            ) AS correct
-                        FROM test_answers a
-                        JOIN mock_questions q  ON a.question_id = q.id
-                        JOIN exam_submissions s ON s.id = a.attempt_id
-                        WHERE s.user_id = $1 AND s.is_completed = true
-                        GROUP BY COALESCE(NULLIF(TRIM(q.topic), ''), 'General')
-                        ORDER BY topic ASC
-                    `, [userId]);
-
-                    console.log('[get-user-performance] Subject stats:', topicQuery.rows);
-
-                    subjectPerformance = topicQuery.rows.map(r => ({
-                        subject:    r.topic,
-                        correct:    parseInt(r.correct) || 0,
-                        total:      parseInt(r.total)   || 0,
-                        percentage: parseInt(r.total) > 0
-                            ? Math.round((parseInt(r.correct) / parseInt(r.total)) * 100)
-                            : 0
-                    }));
-                } catch (topicErr) {
-                    console.warn('[get-user-performance] topic query failed, using test-level fallback:', topicErr.message);
                     const fallback = await client.query(`
-                        SELECT
+                        SELECT 
                             COALESCE(t.title, 'Unknown Test') AS subject,
                             ROUND(
-                                COALESCE(s.score, 0) * 100.0
+                                COALESCE(s.score, 0) * 100.0 
                                 / NULLIF(COALESCE(s.total_questions, 50), 0)
                             , 0) AS percentage
-                        FROM exam_submissions s
-                        LEFT JOIN mock_tests t ON s.test_id = t.id
-                        WHERE s.user_id = $1 AND s.is_completed = true AND s.score IS NOT NULL
+                        FROM (
+                            SELECT test_id, score, total_questions, submitted_at,
+                                   ROW_NUMBER() OVER(PARTITION BY test_id ORDER BY submitted_at DESC) as rn
+                            FROM exam_submissions
+                            WHERE user_id = $1 AND is_completed = true AND score IS NOT NULL
+                        ) s
+                        LEFT JOIN mock_tests t ON s.test_id = cast(t.id as varchar)
+                        WHERE s.rn = 1
                         ORDER BY s.submitted_at DESC
                     `, [userId]);
                     subjectPerformance = fallback.rows.map(r => ({
                         subject:    r.subject,
                         percentage: Math.round(parseFloat(r.percentage) || 0)
                     }));
+                } catch (err) {
+                    console.error('[get-user-performance] Subject query failed:', err.message);
                 }
 
                 const response = {
