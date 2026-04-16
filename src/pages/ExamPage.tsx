@@ -33,6 +33,7 @@ export default function ExamPage() {
     const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
     const [showLanding, setShowLanding] = useState(true);
     const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+    const [isProfileFetching, setIsProfileFetching] = useState(false);
     const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -52,8 +53,12 @@ export default function ExamPage() {
     useEffect(() => {
         if (!isAuthLoading) {
             if (user) {
-                mapSessionToUser(user);
-                setShowLanding(false);
+                setIsProfileFetching(true);
+                // Make sure mapSessionToUser handles failures safely and resolves so finally block runs
+                mapSessionToUser(user).finally(() => {
+                    setIsProfileFetching(false);
+                    setShowLanding(false);
+                });
                 setIsAuthOpen(false);
             } else {
                 setUserDetails(null);
@@ -759,6 +764,13 @@ export default function ExamPage() {
     }
 
     // 0. Loading
+    if (isProfileFetching) {
+        return <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+            <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
+            <p className="text-gray-500">Retrieving Account Details...</p>
+        </div>;
+    }
+
     if (loading && !selectedTest && activeTests.length === 0) {
         return <div className="min-h-screen flex items-center justify-center">Loading Exam Portal...</div>;
     }
