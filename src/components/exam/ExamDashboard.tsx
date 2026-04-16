@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X } from "lucide-react";
+import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X, MapPin } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { dataService } from "@/services/dataService";
-import { MockTest, UserPurchase, ExamSubmission, examDataService } from "@/services/examDataService";
+import { MockTest, UserPurchase, ExamSubmission, examDataService, OfflineCoachingCenter } from "@/services/examDataService";
 import { cn } from "@/lib/utils";
 import mainLogoImg from "@/assets/main-logo.png";
 
@@ -49,8 +49,27 @@ export function ExamDashboard({
 }: ExamDashboardProps) {
     const [profileOpen, setProfileOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+    const [offlineCenters, setOfflineCenters] = useState<OfflineCoachingCenter[]>([]);
+    const [performanceStats, setPerformanceStats] = useState<any>(null);
     const profileRef = useRef<HTMLDivElement>(null);
     const hasBundleAccess = examDataService.hasBundleAccess(purchases);
+
+    useEffect(() => {
+        examDataService.getOfflineCoachingCenters().then(setOfflineCenters);
+    }, []);
+
+    const [performanceLoading, setPerformanceLoading] = useState(true);
+
+    useEffect(() => {
+        if (userDetails?.id) {
+            setPerformanceLoading(true);
+            examDataService.getUserPerformanceStats(userDetails.id).then((stats: any) => {
+                console.log('[Dashboard] Performance stats:', stats);
+                setPerformanceStats(stats);
+                setPerformanceLoading(false);
+            }).catch(() => setPerformanceLoading(false));
+        }
+    }, [userDetails?.id]);
 
     // Close dropdown when clicking outside (but not when the logout dialog is open)
     useEffect(() => {
@@ -78,14 +97,11 @@ export function ExamDashboard({
         });
     }
 
-    // Calculate Stats
-    const totalAttempts = submissions.length;
-    const averageScore = totalAttempts > 0 
-        ? Math.round(submissions.reduce((acc, curr) => acc + curr.score, 0) / totalAttempts) 
-        : 0;
-    const bestScore = totalAttempts > 0
-        ? Math.max(...submissions.map(s => s.score))
-        : 0;
+    // ── Stats: ALL values come from the single backend aggregate query ───────────
+    // Never fall back to local submissions — ensures all 3 metrics are from same dataset
+    const totalAttempts = performanceStats?.totalAttempts ?? 0;
+    const averageScore  = performanceStats?.averageScore  ?? 0;
+    const bestScore     = performanceStats?.bestScore     ?? 0;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -306,6 +322,34 @@ export function ExamDashboard({
                                 </Card>
                             )}
                          </div>
+
+                         {/* Offline Coaching Centers */}
+                         {offlineCenters.length > 0 && (
+                             <div className="pt-6 mt-6 border-t border-gray-100">
+                                 <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
+                                     <MapPin className="w-5 h-5 text-red-500" /> Offline Coaching Centers
+                                 </h2>
+                                 <div className="space-y-1">
+                                     {offlineCenters.map(center => (
+                                         <div key={center.id} className="flex items-center justify-between py-2.5 px-3 border-b border-gray-100 last:border-0 hover:bg-red-50/50 rounded-lg transition-colors">
+                                             <div className="flex items-center gap-2 md:gap-3 min-w-0 pr-4">
+                                                 <div className="h-2 w-2 rounded-full bg-red-400 shrink-0 hidden sm:block"></div>
+                                                 <span className="font-bold text-gray-800 text-sm md:text-base truncate">{center.name}</span>
+                                                 <span className="text-gray-400 hidden sm:block">•</span>
+                                                 <span className="text-gray-500 text-xs md:text-sm truncate">{center.address}</span>
+                                             </div>
+                                             {center.mapUrl && (
+                                                 <Button variant="outline" size="sm" asChild className="shrink-0 h-7 md:h-8 text-xs text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700 bg-white">
+                                                     <a href={center.mapUrl} target="_blank" rel="noopener noreferrer">
+                                                         <MapPin className="w-3 h-3 mr-1" /> Map
+                                                     </a>
+                                                 </Button>
+                                             )}
+                                         </div>
+                                     ))}
+                                 </div>
+                             </div>
+                         )}
                     </div>
 
                     {/* Right Column: Performance Analysis (New!) */}
@@ -318,16 +362,22 @@ export function ExamDashboard({
                         <div className="grid grid-cols-2 gap-3">
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                                 <div className="text-gray-500 text-xs font-medium mb-1">Tests Taken</div>
-                                <div className="text-2xl font-bold text-gray-900">{totalAttempts}</div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {performanceLoading ? <span className="text-gray-300 animate-pulse">—</span> : totalAttempts}
+                                </div>
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                                 <div className="text-gray-500 text-xs font-medium mb-1">Avg. Score</div>
-                                <div className="text-2xl font-bold text-blue-600">{averageScore}</div>
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {performanceLoading ? <span className="text-gray-300 animate-pulse">—</span> : averageScore}
+                                </div>
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm col-span-2 flex items-center justify-between">
                                 <div>
                                     <div className="text-gray-500 text-xs font-medium mb-1">Best Performance</div>
-                                    <div className="text-2xl font-bold text-green-600">{bestScore}</div>
+                                    <div className="text-2xl font-bold text-green-600">
+                                        {performanceLoading ? <span className="text-gray-300 animate-pulse">—</span> : bestScore}
+                                    </div>
                                 </div>
                                 <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                                     <Trophy className="w-5 h-5" />
@@ -341,42 +391,52 @@ export function ExamDashboard({
                                 <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
                                     <BarChart3 className="w-4 h-4 text-purple-600" /> Subject Analysis
                                 </h3>
-                                <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">Based on recent tests</span>
+                                <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">Based on all tests</span>
                             </div>
                             
                             <div className="space-y-3">
-                                {activeTests.slice().reverse().map((test, index: number) => {
-                                    const title = test.title;
-                                    const testSubmissions = submissions.filter(s => s.testTitle === title);
-                                    
-                                    let avgPercent = 0;
-                                    if (testSubmissions.length > 0) {
-                                        const totalScore = testSubmissions.reduce((acc, sub) => acc + (sub.score / (sub.totalQuestions || 50)) * 100, 0);
-                                        avgPercent = Math.round(totalScore / testSubmissions.length);
-                                    }
-
-                                    // Cycle through some colors for variety
-                                    const colors = [
-                                        { text: "text-green-600", bg: "bg-green-500", barBg: "bg-gray-100" },
-                                        { text: "text-blue-600", bg: "bg-blue-500", barBg: "bg-gray-100" },
-                                        { text: "text-yellow-600", bg: "bg-yellow-400", barBg: "bg-gray-100" },
-                                        { text: "text-purple-600", bg: "bg-purple-500", barBg: "bg-gray-100" },
-                                        { text: "text-rose-600", bg: "bg-rose-500", barBg: "bg-gray-100" }
-                                    ];
-                                    const colorTheme = colors[index % colors.length];
-
-                                    return (
-                                        <div key={title} className="mb-3">
-                                            <div className="flex justify-between text-xs font-medium mb-1">
-                                                <span className="text-gray-600 truncate max-w-[70%]">{title}</span>
-                                                <span className={colorTheme.text}>{avgPercent}%</span>
+                                {performanceLoading ? (
+                                    <div className="space-y-3 animate-pulse">
+                                        {[1,2,3].map(i => (
+                                            <div key={i}>
+                                                <div className="flex justify-between mb-1">
+                                                    <div className="h-3 bg-gray-200 rounded w-32" />
+                                                    <div className="h-3 bg-gray-200 rounded w-8" />
+                                                </div>
+                                                <div className="h-2 bg-gray-200 rounded-full w-full" />
                                             </div>
-                                            <div className={`h-2 w-full ${colorTheme.barBg} rounded-full overflow-hidden`}>
-                                                <div className={`h-full ${colorTheme.bg} rounded-full transition-all duration-500`} style={{ width: `${avgPercent}%` }}></div>
+                                        ))}
+                                    </div>
+                                ) : performanceStats?.subjectPerformance?.length > 0 ? (
+                                    performanceStats.subjectPerformance.map((item: any, index: number) => {
+                                        const colors = [
+                                            { text: "text-green-600",  bg: "bg-green-500",  barBg: "bg-gray-100" },
+                                            { text: "text-blue-600",   bg: "bg-blue-500",   barBg: "bg-gray-100" },
+                                            { text: "text-yellow-600", bg: "bg-yellow-400", barBg: "bg-gray-100" },
+                                            { text: "text-purple-600", bg: "bg-purple-500", barBg: "bg-gray-100" },
+                                            { text: "text-rose-600",   bg: "bg-rose-500",   barBg: "bg-gray-100" }
+                                        ];
+                                        const colorTheme = colors[index % colors.length];
+                                        const pct = Math.min(100, Math.max(0, item.percentage || 0));
+
+                                        return (
+                                            <div key={item.subject} className="mb-3">
+                                                <div className="flex justify-between text-xs font-medium mb-1">
+                                                    <span className="text-gray-600 truncate max-w-[70%]">{item.subject}</span>
+                                                    <span className={colorTheme.text}>{pct}%</span>
+                                                </div>
+                                                <div className={`h-2 w-full ${colorTheme.barBg} rounded-full overflow-hidden`}>
+                                                    <div
+                                                        className={`h-full ${colorTheme.bg} rounded-full transition-all duration-500`}
+                                                        style={{ width: `${pct}%` }}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                   })
+                                ) : (
+                                    <p className="text-sm text-gray-500 text-center py-4">Take a test to see your subject analysis.</p>
+                                )}
                             </div>
                         </div>
 

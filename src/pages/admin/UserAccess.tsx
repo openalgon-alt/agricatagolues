@@ -8,7 +8,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { examDataService, MockTest, API_BASE_URL } from "@/services/examDataService";
-import { Search, ShieldAlert, UserCheck, ShieldCheck, Mail, Database, AlertTriangle } from "lucide-react";
+import { dataService } from "@/services/dataService";
+import { AlertTriangle, Database, Mail, Search, ShieldAlert, ShieldCheck, UserCheck, Clock, CheckCircle, Settings, Upload, Loader2, Save } from "lucide-react";
+
+interface PaymentRequest {
+    id: number;
+    user_email: string;
+    utr: string;
+    amount: string;
+    status: string;
+    created_at: string;
+}
 
 interface AccessRecord {
     id: number;
@@ -39,10 +49,98 @@ export default function UserAccess() {
     const [loadingList, setLoadingList] = useState(true);
     const [listError, setListError] = useState<string | null>(null);
 
+    const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
+    const [loadingRequests, setLoadingRequests] = useState(false);
+    const [activeTab, setActiveTab] = useState<'pending' | 'granted' | 'settings'>('pending');
+
+    // Settings state
+    const [upiId, setUpiId] = useState('agriscience@upi');
+    const [qrImageUrl, setQrImageUrl] = useState('');
+    const [savingSettings, setSavingSettings] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+
     useEffect(() => {
         loadTests();
         loadAccessList();
+        loadPaymentRequests();
+        loadSettings();
     }, []);
+
+    const loadSettings = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get-settings' })
+            });
+            const data = await response.json();
+            if (data.payment_upi_id) setUpiId(data.payment_upi_id);
+            if (data.payment_qr_url) setQrImageUrl(data.payment_qr_url);
+        } catch (e) {
+            console.error("Failed to load settings:", e);
+        }
+    };
+
+    const handleSaveSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSavingSettings(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update-settings',
+                    payload: {
+                        settings: {
+                            payment_upi_id: upiId,
+                            payment_qr_url: qrImageUrl
+                        }
+                    }
+                })
+            });
+            if (!response.ok) throw new Error("Failed to save");
+            toast.success("Payment settings updated dynamically!");
+        } catch (e) {
+            toast.error("Failed to save settings");
+        } finally {
+            setSavingSettings(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingImage(true);
+        toast.info("Uploading QR image...");
+        try {
+            const url = await dataService.uploadMemberImage(file);
+            setQrImageUrl(url);
+            toast.success("QR Code uploaded! Don't forget to click Save.");
+        } catch (error) {
+            console.error("Upload failed:", error);
+            toast.error("Image upload failed");
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    const loadPaymentRequests = async () => {
+        setLoadingRequests(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'list-payment-requests' })
+            });
+            const data = await response.json();
+            setPaymentRequests(Array.isArray(data) ? data : []);
+        } catch(e) {
+            toast.error("Failed to load payment requests");
+        } finally {
+            setLoadingRequests(false);
+        }
+    };
 
     const loadTests = async () => {
         try {
@@ -63,9 +161,10 @@ export default function UserAccess() {
         setLoadingList(true);
         setListError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/all-purchases`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'list-user-access' })
             });
             const data = await response.json();
             if (!response.ok) {
@@ -94,10 +193,14 @@ export default function UserAccess() {
         setLoadingLookup(true);
         setFoundUser(null);
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/api/admin/lookup-user?email=${encodeURIComponent(email.trim())}`,
-                { method: 'GET' }
-            );
+            const response = await fetch(`${API_BASE_URL}/api`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'lookup-user',
+                    payload: { email: email.trim() }
+                })
+            });
             const data = await response.json();
 
             if (!response.ok) {
@@ -134,14 +237,17 @@ export default function UserAccess() {
 
         setGranting(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/grant-access`, {
+            const response = await fetch(`${API_BASE_URL}/api`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userId: foundUser.user_id || foundUser.email || email.trim(),
-                    mockTestId: parseInt(selectedTestId),
-                    amount: parseFloat(amount || '0'),
-                    paymentMethod: paymentMethod
+                    action: 'grant-access',
+                    payload: {
+                        userId: foundUser?.user_id || foundUser?.firebase_uid || foundUser?.email || email.trim(),
+                        mockTestId: parseInt(selectedTestId),
+                        amount: parseFloat(amount || '0'),
+                        paymentMethod: paymentMethod
+                    }
                 })
             });
             const data = await response.json();
@@ -157,14 +263,21 @@ export default function UserAccess() {
         }
     };
 
-    const handleRevoke = async (purchaseId: number) => {
+    const handleRevoke = async (purchaseId: number, userId: string, mockTestId: number) => {
         if (!window.confirm("Are you sure you want to revoke access?")) return;
         
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/api/admin/revoke-access?id=${purchaseId}`,
-                { method: 'DELETE' }
-            );
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'revoke-access',
+                    payload: {
+                        userId: userId,
+                        mockTestId: mockTestId
+                    }
+                })
+            });
             if (!response.ok) {
                 const data = await response.json();
                 throw new Error(data.error || 'Failed to revoke access');
@@ -173,6 +286,29 @@ export default function UserAccess() {
             loadAccessList();
         } catch (error: any) {
             toast.error("Error revoking access");
+        }
+    };
+
+    const handleProcessRequest = async (reqId: number, status: string, reqEmail: string) => {
+        try {
+            await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update-payment-request',
+                    payload: { id: reqId, status }
+                })
+            });
+            toast.success(`Request marked as ${status}`);
+            loadPaymentRequests();
+            
+            if (status === 'approved') {
+                setEmail(reqEmail);
+                toast.info("Email loaded on the left. Please grant access to the appropriate Mock Test.");
+                // We use standard form submission on next line dynamically
+            }
+        } catch(e) {
+            toast.error("Failed to update request");
         }
     };
 
@@ -195,7 +331,7 @@ export default function UserAccess() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleLookup} className="flex gap-2">
+                            <form id="lookup-form" onSubmit={handleLookup} className="flex gap-2">
                                 <Input 
                                     placeholder="Enter email or Firebase UID" 
                                     required 
@@ -289,14 +425,186 @@ export default function UserAccess() {
                     </Card>
                 </div>
 
-                {/* Right Col: Access List */}
+                {/* Right Col: Access List & Payment Requests */}
                 <div className="space-y-6">
-                    <Card className="h-full">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <ShieldAlert className="w-5 h-5" /> Granted Access List
-                            </CardTitle>
-                        </CardHeader>
+                    <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+                        <button 
+                            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${activeTab === 'pending' ? 'bg-white shadow text-green-700' : 'text-gray-500 hover:text-gray-700'}`}
+                            onClick={() => setActiveTab('pending')}
+                        >
+                            <Clock className="w-4 h-4 inline-block mr-1" /> Pending Payments
+                            {paymentRequests.filter(r => r.status === 'pending').length > 0 && (
+                                <span className="ml-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                    {paymentRequests.filter(r => r.status === 'pending').length}
+                                </span>
+                            )}
+                        </button>
+                        <button 
+                            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${activeTab === 'granted' ? 'bg-white shadow text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+                            onClick={() => setActiveTab('granted')}
+                        >
+                            <ShieldCheck className="w-4 h-4 inline-block mr-1" /> Granted Access
+                        </button>
+                        <button 
+                            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${activeTab === 'settings' ? 'bg-white shadow text-purple-700' : 'text-gray-500 hover:text-gray-700'}`}
+                            onClick={() => setActiveTab('settings')}
+                        >
+                            <Settings className="w-4 h-4 inline-block mr-1" /> Settings
+                        </button>
+                    </div>
+
+                    {activeTab === 'pending' ? (
+                        <Card className="h-full border-orange-200">
+                            <CardHeader className="pb-4 bg-orange-50/50">
+                                <CardTitle className="text-lg flex items-center gap-2 text-orange-800">
+                                    <Clock className="w-5 h-5" /> Pending Payment Requests
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                {loadingRequests ? (
+                                    <div className="text-center py-8 text-gray-500">Loading requests...</div>
+                                ) : paymentRequests.filter(r => r.status === 'pending').length === 0 ? (
+                                    <div className="text-center py-8 text-gray-500">No pending payment requests found!</div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {paymentRequests.filter(r => r.status === 'pending').map((record) => (
+                                            <div key={record.id} className="border border-orange-100 bg-orange-50/30 rounded-lg p-4 space-y-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <p className="font-bold text-gray-900 text-sm">{record.user_email}</p>
+                                                        <p className="text-xs text-gray-500">{new Date(record.created_at).toLocaleString()}</p>
+                                                    </div>
+                                                    <span className="bg-orange-100 text-orange-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded">Pending</span>
+                                                </div>
+                                                <div className="bg-white p-2 rounded border border-gray-100 text-sm font-mono flex justify-between items-center">
+                                                    <div><span className="text-gray-500 text-xs mr-2 uppercase">UTR:</span>{record.utr}</div>
+                                                    <div className="font-bold text-green-700">₹{record.amount}</div>
+                                                </div>
+                                                <div className="flex gap-2 pt-1">
+                                                    <Button 
+                                                        size="sm" 
+                                                        className="flex-1 bg-green-600 hover:bg-green-700"
+                                                        onClick={() => handleProcessRequest(record.id, 'approved', record.user_email)}
+                                                    >
+                                                        <CheckCircle className="w-4 h-4 mr-1" /> Verify & Prepare Grant
+                                                    </Button>
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="outline"
+                                                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                                        onClick={() => handleProcessRequest(record.id, 'rejected', record.user_email)}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                
+                                {paymentRequests.filter(r => r.status !== 'pending').length > 0 && (
+                                    <div className="mt-8 pt-4 border-t">
+                                        <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Recently Processed</p>
+                                        <div className="space-y-2 opacity-70">
+                                            {paymentRequests.filter(r => r.status !== 'pending').slice(0, 5).map(r => (
+                                                <div key={r.id} className="flex justify-between items-center text-xs p-2 bg-gray-50 rounded">
+                                                    <span>{r.user_email}</span>
+                                                    <span className={`px-1.5 py-0.5 rounded ${r.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                        {r.status}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ) : activeTab === 'settings' ? (
+                        <Card className="h-full border-purple-200">
+                            <CardHeader className="pb-4 bg-purple-50/50">
+                                <CardTitle className="text-lg flex items-center gap-2 text-purple-800">
+                                    <Settings className="w-5 h-5" /> Payment Configuration
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <form onSubmit={handleSaveSettings} className="space-y-6">
+                                    <div className="space-y-3">
+                                        <Label htmlFor="upiId" className="text-base font-semibold">UPI ID</Label>
+                                        <Input
+                                            id="upiId"
+                                            value={upiId}
+                                            onChange={(e) => setUpiId(e.target.value)}
+                                            placeholder="e.g. yourname@sbi"
+                                            required
+                                            className="text-lg"
+                                        />
+                                        <p className="text-sm text-gray-500">This exactly what users will copy to their payment app.</p>
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                        <Label className="text-base font-semibold">QR Code Image</Label>
+                                        <div className="flex flex-col sm:flex-row gap-6 items-start">
+                                            <div className="w-48 h-48 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center shrink-0 p-2 overflow-hidden relative group">
+                                                {qrImageUrl ? (
+                                                    <img src={qrImageUrl} alt="QR Code" className="max-w-full max-h-full object-contain" />
+                                                ) : (
+                                                    <span className="text-sm text-gray-400 font-medium text-center">No QR Code<br/>Uploaded</span>
+                                                )}
+                                                {uploadingImage && (
+                                                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                                                        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="space-y-4 flex-1">
+                                                <p className="text-sm text-gray-600">Upload a square image of your UPI QR Code. It will be displayed directly inside the payment popup.</p>
+                                                <div className="relative">
+                                                    <input
+                                                        type="file"
+                                                        id="qrUpload"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleImageUpload}
+                                                        disabled={uploadingImage}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => document.getElementById('qrUpload')?.click()}
+                                                        disabled={uploadingImage}
+                                                        className="w-full sm:w-auto"
+                                                    >
+                                                        <Upload className="h-4 w-4 mr-2" />
+                                                        Choose Image
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-6 border-t">
+                                        <Button 
+                                            type="submit" 
+                                            disabled={savingSettings || uploadingImage}
+                                            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700"
+                                        >
+                                            {savingSettings ? (
+                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+                                            ) : (
+                                                <><Save className="mr-2 h-4 w-4" /> Save Payment Settings</>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Card className="h-full">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <ShieldAlert className="w-5 h-5" /> Granted Access List
+                                </CardTitle>
+                            </CardHeader>
                         <CardContent>
                             {loadingList ? (
                                 <div className="text-center py-8 text-gray-500">Loading access list...</div>
@@ -348,7 +656,7 @@ export default function UserAccess() {
                                                                 variant="outline" 
                                                                 size="sm" 
                                                                 className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                                                                onClick={() => handleRevoke(record.id)}
+                                                                onClick={() => handleRevoke(record.id, record.user_id, record.mock_test_id)}
                                                             >
                                                                 Revoke
                                                             </Button>
@@ -362,6 +670,7 @@ export default function UserAccess() {
                             )}
                         </CardContent>
                     </Card>
+                    )}
                 </div>
             </div>
         </div>

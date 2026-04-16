@@ -95,54 +95,115 @@ export default function ExamPage() {
         };
     }, []);
 
+    // ─── mapSessionToUser ───────────────────────────────────────────────────────
+    // Called ONLY after Firebase auth state is confirmed (isAuthLoading guard above).
+    // Uses Firebase UID as the SOLE identity — never email.
     const mapSessionToUser = async (firebaseUser: any) => {
+        const uid   = firebaseUser.uid;           // Firebase UID — single source of truth
+        const email = firebaseUser.email || "";
+
+        console.log("[ExamAuth] Firebase UID:", uid);
+
+        // Seed state with basic info immediately so UI is responsive
         const baseData = {
-            id: firebaseUser.uid || firebaseUser.id,
-            email: firebaseUser.email,
-            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "",
-            phone: "",
-            mobile: "",
-            college: "",
-            district: "",
-            guardianName: "",
+            id:                 uid,
+            email,
+            name:               firebaseUser.displayName || email.split('@')[0] || "",
+            phone:              "",
+            mobile:             "",
+            college:            "",
+            district:           "",
+            guardianName:       "",
             guardianProfession: "",
-            guardianContact: "",
+            guardianContact:    "",
         };
         setUserDetails(baseData);
 
-        // Fetch saved profile from the database
+        // ── Step 1: Check localStorage first (fast path for returning users) ──
+        const localKey   = `profile_completed_${uid}`;
+        const localFlag  = localStorage.getItem(localKey) === 'true';
+
+        // ── Step 2: Fetch profile from DB using UID only ──────────────────────
+        let profileFound = false;
         try {
-            const res = await fetch(`${API_BASE_URL}/api/save-profile?firebase_uid=${encodeURIComponent(baseData.id)}`);
+            const res = await fetch(`${API_BASE_URL}/api`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({
+                    action:  'get-profile',
+                    payload: { firebase_uid: uid }   // UID only — no email lookup
+                })
+            });
+
             if (res.ok) {
                 const json = await res.json();
+                console.log("[ExamAuth] Profile found:", !!json.profile);
+
                 if (json.profile) {
+                    profileFound = true;
                     const p = json.profile;
+
+                    // Merge DB data into userDetails
                     const merged = {
                         ...baseData,
-                        name: p.name || baseData.name,
-                        phone: p.mobile || "",
-                        mobile: p.mobile || "",
-                        college: p.college || "",
-                        district: p.district || "",
-                        guardianName: p.guardian_name || "",
+                        name:               p.name               || baseData.name,
+                        phone:              p.mobile             || "",
+                        mobile:             p.mobile             || "",
+                        college:            p.college            || "",
+                        district:           p.district           || "",
+                        guardianName:       p.guardian_name      || "",
                         guardianProfession: p.guardian_profession || "",
-                        guardianContact: p.guardian_contact || "",
+                        guardianContact:    p.guardian_contact   || "",
                     };
                     setUserDetails(merged);
-                    // Profile complete if all essential fields are filled
-                    const isComplete = !!(merged.mobile && merged.college && merged.district && merged.guardianName);
-                    setIsProfileIncomplete(!isComplete);
-                    if (!isComplete) {
-                        setTimeout(() => setShowUserDetailsModal(true), 250);
-                    }
-                    return;
+
+                    // Persist recognition to localStorage
+                    localStorage.setItem(localKey, 'true');
+                    setIsProfileIncomplete(false);
+                    return; // ✅ Returning user — done, no popup
                 }
             }
         } catch (e) {
-            console.warn("Could not fetch saved profile:", e);
+            console.warn("[ExamAuth] Profile fetch error:", e);
         }
 
-        // No saved profile — mark incomplete so modal opens
+        // ── Step 3: LocalStorage fallback (network errors / offline) ──────────
+        if (localFlag) {
+            console.log("[ExamAuth] Using localStorage fallback — skipping popup");
+            setIsProfileIncomplete(false);
+            return;
+        }
+
+        // ── Step 4: Truly new user — auto-create a minimal profile silently ───
+        if (!profileFound) {
+            console.log("[ExamAuth] New user detected. Auto-creating minimal profile...");
+            try {
+                await fetch(`${API_BASE_URL}/api`, {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({
+                        action:  'save-profile',
+                        payload: {
+                            firebase_uid: uid,
+                            email,
+                            name:                 baseData.name,
+                            mobile:               "",
+                            college:              "",
+                            district:             "",
+                            guardian_name:        "",
+                            guardian_profession:  "",
+                            guardian_contact:     "",
+                        }
+                    })
+                });
+                console.log("[ExamAuth] Minimal profile created for UID:", uid);
+            } catch (e) {
+                console.warn("[ExamAuth] Could not auto-create profile:", e);
+            }
+        }
+
+        // ── Step 5: Show profile completion popup (new users with missing fields) ─
+        // Popup condition: authenticated + no complete profile + no localStorage flag
         setIsProfileIncomplete(true);
         setTimeout(() => setShowUserDetailsModal(true), 250);
     };
@@ -159,7 +220,7 @@ export default function ExamPage() {
     const handleSignupSuccess = () => {
         setIsAuthOpen(false);
         setShowLanding(false);
-        setTimeout(() => setShowUserDetailsModal(true), 250);
+        // We rely entirely on mapSessionToUser (fired by auth state change) to show the modal if truly needed
     };
 
     const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
@@ -172,19 +233,22 @@ export default function ExamPage() {
 
         // 2. Save profile to Supabase via API
         try {
-            const res = await fetch(`${API_BASE_URL}/api/save-profile`, {
+            const res = await fetch(`${API_BASE_URL}/api`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    firebase_uid: user?.uid || userDetails?.id,
-                    name: data.name,
-                    mobile: data.mobile,
-                    email: data.email || userDetails?.email,
-                    college: data.college,
-                    district: data.district,
-                    guardian_name: data.guardianName,
-                    guardian_profession: data.guardianProfession,
-                    guardian_contact: data.guardianContact,
+                    action: 'save-profile',
+                    payload: {
+                        firebase_uid: user?.uid || userDetails?.id,
+                        name: data.name,
+                        mobile: data.mobile,
+                        email: data.email || userDetails?.email,
+                        college: data.college,
+                        district: data.district,
+                        guardian_name: data.guardianName,
+                        guardian_profession: data.guardianProfession,
+                        guardian_contact: data.guardianContact,
+                    }
                 })
             });
             const json = await res.json();
@@ -213,6 +277,12 @@ export default function ExamPage() {
             guardianProfession: data.guardianProfession,
             guardianContact: data.guardianContact,
         }));
+        
+        // Use localStorage as a bulletproof fallback to prevent prompt loops
+        if (user?.uid || userDetails?.id) {
+            localStorage.setItem(`profile_completed_${user?.uid || userDetails?.id}`, 'true');
+        }
+
         setIsProfileIncomplete(false);
         setShowUserDetailsModal(false);
     };
@@ -465,22 +535,38 @@ export default function ExamPage() {
         try { await document.documentElement.requestFullscreen(); } catch (e) { console.warn(e); }
 
         try {
+            // ── STRICT UID TRACE: log exactly what is sent to start-test
+            console.log('[ExamFlow] >>> start-test user_id:', userDetails.id);
+            console.log('[ExamFlow] >>> test_id:', test.id, '| retake:', !!retake);
+
             const response = await fetch(`${API_BASE_URL}/api/start-test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userDetails.id, test_id: test.id, retake })
+                body: JSON.stringify({
+                    user_id: userDetails.id,       // Firebase UID — must match DB
+                    test_id:  test.id,
+                    retake:   !!retake,
+                    name:     userDetails.name    || '',
+                    email:    userDetails.email   || '',
+                    phone:    userDetails.mobile  || userDetails.phone || '',
+                    college:  userDetails.college || '',
+                })
             });
             const responseData = await response.json();
 
             if (!response.ok) {
+                console.error('[ExamFlow] start-test failed:', responseData);
                 toast.error(`Error: ${responseData.error || 'Could not start session'}`);
                 return;
             }
 
             const aid = responseData.attempt_id;
+            console.log('[ExamFlow] >>> attempt_id received:', aid);
             if (aid) {
                 setSubmissionId(aid);
                 sessionStorage.setItem('submissionId', aid.toString());
+            } else {
+                console.error('[ExamFlow] No attempt_id returned! Submissions will fail.');
             }
         } catch (err: any) {
             toast.error('Failed to initialize session: ' + (err.message || String(err)));
@@ -506,25 +592,19 @@ export default function ExamPage() {
     const [submissions, setSubmissions] = useState<any[]>([]);
 
     useEffect(() => {
-        // Redundant fetch block, keeping in sync just in case
-        if (userDetails?.id || userDetails?.email) {
+        if (userDetails?.id) {
+            // Always use Firebase UID — never email — for consistent identity
             Promise.all([
-                userDetails.id ? examDataService.getUserPurchases(userDetails.id) : Promise.resolve([]),
-                userDetails.email ? examDataService.getUserPurchases(userDetails.email) : Promise.resolve([])
-            ]).then(([p1, p2]) => {
-                const map = new Map();
-                p1.forEach(p => map.set(p.mockTestId, p));
-                p2.forEach(p => map.set(p.mockTestId, p));
-                setPurchases(Array.from(map.values()));
+                examDataService.getUserPurchases(userDetails.id),
+            ]).then(([p1]) => {
+                setPurchases(p1);
             });
-            if (userDetails.email) {
-                examDataService.getUserSubmissions(userDetails.email).then(setSubmissions);
-            }
+            examDataService.getUserSubmissions(userDetails.id).then(setSubmissions);
         } else {
             setPurchases([]);
             setSubmissions([]);
         }
-    }, [userDetails?.id, userDetails?.email]);
+    }, [userDetails?.id]);
 
 
     const handleSubmitExam = async () => {
@@ -541,6 +621,17 @@ export default function ExamPage() {
             // Save Result & Calculate Score via REST endpoint
             if (submissionId) {
                 try {
+                    // ── PRE-SUBMIT DEBUG ────────────────────────────────────────
+                    console.log('[submit] answers object:', JSON.stringify(answers));
+                    console.log('[submit] answers keys:', Object.keys(answers));
+                    if (questions.length > 0) {
+                        const q0 = questions[0];
+                        console.log('[submit] first q.id=', q0.id, typeof q0.id,
+                            '| answers[q0.id]=', answers[q0.id],
+                            '| answers[String(q0.id)]=', answers[String(q0.id)]
+                        );
+                    }
+                    // ────────────────────────────────────────────────────────────
                     const response = await fetch(`${API_BASE_URL}/api/submit-test`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -886,12 +977,21 @@ export default function ExamPage() {
                     <div className="max-w-3xl w-full space-y-6">
                         <h2 className="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-4">Detailed Analysis</h2>
                         {questions.map((q: any) => {
-                            const userAnswer = answers[q.id];
-                            const correctIndex = q.correctOptionIndex;
-                            const correctOption = correctIndex !== undefined ? q.options[correctIndex] : null;
-                            const isCorrect = userAnswer === correctOption;
-                            const isSkipped = !userAnswer;
-                            const isWrong = !isSkipped && !isCorrect;
+                            // Answer is always a string index: "0","1","2","3"
+                            const rawAnswer    = answers[q.id] ?? answers[String(q.id)];
+                            const userIndex    = parseInt(String(rawAnswer ?? ''), 10);
+                            const correctIndex = parseInt(String(q.correctOptionIndex ?? ''), 10);
+
+                            // Old text-format answers produce NaN → treated as skipped
+                            const isSkipped = rawAnswer === undefined || rawAnswer === null
+                                || rawAnswer === '' || isNaN(userIndex);
+                            const isCorrect = !isSkipped && !isNaN(correctIndex)
+                                && userIndex === correctIndex;
+                            const isWrong   = !isSkipped && !isCorrect;
+
+                            // Text to show — resolved from index only
+                            const userOptionText    = !isSkipped ? (q.options[userIndex]    ?? '') : '';
+                            const correctOptionText = !isNaN(correctIndex) ? (q.options[correctIndex] ?? '') : '';
 
                             return (
                                 <Card
@@ -938,8 +1038,9 @@ export default function ExamPage() {
 
                                             <div className="space-y-2 mt-4">
                                                 {q.options.map((option: string, optIdx: number) => {
-                                                    const isSelected = userAnswer === option;
-                                                    const isThisCorrect = option === correctOption;
+                                                    // Compare loop index against parsed indices — pure integer comparison
+                                                    const isSelected    = !isSkipped && optIdx === userIndex;
+                                                    const isThisCorrect = !isNaN(correctIndex) && optIdx === correctIndex;
 
                                                     let styles = "border-gray-200 bg-white text-gray-700 hover:bg-gray-50";
                                                     let badge = null;

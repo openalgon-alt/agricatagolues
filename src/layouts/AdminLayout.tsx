@@ -9,7 +9,8 @@ import {
     Users,
     ShoppingBag,
     GraduationCap,
-    KeyRound
+    KeyRound,
+    MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +39,7 @@ export const AdminLayout = () => {
         { title: "Exam Submissions", url: "/admin/exams/submissions", icon: GraduationCap },
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
         { title: "Students", url: "/admin/students", icon: Users },
+        { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
         // { title: "Settings", url: "/admin/settings", icon: Settings }, // Future
     ];
 

@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { examDataService, MockTest } from "@/services/examDataService";
+import { examDataService, MockTest, API_BASE_URL } from "@/services/examDataService";
 
 export default function ExamList() {
     const [tests, setTests] = useState<MockTest[]>([]);
@@ -23,7 +23,7 @@ export default function ExamList() {
     const loadTests = async () => {
         try {
             // Fetch all tests (including inactive)
-            const res = await fetch('/api/mock-tests', {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ activeOnly: false })

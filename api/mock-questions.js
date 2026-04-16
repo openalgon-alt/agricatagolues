@@ -17,8 +17,9 @@ export default async function handler(req, res) {
         return res.status(200).json({});
     }
 
-    if (!process.env.DATABASE_URL) {
-        return res.status(500).json({ error: 'DATABASE_URL not set.' });
+    const dbUrl = process.env.CLOUD_SQL_URL || process.env.VITE_CLOUD_SQL_URL || process.env.DATABASE_URL;
+    if (!dbUrl) {
+        return res.status(500).json({ error: 'DATABASE_URL or CLOUD_SQL_URL environment variable is not set.' });
     }
 
     let testId;
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
     }
 
     const client = new Client({
-        connectionString: process.env.DATABASE_URL,
+        connectionString: dbUrl,
         ssl: { rejectUnauthorized: false },
     });
 
@@ -51,12 +52,19 @@ export default async function handler(req, res) {
         }
 
         const qResult = await client.query(
-            `SELECT id, mock_test_id, question_text, options, image_url, marks, topic
+            `SELECT id, mock_test_id, question_text, options,
+                    correct_option_index, image_url, marks, topic
              FROM mock_questions 
              WHERE mock_test_id = $1 
              ORDER BY id ASC`,
             [testId]
         );
+
+        console.log('[mock-questions] Fetched', qResult.rows.length,
+            'questions for test_id:', testId,
+            '| first correct_option_index sample:',
+            qResult.rows[0]?.correct_option_index);
+
 
         return res.status(200).json({
             test: testResult.rows[0],

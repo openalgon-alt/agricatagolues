@@ -18,12 +18,13 @@ export default async function handler(req, res) {
         return res.status(200).json({});
     }
 
-    if (!process.env.DATABASE_URL) {
-        return res.status(500).json({ error: 'DATABASE_URL environment variable is not set.' });
+    const dbUrl = process.env.CLOUD_SQL_URL || process.env.VITE_CLOUD_SQL_URL || process.env.DATABASE_URL;
+    if (!dbUrl) {
+        return res.status(500).json({ error: 'DATABASE_URL or CLOUD_SQL_URL environment variable is not set.' });
     }
 
     const client = new Client({
-        connectionString: process.env.DATABASE_URL,
+        connectionString: dbUrl,
         ssl: { rejectUnauthorized: false },
     });
 

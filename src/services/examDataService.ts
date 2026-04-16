@@ -9,6 +9,14 @@ export interface MockTest {
     questions?: MockQuestion[];
 }
 
+export interface OfflineCoachingCenter {
+    id: number;
+    name: string;
+    address: string;
+    mapUrl: string;
+}
+
+
 export interface MockQuestion {
     id: number | string;
     mockTestId: number | string;
@@ -47,7 +55,7 @@ const isLocalhost = typeof window !== 'undefined' &&
 export const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
 
 class ExamDataService {
-    public readonly BUNDLE_PRICE = 4000;
+    public readonly BUNDLE_PRICE = 2000;
     public readonly BUNDLE_ACCESS_ID = -1;
 
     async getMockTests(activeOnly: boolean = true): Promise<MockTest[]> {
@@ -147,12 +155,70 @@ class ExamDataService {
         }
     }
 
+    async getUserPerformanceStats(userId: string): Promise<any> {
+        if (!userId) return null;
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/user-performance?userId=${encodeURIComponent(userId)}&_t=${Date.now()}`,
+                { method: 'GET', cache: 'no-store' }
+            );
+            if (!response.ok) return null;
+            return await response.json();
+        } catch {
+            return null;
+        }
+    }
+
     async grantUserAccess(userId: string, testId: string | number, amount: number): Promise<void> {
         console.log(`Granted access to user ${userId} for test ${testId}`);
     }
 
     hasBundleAccess(purchases: UserPurchase[]): boolean {
         return purchases.some(p => Number(p.mockTestId) === Number(this.BUNDLE_ACCESS_ID) && p.status === 'active');
+    }
+
+    async getOfflineCoachingCenters(): Promise<OfflineCoachingCenter[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/offline-coaching`);
+            if (!response.ok) throw new Error('Failed to fetch offline coaching centers');
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching offline coaching centers:", error);
+            return [];
+        }
+    }
+
+    async saveOfflineCoachingCenter(center: Partial<OfflineCoachingCenter>): Promise<OfflineCoachingCenter> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/save-offline-coaching`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(center)
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to save offline coaching center');
+            return data;
+        } catch (error) {
+            console.error("Error saving offline coaching center:", error);
+            throw error;
+        }
+    }
+
+    async deleteOfflineCoachingCenter(id: number | string): Promise<void> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/delete-offline-coaching`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error('Failed to delete offline coaching center: ' + text.substring(0, 50));
+            }
+        } catch (error) {
+            console.error("Error deleting offline coaching center:", error);
+            throw error;
+        }
     }
 
     // --- Admin Operations ---

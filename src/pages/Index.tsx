@@ -1,6 +1,7 @@
 import { Layout } from '@/components/layout/Layout';
 import { HeroSection } from '@/components/home/HeroSection';
 import { AboutSection } from '@/components/home/AboutSection';
+import { MockTestPromoModal } from '@/components/home/MockTestPromoModal';
 import { Helmet } from 'react-helmet-async';
 
 const Index = () => {
@@ -33,6 +34,7 @@ const Index = () => {
         <HeroSection />
         <AboutSection />
       </Layout>
+      <MockTestPromoModal />
     </>
   );
 };

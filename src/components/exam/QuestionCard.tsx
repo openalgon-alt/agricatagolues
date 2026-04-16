@@ -74,13 +74,16 @@ export function QuestionCard({ question, selectedOption, onSelect, currentQuesti
                     >
                         {question.options.map((option, index) => {
                             const optionId = `q${question.id}-opt${index}`;
+                            // value is the index as a string — avoids any text-encoding issues
+                            const indexStr = String(index);
+                            const isSelected = selectedOption === indexStr;
                             return (
                                 <div key={index} className={cn(
                                     "flex items-start space-x-4 border p-4 md:p-5 rounded-xl cursor-pointer transition-all hover:bg-gray-50/80",
-                                    selectedOption === option ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600 shadow-sm" : "border-gray-200"
+                                    isSelected ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600 shadow-sm" : "border-gray-200"
                                 )}>
                                     <div className="pt-0.5">
-                                        <RadioGroupItem value={option} id={optionId} className={cn("w-5 h-5 text-blue-600", selectedOption === option ? "border-blue-600" : "")} />
+                                        <RadioGroupItem value={indexStr} id={optionId} className={cn("w-5 h-5 text-blue-600", isSelected ? "border-blue-600" : "")} />
                                     </div>
                                     <Label htmlFor={optionId} className="flex-1 cursor-pointer font-medium text-base md:text-lg text-gray-700 leading-relaxed">
                                         {option}
