@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: ["agricatagolues.onrender.com"],
     proxy: {
       '/api': {
         target: 'https://agri-backend-plux.vercel.app',
