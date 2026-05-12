@@ -13,7 +13,6 @@ const navItems = [
   { name: 'Current Issue', path: '/current-issue', newTab: false },
   { name: 'Archives', path: '/archives', newTab: false },
   { name: 'Publish with Us', path: '/publish-with-us', newTab: false },
-  { name: 'Mock Tests', path: '/exam', newTab: true },
   { name: 'Shop', path: '/shop', newTab: false },
   { name: 'Membership', path: '/membership', newTab: false },
   { name: 'Contact', path: '/contact', newTab: false },

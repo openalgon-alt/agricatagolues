@@ -45,8 +45,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return { success: false, error: error.message };
             }
             return { success: !!data.user };
-        } catch (e: any) {
-            return { success: false, error: e.message || "An unexpected error occurred" };
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            return { success: false, error: msg || "An unexpected error occurred" };
         }
     };
 

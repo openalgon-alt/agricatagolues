@@ -14,6 +14,7 @@ const Archives = () => {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   const loadArchives = async () => {
     try {
@@ -23,6 +24,14 @@ const Archives = () => {
       // Extract years
       const years = Array.from(new Set(data.map(i => i.year))).sort((a, b) => b - a);
       setAvailableYears(years);
+      // Debug: expose first few coverUrl values for inspection
+      try {
+        const debugList = data.map(d => ({ id: d.id, coverUrl: d.coverUrl }));
+        console.log('Archives debug (id -> coverUrl):', debugList.slice(0, 50));
+        setDebugInfo(JSON.stringify(debugList.slice(0, 50), null, 2));
+      } catch (e) {
+        console.error('Failed to build archives debug info', e);
+      }
     } catch (error) {
       console.error("Failed to load archives");
     } finally {
@@ -170,7 +179,12 @@ const Archives = () => {
                         >
                           <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-primary/5 flex flex-col items-center justify-center p-6 relative">
                             {item.coverUrl ? (
-                              <img src={item.coverUrl} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                              <img
+                                src={item.coverUrl}
+                                alt={item.title}
+                                className="absolute inset-0 w-full h-full object-cover"
+                                onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.style.display = 'none'; }}
+                              />
                             ) : (
                               <>
                                 <Calendar className="w-12 h-12 text-primary/40 mb-4" />
@@ -209,7 +223,12 @@ const Archives = () => {
                         >
                           <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-lg flex flex-col items-center justify-center overflow-hidden">
                             {item.coverUrl ? (
-                              <img src={item.coverUrl} alt={item.title} className="w-full h-full object-cover" />
+                              <img
+                                src={item.coverUrl}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.style.display = 'none'; }}
+                              />
                             ) : (
                               <>
                                 <span className="text-lg font-display font-bold text-primary">
@@ -238,6 +257,16 @@ const Archives = () => {
           </div>
         </section>
       </Layout>
+      {/* Temporary debug overlay: shows first 50 id -> coverUrl entries. Remove after verification. */}
+      {typeof debugInfo === 'string' && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm w-80 max-h-56 overflow-auto bg-white/95 border border-border rounded p-2 text-xs shadow-lg">
+          <div className="flex justify-between items-center mb-1">
+            <strong className="text-sm">Archives debug</strong>
+            <button className="text-muted-foreground text-xs" onClick={() => setDebugInfo(null)}>Close</button>
+          </div>
+          <pre className="whitespace-pre-wrap">{debugInfo}</pre>
+        </div>
+      )}
     </>
   );
 };

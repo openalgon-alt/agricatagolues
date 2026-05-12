@@ -57,11 +57,38 @@ class DataService {
             month: dbIssue.month,
             year: dbIssue.year,
             status: dbIssue.status,
-            coverUrl: dbIssue.cover_url,
+            coverUrl: this.ensureAbsoluteUrl(dbIssue.cover_url),
             pdfUrl: dbIssue.pdf_url,
             publishDate: dbIssue.publish_date,
             articles: dbIssue.articles ? dbIssue.articles.map(this.mapArticleFromDB) : []
         };
+    }
+
+    // Normalize stored URLs to absolute URLs the browser can load.
+    // Handles values like '/uploads/xyz.jpg', 'uploads/xyz.jpg', '//host/xyz', or missing protocol.
+    private ensureAbsoluteUrl(raw: any): string | undefined {
+        if (!raw) return undefined;
+        if (typeof raw !== 'string') return undefined;
+        const s = raw.trim();
+        if (!s) return undefined;
+        // Already absolute
+        if (/^https?:\/\//i.test(s)) return s;
+        // Protocol-relative
+        if (/^\/\//.test(s)) {
+            if (typeof window !== 'undefined' && window.location && window.location.protocol) {
+                return window.location.protocol + s;
+            }
+            return 'https:' + s;
+        }
+        // Root-relative
+        if (s.startsWith('/')) {
+            if (typeof window !== 'undefined' && window.location) {
+                return `${window.location.origin}${s}`;
+            }
+            return `https://agricatalogues.in${s}`;
+        }
+        // Bare path or filename - assume host root
+        return `https://agricatalogues.in/${s}`;
     }
 
     private mapArticleFromDB(dbArticle: any): Article {

@@ -3,13 +3,9 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import {
     LayoutDashboard,
     FileText,
-    Settings,
     LogOut,
-    Menu,
     Users,
     ShoppingBag,
-    GraduationCap,
-    KeyRound,
     MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,10 +33,6 @@ export const AdminLayout = () => {
         { title: "Issues", url: "/admin/issues", icon: FileText },
         { title: "Editorial Board", url: "/admin/editorial-board", icon: Users },
         { title: "Shop Products", url: "/admin/products", icon: ShoppingBag },
-        { title: "Manage Exams", url: "/admin/exams", icon: GraduationCap },
-        { title: "Exam Submissions", url: "/admin/exams/submissions", icon: GraduationCap },
-        { title: "User Access", url: "/admin/user-access", icon: KeyRound },
-        { title: "Students", url: "/admin/students", icon: Users },
         { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
     ];
 

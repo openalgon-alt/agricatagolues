@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import EditorialBoard from "./pages/EditorialBoard";
 import Guidelines from "./pages/Guidelines";
@@ -14,9 +14,7 @@ import Shop from "./pages/Shop";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
-import ExamPage from "./pages/ExamPage";
 import { AuthProvider } from "./context/AuthContext";
-import { ExamAuthProvider } from "./context/ExamAuthContext";
 import Login from "./pages/admin/Login";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { RequireAuth } from "./components/admin/RequireAuth";
@@ -30,11 +28,6 @@ import EditorialBoardList from "./pages/admin/EditorialBoardList";
 import EditorialMemberEditor from "./pages/admin/EditorialMemberEditor";
 import ProductList from "./pages/admin/ProductList";
 import ProductEditor from "./pages/admin/ProductEditor";
-import ExamSubmissions from "./pages/admin/ExamSubmissions";
-import ExamList from "./pages/admin/ExamList";
-import ExamEditor from "./pages/admin/ExamEditor";
-import UserAccess from "./pages/admin/UserAccess";
-import StudentList from "./pages/admin/StudentList";
 import OfflineCoachingList from "./pages/admin/OfflineCoachingList";
 
 const queryClient = new QueryClient();
@@ -45,10 +38,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <ExamAuthProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/editorial-board" element={<EditorialBoard />} />
             <Route path="/guidelines" element={<Guidelines />} />
@@ -60,7 +52,8 @@ const App = () => (
             <Route path="/issues/:id" element={<IssueView />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/exam" element={<ExamPage />} />
+            <Route path="/exam" element={<Navigate to="/" replace />} />
+            <Route path="/exam/*" element={<Navigate to="/" replace />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
@@ -79,19 +72,12 @@ const App = () => (
               <Route path="products" element={<ProductList />} />
               <Route path="products/new" element={<ProductEditor />} />
               <Route path="products/:id" element={<ProductEditor />} />
-              <Route path="exams" element={<ExamList />} />
-              <Route path="exams/new" element={<ExamEditor />} />
-              <Route path="exams/:id" element={<ExamEditor />} />
-              <Route path="exam-submissions" element={<ExamSubmissions />} />
-              <Route path="user-access" element={<UserAccess />} />
-              <Route path="students" element={<StudentList />} />
               <Route path="offline-coaching" element={<OfflineCoachingList />} />
             </Route>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </ExamAuthProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

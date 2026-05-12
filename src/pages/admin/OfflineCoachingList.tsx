@@ -43,8 +43,9 @@ export default function OfflineCoachingList() {
             toast.success("Coaching center saved!");
             setIsDialogOpen(false);
             loadCenters();
-        } catch (error: any) {
-            toast.error(error.message || "Failed to save");
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : String(error);
+            toast.error(msg || "Failed to save");
         }
     };
 
@@ -55,8 +56,9 @@ export default function OfflineCoachingList() {
             await examDataService.deleteOfflineCoachingCenter(id);
             toast.success("Deleted successfully");
             loadCenters();
-        } catch (error: any) {
-            toast.error(error.message || "Failed to delete");
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : String(error);
+            toast.error(msg || "Failed to delete");
         }
     };
 
