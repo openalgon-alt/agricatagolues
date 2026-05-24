@@ -224,8 +224,7 @@ export default function ExamPage() {
 
     const handleSignupSuccess = () => {
         setIsAuthOpen(false);
-        setShowLanding(false);
-        // We rely entirely on mapSessionToUser (fired by auth state change) to show the modal if truly needed
+        // Do not update showLanding here; let the onAuthStateChanged useEffect handle it securely after checking profile status
     };
 
     const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
@@ -742,7 +741,7 @@ export default function ExamPage() {
 
     const renderContent = () => {
 
-    // -2. Auth Check Loading
+    // -1.5 Auth Check Loading
     if (isAuthLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white flex-col gap-3">
@@ -752,6 +751,14 @@ export default function ExamPage() {
         );
     }
     
+    // -1. Profile Fetching Phase (Immediate loading interlock)
+    if (isProfileFetching) {
+        return <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+            <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
+            <p className="text-gray-500">Retrieving Account Details...</p>
+        </div>;
+    }
+
     // -1. Landing Page
     if (showLanding) {
         return (
@@ -761,14 +768,6 @@ export default function ExamPage() {
                 onSignup={() => { setAuthMode("signup"); setIsAuthOpen(true); }}
             />
         );
-    }
-
-    // 0. Loading
-    if (isProfileFetching) {
-        return <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-            <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
-            <p className="text-gray-500">Retrieving Account Details...</p>
-        </div>;
     }
 
     if (loading && !selectedTest && activeTests.length === 0) {
