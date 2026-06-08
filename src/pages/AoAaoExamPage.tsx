@@ -16,6 +16,7 @@ import { ExamPurchaseView } from "@/components/exam/ExamPurchaseView";
 import { PremiumTestsList } from "@/components/exam/PremiumTestsList";
 import { UserDetailsModal } from "@/components/exam/UserDetailsModal";
 import { useExamAuth } from "@/context/ExamAuthContext";
+import { useStrictExamMode } from "@/hooks/useStrictExamMode";
 import mainLogoImg from "@/assets/main-logo.png";
 
 // ─── AO/AAO Landing Page ──────────────────────────────────────────────────────
@@ -183,6 +184,13 @@ export default function AoAaoExamPage() {
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [showPurchaseView, setShowPurchaseView] = useState(false);
     const [submissions, setSubmissions] = useState<any[]>([]);
+
+    useStrictExamMode(
+        selectedTest
+            ? (isSubmitted ? 'result' : 'exam')
+            : (viewResultData ? 'result' : 'inactive'),
+        userDetails
+    );
 
     // Sync User Details from Auth Context
     useEffect(() => {
@@ -836,9 +844,6 @@ export default function AoAaoExamPage() {
                                 <Button onClick={() => window.location.reload()} variant="outline" className="print:hidden">
                                     Take Exam Again
                                 </Button>
-                                <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700 print:hidden text-white shadow-md">
-                                    <Printer className="w-4 h-4 mr-2" /> Download Report
-                                </Button>
                             </div>
                         </Card>
 
@@ -920,13 +925,7 @@ export default function AoAaoExamPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className={cn(
-                            "flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono font-bold text-sm",
-                            timeLeft <= 300 ? "bg-red-600 animate-pulse" : "bg-blue-700"
-                        )}>
-                            <Clock className="w-4 h-4" />
-                            {formatTime(timeLeft)}
-                        </div>
+
                         <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:bg-blue-700">
                             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                         </Button>
@@ -948,12 +947,11 @@ export default function AoAaoExamPage() {
                             </div>
                         ) : questions.length > 0 ? (
                             <QuestionCard
-                                question={questions[currentQuestionIndex]}
-                                questionNumber={currentQuestionIndex + 1}
-                                totalQuestions={questions.length}
-                                selectedAnswer={answers[questions[currentQuestionIndex]?.id]}
-                                onSelectAnswer={handleOptionSelect}
-                                isSubmitted={false}
+                                key={questions[currentQuestionIndex].id}
+                                question={questions[currentQuestionIndex] as any}
+                                selectedOption={answers[questions[currentQuestionIndex]?.id] || null}
+                                onSelect={handleOptionSelect}
+                                currentQuestionIndex={currentQuestionIndex}
                             />
                         ) : (
                              <div className="flex items-center justify-center h-full flex-col gap-4">

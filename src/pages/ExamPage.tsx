@@ -17,6 +17,7 @@ import { ExamPurchaseView } from "@/components/exam/ExamPurchaseView";
 import { PremiumTestsList } from "@/components/exam/PremiumTestsList";
 import { UserDetailsModal } from "@/components/exam/UserDetailsModal";
 import { useExamAuth } from "@/context/ExamAuthContext";
+import { useStrictExamMode } from "@/hooks/useStrictExamMode";
 import mainLogoImg from "@/assets/main-logo.png";
 
 export default function ExamPage() {
@@ -48,6 +49,13 @@ export default function ExamPage() {
     const [loading, setLoading] = useState(false);
     const [timeLeft, setTimeLeft] = useState<number>(0); // Timer State moved here
     const [showPurchaseView, setShowPurchaseView] = useState(false);
+
+    useStrictExamMode(
+        selectedTest
+            ? (isSubmitted ? 'result' : 'exam')
+            : (viewResultData ? 'result' : 'inactive'),
+        userDetails
+    );
 
     // Sync User Details from Auth Context
     useEffect(() => {

@@ -4,8 +4,157 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { AlertCircle, FileText, CheckCircle2, Copy } from "lucide-react";
+import { AlertCircle, FileText, CheckCircle2, Copy, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import * as pdfjsLib from "pdfjs-dist";
+import mammoth from "mammoth";
+
+// Configure PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
+
+const formatAndSortOptionsText = (rawText: string): string => {
+    // Check if this matches the "Model Question Paper" format: has "Answer Key" and numbered questions
+    const hasAnswerKey = /Answer Key/i.test(rawText);
+    const hasNumberedQuestions = /(?:\r?\n|^)\s*\d+\.\s+/i.test(rawText);
+
+    if (hasAnswerKey && hasNumberedQuestions) {
+        try {
+            const parts = rawText.split(/Answer Key/i);
+            const questionsPart = parts[0];
+            const answerKeyPart = parts[1] || "";
+
+            // 1. Parse Answer Key to build a map of { qNum: ansLetter }
+            const answersMap: { [key: number]: string } = {};
+            const lines = answerKeyPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            let lastNumber: number | null = null;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (/^\d+$/.test(line)) {
+                    lastNumber = parseInt(line);
+                } else if (/^[A-D]$/i.test(line) && lastNumber !== null) {
+                    answersMap[lastNumber] = line.toUpperCase();
+                    lastNumber = null; // Reset
+                }
+            }
+
+            // 2. Parse Questions & Options
+            const qRegex = /(?:\r?\n|^)\s*(\d+)\.\s+/g;
+            const qMatches: { qNum: number; index: number; matchLength: number }[] = [];
+            let match;
+            while ((match = qRegex.exec(questionsPart)) !== null) {
+                qMatches.push({
+                    qNum: parseInt(match[1]),
+                    index: match.index,
+                    matchLength: match[0].length
+                });
+            }
+
+            const formattedBlocks: string[] = [];
+
+            for (let i = 0; i < qMatches.length; i++) {
+                const currentQ = qMatches[i];
+                const nextIndex = i + 1 < qMatches.length ? qMatches[i + 1].index : questionsPart.length;
+                
+                const blockText = questionsPart.substring(currentQ.index + currentQ.matchLength, nextIndex).trim();
+                
+                // Extract options A), B), C), D) within blockText (handles both single-line and multi-line option text)
+                const optRegex = /A\)\s*([\s\S]*?)\s*B\)\s*([\s\S]*?)\s*C\)\s*([\s\S]*?)\s*D\)\s*([\s\S]*)$/i;
+                const optMatch = blockText.match(optRegex);
+                
+                if (optMatch) {
+                    const optA = optMatch[1].trim();
+                    const optB = optMatch[2].trim();
+                    const optC = optMatch[3].trim();
+                    const optD = optMatch[4].trim();
+                    const ansLetter = answersMap[currentQ.qNum] || "A"; // Fallback to A
+
+                    formattedBlocks.push([
+                        `A) ${optA}`,
+                        `B) ${optB}`,
+                        `C) ${optC}`,
+                        `D) ${optD}`,
+                        `Ans: ${ansLetter}`
+                    ].join('\n'));
+                }
+            }
+
+            if (formattedBlocks.length > 0) {
+                return formattedBlocks.join('\n\n');
+            }
+        } catch (e) {
+            console.error("Failed to parse using advanced model question paper parser:", e);
+        }
+    }
+
+    // Normalize spaces and line breaks
+    const text = rawText.replace(/\s+/g, ' ');
+
+    // Find all indexes of A), B), C), D), Ans: (case-insensitive)
+    const tokenRegex = /(?:([A-D])\)|(Ans|Answer|Correct\s+Answer)(?:\.|\s|-|:)*)/gi;
+    const tokens: { type: string; index: number; length: number }[] = [];
+    let tokenMatch;
+    
+    while ((tokenMatch = tokenRegex.exec(text)) !== null) {
+        tokens.push({
+            type: tokenMatch[1] ? tokenMatch[1].toUpperCase() : 'ANS',
+            index: tokenMatch.index,
+            length: tokenMatch[0].length
+        });
+    }
+
+    if (tokens.length === 0) return rawText;
+
+    const blocks: string[] = [];
+    let currentBlockData: { [key: string]: string } = {};
+    
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const nextTokenIndex = i + 1 < tokens.length ? tokens[i + 1].index : text.length;
+        
+        // Extract the content between this token and the next token
+        const start = token.index + token.length;
+        const content = text.substring(start, nextTokenIndex).trim();
+
+        // If the token type already exists in the current block, or if it's 'A' and we already have 'Ans',
+        // we should commit the current block and start a new one.
+        if (currentBlockData[token.type] !== undefined || (token.type === 'A' && currentBlockData['ANS'])) {
+            // Commit block if it has at least some options
+            if (Object.keys(currentBlockData).length > 0) {
+                blocks.push([
+                    `A) ${currentBlockData['A'] || ''}`,
+                    `B) ${currentBlockData['B'] || ''}`,
+                    `C) ${currentBlockData['C'] || ''}`,
+                    `D) ${currentBlockData['D'] || ''}`,
+                    `Ans: ${currentBlockData['ANS'] || ''}`
+                ].join('\n'));
+            }
+            currentBlockData = {};
+        }
+
+        currentBlockData[token.type] = content;
+    }
+
+    // Commit final block
+    if (Object.keys(currentBlockData).length > 0) {
+        blocks.push([
+            `A) ${currentBlockData['A'] || ''}`,
+            `B) ${currentBlockData['B'] || ''}`,
+            `C) ${currentBlockData['C'] || ''}`,
+            `D) ${currentBlockData['D'] || ''}`,
+            `Ans: ${currentBlockData['ANS'] || ''}`
+        ].join('\n'));
+    }
+
+    if (blocks.length > 0) {
+        return blocks.join('\n\n');
+    }
+    
+    return rawText;
+};
 
 interface BulkUploadDialogProps {
     open: boolean;
@@ -20,6 +169,58 @@ export default function BulkUploadDialog({ open, onOpenChange, mockTestId, onSav
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const [parsedData, setParsedData] = useState<any[] | null>(null);
+    const [extracting, setExtracting] = useState(false);
+
+    const handleDocumentChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            setExtracting(true);
+            setErrors([]);
+            try {
+                let extractedText = "";
+                if (file.name.endsWith(".docx")) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    extractedText = result.value;
+                } else if (file.name.endsWith(".pdf")) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                    const pdf = await loadingTask.promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items
+                            .map((item: any) => item.str)
+                            .join(" ");
+                        fullText += pageText + "\n";
+                    }
+                    extractedText = fullText;
+                } else {
+                    toast.error("Unsupported file format. Please upload a .docx or .pdf file.");
+                    setExtracting(false);
+                    return;
+                }
+
+                if (extractedText.trim()) {
+                    const formatted = formatAndSortOptionsText(extractedText);
+                    setTextInput(formatted);
+                    setParsedData(null); // Reset validation
+                    toast.success(`Successfully extracted and formatted text from ${file.name}.`);
+                } else {
+                    toast.error("Could not extract any text from the document.");
+                }
+            } catch (error: any) {
+                console.error("Error extracting document text:", error);
+                setErrors([`Error extracting document text: ${error.message || error}`]);
+                toast.error("Failed to extract text from the document.");
+            } finally {
+                setExtracting(false);
+                // Clear the input value so user can upload the same file again if needed
+                e.target.value = "";
+            }
+        }
+    };
 
     const formatTemplate = `A) Oryza sativa
 B) Triticum aestivum
@@ -223,6 +424,35 @@ Ans: C`;
                         {selectedFiles.length > 0 && (
                             <p className="text-xs text-green-600 mb-4">{selectedFiles.length} files selected.</p>
                         )}
+
+                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4">
+                            <label className="block text-sm font-semibold text-gray-800 mb-1">
+                                Extract Options from Document (Word / PDF)
+                            </label>
+                            <p className="text-xs text-gray-500 mb-3">
+                                Automatically extract options text from a Word (.docx) or PDF (.pdf) file and fill it below.
+                            </p>
+                            <div className="flex gap-3 items-center">
+                                <input 
+                                    type="file" 
+                                    accept=".docx,.pdf"
+                                    onChange={handleDocumentChange}
+                                    disabled={extracting}
+                                    className="block w-full text-sm text-gray-500
+                                        file:mr-4 file:py-2 file:px-4
+                                        file:rounded-md file:border-0
+                                        file:text-sm file:font-semibold
+                                        file:bg-blue-50 file:text-blue-700
+                                        hover:file:bg-blue-100 border border-gray-300 rounded-md p-1 bg-white"
+                                />
+                                {extracting && (
+                                    <div className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold shrink-0 animate-pulse">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Extracting...
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         <label className="block text-sm font-medium text-gray-700 mb-1">2. Paste Options Text</label>
                         <Textarea 

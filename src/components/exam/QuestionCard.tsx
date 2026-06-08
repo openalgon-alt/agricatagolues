@@ -78,7 +78,7 @@ export function QuestionCard({ question, selectedOption, onSelect, currentQuesti
                             const indexStr = String(index);
                             const isSelected = selectedOption === indexStr;
                             return (
-                                <div key={index} className={cn(
+                                <div key={index} onClick={() => onSelect(indexStr)} className={cn(
                                     "flex items-start space-x-4 border p-4 md:p-5 rounded-xl cursor-pointer transition-all hover:bg-gray-50/80",
                                     isSelected ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600 shadow-sm" : "border-gray-200"
                                 )}>
