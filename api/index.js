@@ -831,21 +831,29 @@ export default async function handler(req, res) {
 
         if (action === 'students' || action === 'admin-students') {
             try {
-                // Return all student profiles safely
+                // Return all student profiles, backfilling missing email/name from exam_submissions
                 const result = await client.query(`
                     SELECT 
-                        firebase_uid, 
-                        name, 
-                        email, 
-                        mobile, 
-                        college, 
-                        district, 
-                        guardian_name, 
-                        guardian_profession, 
-                        guardian_contact, 
-                        created_at 
-                    FROM student_profiles 
-                    ORDER BY created_at DESC
+                        sp.firebase_uid,
+                        COALESCE(NULLIF(TRIM(sp.name), ''), es_data.name, split_part(COALESCE(NULLIF(TRIM(sp.email),''), es_data.email, sp.firebase_uid), '@', 1)) AS name,
+                        COALESCE(NULLIF(TRIM(sp.email), ''), es_data.email) AS email,
+                        COALESCE(NULLIF(TRIM(sp.mobile), ''), es_data.phone) AS mobile,
+                        COALESCE(NULLIF(TRIM(sp.college), ''), es_data.college) AS college,
+                        NULLIF(TRIM(sp.district), '') AS district,
+                        NULLIF(TRIM(sp.guardian_name), '') AS guardian_name,
+                        NULLIF(TRIM(sp.guardian_profession), '') AS guardian_profession,
+                        NULLIF(TRIM(sp.guardian_contact), '') AS guardian_contact,
+                        sp.created_at
+                    FROM student_profiles sp
+                    LEFT JOIN LATERAL (
+                        SELECT name, email, phone, college
+                        FROM exam_submissions
+                        WHERE user_id = sp.firebase_uid
+                          AND (email IS NOT NULL AND email <> '')
+                        ORDER BY submitted_at DESC
+                        LIMIT 1
+                    ) es_data ON true
+                    ORDER BY sp.created_at DESC
                 `);
                 return res.status(200).json({ students: result.rows });
             } catch (err) {
