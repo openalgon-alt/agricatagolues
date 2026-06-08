@@ -253,10 +253,7 @@ export default function AoAaoExamPage() {
             phone: "",
             mobile: "",
             college: "",
-            district: "",
-            guardianName: "",
-            guardianProfession: "",
-            guardianContact: "",
+            category: "General",
         };
         setUserDetails(baseData);
 
@@ -285,10 +282,7 @@ export default function AoAaoExamPage() {
                         phone: p.mobile || "",
                         mobile: p.mobile || "",
                         college: p.college || "",
-                        district: p.district || "",
-                        guardianName: p.guardian_name || "",
-                        guardianProfession: p.guardian_profession || "",
-                        guardianContact: p.guardian_contact || "",
+                        category: p.category || "",
                     };
                     setUserDetails(merged);
                     localStorage.setItem(localKey, 'true');
@@ -310,20 +304,17 @@ export default function AoAaoExamPage() {
                 await fetch(`${API_BASE_URL}/api`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'save-profile',
-                        payload: {
-                            firebase_uid: uid,
-                            email,
-                            name: baseData.name,
-                            mobile: "",
-                            college: "",
-                            district: "",
-                            guardian_name: "",
-                            guardian_profession: "",
-                            guardian_contact: "",
-                        }
-                    })
+                            body: JSON.stringify({
+                            action: 'save-profile',
+                            payload: {
+                                firebase_uid: uid,
+                                email,
+                                name: baseData.name,
+                                mobile: "",
+                                college: "",
+                                category: "General",
+                            }
+                        })
                 });
             } catch (e) {
                 console.warn("[AoAaoExamAuth] Could not auto-create profile:", e);
@@ -632,7 +623,7 @@ export default function AoAaoExamPage() {
         toast.info("Logged out successfully");
     };
 
-    const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
+    const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; category: string }) => {
         try {
             await fetch(`${API_BASE_URL}/api`, {
                 method: 'POST',
@@ -645,10 +636,7 @@ export default function AoAaoExamPage() {
                         mobile: data.mobile,
                         email: data.email || userDetails?.email,
                         college: data.college,
-                        district: data.district,
-                        guardian_name: data.guardianName,
-                        guardian_profession: data.guardianProfession,
-                        guardian_contact: data.guardianContact,
+                        category: data.category,
                     }
                 })
             });
@@ -664,10 +652,7 @@ export default function AoAaoExamPage() {
             mobile: data.mobile,
             email: data.email || prev?.email,
             college: data.college,
-            district: data.district,
-            guardianName: data.guardianName,
-            guardianProfession: data.guardianProfession,
-            guardianContact: data.guardianContact,
+            category: data.category,
         }));
 
         if (user?.uid || userDetails?.id) {
@@ -1031,10 +1016,16 @@ export default function AoAaoExamPage() {
             {showUserDetailsModal && (
                 <UserDetailsModal
                     isOpen={showUserDetailsModal}
+                    userEmail={userDetails?.email || ""}
+                    initialData={userDetails ? {
+                        name: userDetails.name || "",
+                        mobile: userDetails.mobile || "",
+                        email: userDetails.email || "",
+                        college: userDetails.college || "",
+                        category: userDetails.category || "",
+                    } : undefined}
                     onComplete={handleDetailsComplete}
-                    onLogout={handleLogout}
-                    initialEmail={userDetails?.email || ""}
-                    initialName={userDetails?.name || ""}
+                    onCancel={handleLogout}
                 />
             )}
         </>

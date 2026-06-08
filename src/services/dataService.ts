@@ -2,6 +2,10 @@ import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import Fuse from 'fuse.js';
 
+const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
+
 export type IssueStatus = 'Current' | 'Archived' | 'Draft';
 
 export interface Article {
@@ -115,6 +119,51 @@ class DataService {
 
         if (error) return null;
         return data ? this.mapIssueFromDB(data) : null;
+    }
+
+    async upsertProfile(profile: { id: string, email: string }): Promise<void> {
+        const fallbackName = profile.email.includes('@') ? profile.email.split('@')[0] : '';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'save-profile',
+                    payload: {
+                        firebase_uid: profile.id,
+                        name: fallbackName,
+                        email: profile.email,
+                        mobile: '',
+                        college: '',
+                        category: 'General'
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => null);
+                console.warn("Profile sync warning:", errorBody?.error || `HTTP ${response.status}`);
+            }
+        } catch (e) {
+            console.warn("Profile sync exception:", e);
+        }
+
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .upsert({ 
+                    id: profile.id, 
+                    email: profile.email, 
+                    updated_at: new Date().toISOString() 
+                });
+            
+            if (error) {
+                console.warn("Supabase profile upsert warning:", error.message);
+            }
+        } catch (e) {
+            console.warn("Supabase profile upsert exception:", e);
+        }
     }
 
     async saveIssue(issue: Partial<Issue>): Promise<Issue> {

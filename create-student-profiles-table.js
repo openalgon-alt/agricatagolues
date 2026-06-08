@@ -27,7 +27,7 @@ async function createTable() {
   await client.connect();
   console.log('✅ Connected.');
 
-  try {
+    try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS student_profiles (
         id                  SERIAL PRIMARY KEY,
@@ -36,10 +36,11 @@ async function createTable() {
         mobile              TEXT NOT NULL,
         email               TEXT NOT NULL,
         college             TEXT NOT NULL,
-        district            TEXT NOT NULL,
-        guardian_name       TEXT NOT NULL,
-        guardian_profession TEXT NOT NULL,
-        guardian_contact    TEXT NOT NULL,
+        district            TEXT,
+        guardian_name       TEXT,
+        guardian_profession TEXT,
+        guardian_contact    TEXT,
+        category            TEXT,
         created_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );

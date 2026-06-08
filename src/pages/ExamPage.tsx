@@ -125,10 +125,7 @@ export default function ExamPage() {
             phone:              "",
             mobile:             "",
             college:            "",
-            district:           "",
-            guardianName:       "",
-            guardianProfession: "",
-            guardianContact:    "",
+            category:           "General",
         };
         setUserDetails(baseData);
 
@@ -163,10 +160,7 @@ export default function ExamPage() {
                         phone:              p.mobile             || "",
                         mobile:             p.mobile             || "",
                         college:            p.college            || "",
-                        district:           p.district           || "",
-                        guardianName:       p.guardian_name      || "",
-                        guardianProfession: p.guardian_profession || "",
-                        guardianContact:    p.guardian_contact   || "",
+                        category:           p.category           || "",
                     };
                     setUserDetails(merged);
 
@@ -202,10 +196,7 @@ export default function ExamPage() {
                             name:                 baseData.name,
                             mobile:               "",
                             college:              "",
-                            district:             "",
-                            guardian_name:        "",
-                            guardian_profession:  "",
-                            guardian_contact:     "",
+                            category:             "General",
                         }
                     })
                 });
@@ -235,7 +226,7 @@ export default function ExamPage() {
         // Do not update showLanding here; let the onAuthStateChanged useEffect handle it securely after checking profile status
     };
 
-    const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; district: string; guardianName: string; guardianProfession: string; guardianContact: string }) => {
+    const handleDetailsComplete = async (data: { name: string; mobile: string; email: string; college: string; category: string }) => {
         // 1. Persist display name to Firebase
         try {
             await updateUserDisplayName(data.name);
@@ -256,10 +247,7 @@ export default function ExamPage() {
                         mobile: data.mobile,
                         email: data.email || userDetails?.email,
                         college: data.college,
-                        district: data.district,
-                        guardian_name: data.guardianName,
-                        guardian_profession: data.guardianProfession,
-                        guardian_contact: data.guardianContact,
+                        category: data.category,
                     }
                 })
             });
@@ -284,10 +272,7 @@ export default function ExamPage() {
             mobile: data.mobile,
             email: data.email || prev?.email,
             college: data.college,
-            district: data.district,
-            guardianName: data.guardianName,
-            guardianProfession: data.guardianProfession,
-            guardianContact: data.guardianContact,
+            category: data.category,
         }));
         
         // Use localStorage as a bulletproof fallback to prevent prompt loops
@@ -1310,10 +1295,7 @@ export default function ExamPage() {
                     mobile: userDetails.mobile || "",
                     email: userDetails.email || "",
                     college: userDetails.college || "",
-                    district: userDetails.district || "",
-                    guardianName: userDetails.guardianName || "",
-                    guardianProfession: userDetails.guardianProfession || "",
-                    guardianContact: userDetails.guardianContact || "",
+                    category: userDetails.category || "",
                 } : undefined}
                 onComplete={handleDetailsComplete}
                 onCancel={isProfileIncomplete ? handleLogoutFromModal : () => setShowUserDetailsModal(false)}

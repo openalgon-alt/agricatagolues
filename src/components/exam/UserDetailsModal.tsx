@@ -9,15 +9,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { User, Phone, Mail, GraduationCap, MapPin, Users, Briefcase, Shield, Loader2 } from "lucide-react";
 import mainLogoImg from "@/assets/main-logo.png";
 
+const CategoryEnum = z.enum(["General", "SC", "ST", "OBC", "EWS", "Other"]);
 const formSchema = z.object({
     name: z.string().min(2, "Full name is required"),
     mobile: z.string().min(10, "Valid 10-digit mobile number required").max(15, "Mobile number too long").regex(/^[0-9+\s-]+$/, "Invalid mobile number"),
     email: z.string().email("Invalid email address").optional().or(z.literal('')),
-    college: z.string().min(2, "College name is required"),
-    district: z.string().min(2, "College district is required"),
-    guardianName: z.string().min(2, "Guardian name is required"),
-    guardianProfession: z.string().min(2, "Guardian profession is required"),
-    guardianContact: z.string().min(10, "Valid guardian contact number required").max(15).regex(/^[0-9+\s-]+$/, "Invalid contact number"),
+    college: z.string().min(2, "University / College name is required"),
+    category: CategoryEnum,
 });
 
 export type ProfileFormData = z.infer<typeof formSchema>;
@@ -38,10 +36,7 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
             mobile: "",
             email: userEmail || "",
             college: "",
-            district: "",
-            guardianName: "",
-            guardianProfession: "",
-            guardianContact: "",
+            category: "General",
         },
     });
 
@@ -60,10 +55,7 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
                 mobile: initialData.mobile || "",
                 email: initialData.email || userEmail || "",
                 college: initialData.college || "",
-                district: initialData.district || "",
-                guardianName: initialData.guardianName || "",
-                guardianProfession: initialData.guardianProfession || "",
-                guardianContact: initialData.guardianContact || "",
+                category: (initialData as any).category || "General",
             });
         }
     }, [isOpen, initialData, userEmail]);
@@ -195,22 +187,14 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
                                 {/* Divider */}
                                 <div className="border-t border-gray-100" />
 
-                                {/* Section: College Info */}
-                                <div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                                            <GraduationCap className="w-3.5 h-3.5 text-blue-700" />
-                                        </div>
-                                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">College Info</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
                                             name="college"
                                             render={({ field }) => (
                                                 <FormItem className="sm:col-span-2">
                                                     <FormLabel className="text-gray-700 text-sm font-medium">
-                                                        College / Institution Name <span className="text-red-500">*</span>
+                                                        University / College Name <span className="text-red-500">*</span>
                                                     </FormLabel>
                                                     <FormControl>
                                                         <div className="relative">
@@ -222,95 +206,30 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name="district"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-gray-700 text-sm font-medium">
-                                                        College District <span className="text-red-500">*</span>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                                            <Input placeholder="e.g. Bengaluru" className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                            <FormField
+                                                control={form.control}
+                                                name="category"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-gray-700 text-sm font-medium">
+                                                            Category <span className="text-red-500">*</span>
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <select {...field} className="w-full h-11 bg-gray-50 border border-gray-200 rounded px-3">
+                                                                <option value="">Select category</option>
+                                                                <option value="General">General</option>
+                                                                <option value="SC">SC</option>
+                                                                <option value="ST">ST</option>
+                                                                <option value="OBC">OBC</option>
+                                                                <option value="EWS">EWS</option>
+                                                                <option value="Other">Other</option>
+                                                            </select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                     </div>
-                                </div>
-
-                                {/* Divider */}
-                                <div className="border-t border-gray-100" />
-
-                                {/* Section: Guardian Info */}
-                                <div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                            <Users className="w-3.5 h-3.5 text-purple-700" />
-                                        </div>
-                                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Guardian Info</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="guardianName"
-                                            render={({ field }) => (
-                                                <FormItem className="sm:col-span-2">
-                                                    <FormLabel className="text-gray-700 text-sm font-medium">
-                                                        Guardian Name <span className="text-red-500">*</span>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                                            <Input placeholder="e.g. Rajesh Kumar" className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="guardianProfession"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-gray-700 text-sm font-medium">
-                                                        Profession <span className="text-red-500">*</span>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                                            <Input placeholder="e.g. Farmer, Teacher…" className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="guardianContact"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-gray-700 text-sm font-medium">
-                                                        Guardian Contact <span className="text-red-500">*</span>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                                            <Input placeholder="9876543210" type="tel" className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </div>
 
                                 <div className="flex flex-col gap-3 mt-8">
                                     <Button

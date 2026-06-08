@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         }
 
         if (action === 'save-profile') {
-            const { firebase_uid, name, mobile, email, college, district, guardian_name, guardian_profession, guardian_contact } = payload || {};
+            const { firebase_uid, name, mobile, email, college, district, guardian_name, guardian_profession, guardian_contact, category } = payload || {};
             if (!firebase_uid) return res.status(400).json({ error: 'firebase_uid required' });
 
             await client.query(`
@@ -101,14 +101,15 @@ export default async function handler(req, res) {
                     guardian_name TEXT,
                     guardian_profession TEXT,
                     guardian_contact TEXT,
+                    category TEXT,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 );
             `);
 
             const r = await client.query(`
-                INSERT INTO student_profiles (firebase_uid, name, email, mobile, college, district, guardian_name, guardian_profession, guardian_contact)
-                VALUES ($1, COALESCE($2, ''), COALESCE($3, ''), COALESCE($4, ''), COALESCE($5, ''), COALESCE($6, ''), COALESCE($7, ''), COALESCE($8, ''), COALESCE($9, ''))
+                INSERT INTO student_profiles (firebase_uid, name, email, mobile, college, district, guardian_name, guardian_profession, guardian_contact, category)
+                VALUES ($1, COALESCE($2, ''), COALESCE($3, ''), COALESCE($4, ''), COALESCE($5, ''), COALESCE($6, ''), COALESCE($7, ''), COALESCE($8, ''), COALESCE($9, ''), COALESCE($10, ''))
                 ON CONFLICT (firebase_uid) DO UPDATE SET
                     name = EXCLUDED.name,
                     email = COALESCE(EXCLUDED.email, student_profiles.email),
@@ -118,9 +119,10 @@ export default async function handler(req, res) {
                     guardian_name = EXCLUDED.guardian_name,
                     guardian_profession = EXCLUDED.guardian_profession,
                     guardian_contact = EXCLUDED.guardian_contact,
+                    category = COALESCE(EXCLUDED.category, student_profiles.category),
                     updated_at = CURRENT_TIMESTAMP
                 RETURNING *
-            `, [firebase_uid, name, email, mobile, college, district, guardian_name, guardian_profession, guardian_contact]);
+            `, [firebase_uid, name, email, mobile, college, district, guardian_name, guardian_profession, guardian_contact, category]);
 
             return res.status(200).json({ success: true, profile: r.rows[0] });
         }

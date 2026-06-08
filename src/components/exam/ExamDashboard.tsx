@@ -170,15 +170,12 @@ export function ExamDashboard({
 
                                     {/* Info Rows */}
                                     <div className="px-4 py-3 space-y-1 border-b border-gray-100">
-                                        {userDetails.mobile && (
-                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Mobile:</span> {userDetails.mobile}</div>
-                                        )}
-                                        {userDetails.district && (
-                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">District:</span> {userDetails.district}</div>
-                                        )}
-                                        {userDetails.guardianName && (
-                                            <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Guardian:</span> {userDetails.guardianName}</div>
-                                        )}
+                                                                {userDetails.mobile && (
+                                                                    <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Mobile:</span> {userDetails.mobile}</div>
+                                                                )}
+                                                                {userDetails.category && (
+                                                                    <div className="text-xs text-gray-600"><span className="font-medium text-gray-800">Category:</span> {userDetails.category}</div>
+                                                                )}
                                     </div>
 
                                     {/* Actions */}
