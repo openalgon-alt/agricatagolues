@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         await client.connect();
 
         const testResult = await client.query(
-            `SELECT id, title, description, category, price, image_url 
+            `SELECT id, title, description, category, price, image_url, landing_page_url, popup_message, banner_image_url 
              FROM mock_tests WHERE id = $1`,
             [testId]
         );

@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': {
-        target: 'https://agri-backend-plux.vercel.app',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       }
     }

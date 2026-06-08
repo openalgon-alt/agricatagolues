@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dataService, SearchResult } from '@/services/dataService';
 import mainLogo from '@/assets/main-logo.png';
+import { useSiteSettings } from '@/context/SiteSettingsContext';
 
 const navItems = [
   { name: 'Home', path: '/', newTab: false },
@@ -20,6 +21,7 @@ const navItems = [
 ];
 
 export const Header = () => {
+  const { activeExam } = useSiteSettings();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -27,6 +29,13 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+
+  const updatedNavItems = navItems.map(item => {
+    if (item.name === 'Mock Tests') {
+      return { ...item, path: activeExam === 'ao-aao' ? '/exam/ao-aao' : '/exam' };
+    }
+    return item;
+  });
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -103,7 +112,7 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) =>
+            {updatedNavItems.map((item) =>
               item.newTab ? (
                 <a
                   key={item.path}
@@ -212,7 +221,7 @@ export const Header = () => {
             >
               <div className="py-4 space-y-1 border-t border-border">
                 {/* Search removed from inside menu as it's now accessible via icon in header */}
-                {navItems.map((item) =>
+                {updatedNavItems.map((item) =>
                   item.newTab ? (
                     <a
                       key={item.path}

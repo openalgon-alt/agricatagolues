@@ -345,7 +345,11 @@ export default function ExamPage() {
         try {
             const tests = await examDataService.getMockTests(true);
             // Hide the bundle (-1) completely from all frontend views
-            setActiveTests(tests.filter(t => Number(t.id) !== -1));
+            // AND filter out AO/AAO tests (they belong on the AoAaoExamPage)
+            setActiveTests(tests.filter(t => 
+                Number(t.id) !== -1 && 
+                t.category?.trim().toUpperCase() !== "AO/AAO"
+            ));
         } catch (error) {
             console.error(error);
             toast.error("Failed to load available tests.");
@@ -1087,11 +1091,20 @@ export default function ExamPage() {
 
     // 4. Exam Interface Mode (Active) - NO LAYOUT, Minimal UI
     // Wait for questions to load
-    if (questions.length === 0) {
+    if (loading) {
         return (
              <div className="min-h-screen flex items-center justify-center flex-col gap-4">
                  <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
                  <p className="text-gray-500">Loading Questions...</p>
+             </div>
+        );
+    }
+
+    if (questions.length === 0) {
+        return (
+             <div className="min-h-screen flex items-center justify-center flex-col gap-4 bg-gray-50">
+                 <div className="text-gray-500 text-lg">No questions available for this test yet.</div>
+                 <Button onClick={() => { setSelectedTest(null); sessionStorage.removeItem("examTestId"); }}>Back to Dashboard</Button>
              </div>
         );
     }

@@ -12,7 +12,7 @@ import mainLogoImg from "@/assets/main-logo.png";
 const formSchema = z.object({
     name: z.string().min(2, "Full name is required"),
     mobile: z.string().min(10, "Valid 10-digit mobile number required").max(15, "Mobile number too long").regex(/^[0-9+\s-]+$/, "Invalid mobile number"),
-    email: z.string().email("Invalid email address"),
+    email: z.string().email("Invalid email address").optional().or(z.literal('')),
     college: z.string().min(2, "College name is required"),
     district: z.string().min(2, "College district is required"),
     guardianName: z.string().min(2, "Guardian name is required"),
@@ -178,9 +178,9 @@ export function UserDetailsModal({ isOpen, userEmail, initialData, onComplete, o
                                                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                                             <Input
                                                                 type="email"
-                                                                placeholder="Auto-filled"
-                                                                className="pl-9 h-11 bg-green-50 border-green-200 text-gray-600 cursor-not-allowed"
-                                                                readOnly
+                                                                placeholder={userEmail || initialData?.email ? "Auto-filled" : "e.g. name@example.com"}
+                                                                className={`pl-9 h-11 ${userEmail || initialData?.email ? 'bg-green-50 border-green-200 text-gray-600 cursor-not-allowed' : 'bg-gray-50 border-gray-200 focus:bg-white'}`}
+                                                                readOnly={!!(userEmail || initialData?.email)}
                                                                 {...field}
                                                             />
                                                         </div>

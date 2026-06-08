@@ -6,6 +6,9 @@ export interface MockTest {
     price: number;
     isActive?: boolean;
     imageUrl?: string;
+    landingPageUrl?: string;
+    popupMessage?: string;
+    bannerImageUrl?: string;
     questions?: MockQuestion[];
 }
 
@@ -73,7 +76,10 @@ class ExamDataService {
                 description: t.description,
                 category: t.category,
                 price: parseFloat(t.price),
-                imageUrl: t.image_url
+                imageUrl: t.image_url,
+                landingPageUrl: t.landing_page_url,
+                popupMessage: t.popup_message,
+                bannerImageUrl: t.banner_image_url
             }));
         } catch (error) {
             console.error("Error fetching mock tests:", error);
@@ -100,6 +106,9 @@ class ExamDataService {
                 category: data.test.category,
                 price: parseFloat(data.test.price),
                 imageUrl: data.test.image_url,
+                landingPageUrl: data.test.landing_page_url,
+                popupMessage: data.test.popup_message,
+                bannerImageUrl: data.test.banner_image_url,
                 questions: data.questions.map((q: any) => ({
                     id: q.id,
                     mockTestId: q.mock_test_id,

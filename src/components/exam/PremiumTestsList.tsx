@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MockTest } from "@/services/examDataService";
-import { ArrowLeft, Clock, HelpCircle, Search, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Clock, HelpCircle, Search, ChevronLeft, Award } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface PremiumTestsListProps {
@@ -97,7 +97,7 @@ function PremiumTestCard({
                     <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
                         <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 50 Questions</span>
                         <span className="text-gray-300">•</span>
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 200 Marks</span>
+                        <span className="flex items-center gap-1"><Award className="w-3 h-3" /> 200 Marks</span>
                     </div>
                 </div>
             </div>

@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     try {
         await client.connect();
         const { rows } = await client.query(
-            `SELECT id, title, description, category, price, image_url, is_active 
+            `SELECT id, title, description, category, price, image_url, is_active, landing_page_url, popup_message, banner_image_url 
              FROM mock_tests 
              WHERE is_active = true 
              ORDER BY price ASC, id ASC`

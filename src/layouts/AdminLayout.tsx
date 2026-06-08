@@ -38,7 +38,8 @@ export const AdminLayout = () => {
         { title: "Editorial Board", url: "/admin/editorial-board", icon: Users },
         { title: "Shop Products", url: "/admin/products", icon: ShoppingBag },
         { title: "Manage Exams", url: "/admin/exams", icon: GraduationCap },
-        { title: "Exam Submissions", url: "/admin/exams/submissions", icon: GraduationCap },
+        { title: "AO/AAO Exams", url: "/admin/exams?category=AO%2FAAO", icon: GraduationCap },
+        { title: "Exam Submissions", url: "/admin/exam-submissions", icon: GraduationCap },
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
         { title: "Students", url: "/admin/students", icon: Users },
         { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
@@ -50,6 +51,18 @@ export const AdminLayout = () => {
             ["Dashboard", "Issues", "Editorial Board", "Shop Products"].includes(item.title)
         );
 
+    const isLinkActive = (itemUrl: string) => {
+        if (itemUrl.includes('?')) {
+            return location.pathname + location.search === itemUrl;
+        }
+        if (itemUrl === '/admin') {
+            return location.pathname === '/admin';
+        }
+        if (location.search && !itemUrl.includes('?')) {
+            return false;
+        }
+        return location.pathname.startsWith(itemUrl);
+    };
 
     return (
         <SidebarProvider>
@@ -67,7 +80,7 @@ export const AdminLayout = () => {
                                         <SidebarMenuItem key={item.title}>
                                             <SidebarMenuButton
                                                 asChild
-                                                isActive={location.pathname === item.url || (item.url !== '/admin' && location.pathname.startsWith(item.url))}
+                                                isActive={isLinkActive(item.url)}
                                             >
                                                 <Link to={item.url}>
                                                     <item.icon className="h-4 w-4 mr-2" />

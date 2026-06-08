@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import EditorialBoard from "./pages/EditorialBoard";
 import Guidelines from "./pages/Guidelines";
@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import ExamPage from "./pages/ExamPage";
+import AoAaoExamPage from "./pages/AoAaoExamPage";
 import { AuthProvider } from "./context/AuthContext";
 import { ExamAuthProvider } from "./context/ExamAuthContext";
 import Login from "./pages/admin/Login";
@@ -36,6 +37,7 @@ import ExamEditor from "./pages/admin/ExamEditor";
 import UserAccess from "./pages/admin/UserAccess";
 import StudentList from "./pages/admin/StudentList";
 import OfflineCoachingList from "./pages/admin/OfflineCoachingList";
+import { SiteSettingsProvider, useSiteSettings } from "./context/SiteSettingsContext";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +47,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <ExamAuthProvider>
+        <SiteSettingsProvider>
+          <ExamAuthProvider>
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
@@ -61,6 +64,7 @@ const App = () => (
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/exam" element={<ExamPage />} />
+            <Route path="/exam/ao-aao" element={<AoAaoExamPage />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
@@ -91,7 +95,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </ExamAuthProvider>
+          </ExamAuthProvider>
+        </SiteSettingsProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

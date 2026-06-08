@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox"; // Added Checkbox
-import { Trash2, Plus, ArrowLeft, Save, Edit, Image as ImageIcon, FileText, CheckSquare, Square } from "lucide-react";
+import { Trash2, Plus, ArrowLeft, Save, Edit, Image as ImageIcon, FileText, CheckSquare, Square, ChevronDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import QuestionDialog from "./QuestionDialog";
 import BulkUploadDialog from "./BulkUploadDialog";
@@ -24,6 +25,7 @@ export default function ExamEditor() {
     const [mockTest, setMockTest] = useState<Partial<MockTest>>({
         title: "",
         description: "",
+        category: "Practical Exam",
         price: 100,
         isActive: true,
         questions: []
@@ -199,6 +201,34 @@ export default function ExamEditor() {
                                 />
                             </div>
                             <div className="space-y-2">
+                                <Label>Category <span className="text-xs text-gray-500">(Exam Type)</span></Label>
+                                <Select
+                                    value={mockTest.category || "Practical Exam"}
+                                    onValueChange={(val) => setMockTest({ ...mockTest, category: val })}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select exam category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Practical Exam">
+                                            <div className="flex items-center gap-2">
+                                                <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+                                                Practical Exam
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="AO/AAO">
+                                            <div className="flex items-center gap-2">
+                                                <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+                                                AO / AAO
+                                            </div>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-xs text-muted-foreground">
+                                    This determines which exam page displays this test.
+                                </p>
+                            </div>
+                            <div className="space-y-2">
                                 <Label>Price (₹) <span className="text-xs text-gray-500">(0 for Free)</span></Label>
                                 <Input 
                                     type="number"
@@ -240,6 +270,61 @@ export default function ExamEditor() {
                                 </div>
                                 {mockTest.imageUrl && (
                                     <img src={mockTest.imageUrl} className="h-24 w-auto rounded-md object-cover border mt-2" alt="Cover Preview" />
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Landing Page URL (Optional)</Label>
+                                <Input 
+                                    defaultValue={mockTest.landingPageUrl || ""}
+                                    onBlur={e => setMockTest({ ...mockTest, landingPageUrl: e.target.value })}
+                                    placeholder="https://example.com/landing-page"
+                                />
+                                <p className="text-xs text-muted-foreground">External URL to redirect users when they click this test.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Popup Message (Optional)</Label>
+                                <Textarea 
+                                    defaultValue={mockTest.popupMessage || ""}
+                                    onBlur={e => setMockTest({ ...mockTest, popupMessage: e.target.value })}
+                                    placeholder="Message to display in a popup..."
+                                    className="h-24"
+                                />
+                                <p className="text-xs text-muted-foreground">Message to show when users view the exams page.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Banner Image URL (Optional)</Label>
+                                <div className="flex gap-2">
+                                    <Input 
+                                        key={mockTest.id ? `banner-${mockTest.bannerImageUrl}` : 'new-banner'}
+                                        defaultValue={mockTest.bannerImageUrl || ""}
+                                        onBlur={e => setMockTest({ ...mockTest, bannerImageUrl: e.target.value })}
+                                        placeholder="https://example.com/banner.jpg"
+                                        className="flex-1"
+                                    />
+                                    <Input 
+                                        type="file" 
+                                        accept="image/*"
+                                        className="w-64 cursor-pointer"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            try {
+                                                setLoading(true);
+                                                toast.loading("Uploading banner image...", { id: "upload-banner" });
+                                                const url = await examDataService.uploadImage(file, 'exam_banners');
+                                                setMockTest({ ...mockTest, bannerImageUrl: url });
+                                                toast.success("Banner image uploaded!");
+                                            } catch (error) {
+                                                toast.error("Failed to upload banner image");
+                                            } finally {
+                                                setLoading(false);
+                                                toast.dismiss("upload-banner");
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                {mockTest.bannerImageUrl && (
+                                    <img src={mockTest.bannerImageUrl} className="h-24 w-auto rounded-md object-cover border mt-2" alt="Banner Preview" />
                                 )}
                             </div>
                             <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">

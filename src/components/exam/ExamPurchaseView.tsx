@@ -21,9 +21,33 @@ interface ExamPurchaseViewProps {
     price: number;
     onBack: () => void;
     onPay: () => void;
+    isAoAao?: boolean;
 }
 
-export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseViewProps) {
+const aoAaoTimetable = [
+    { no: 1, subject: "Agronomy", date: "10/06/2026", time: "5:00 PM" },
+    { no: 2, subject: "Agricultural Economics", date: "13/06/2026", time: "5:00 PM" },
+    { no: 3, subject: "Agricultural Engineering", date: "14/06/2026", time: "5:00 PM" },
+    { no: 4, subject: "Agricultural Entomology", date: "17/06/2026", time: "5:00 PM" },
+    { no: 5, subject: "Agricultural Extension", date: "20/06/2026", time: "5:00 PM" },
+    { no: 6, subject: "Agricultural Marketing and Cooperation", date: "22/06/2026", time: "5:00 PM" },
+    { no: 7, subject: "Agricultural Microbiology", date: "24/06/2026", time: "5:00 PM" },
+    { no: 8, subject: "Agricultural Statistics", date: "27/06/2026", time: "5:00 PM" },
+    { no: 9, subject: "Animal Science", date: "30/06/2026", time: "5:00 PM" },
+    { no: 10, subject: "Apiculture", date: "01/07/2026", time: "5:00 PM" },
+    { no: 11, subject: "Biotechnology", date: "03/07/2026", time: "5:00 PM" },
+    { no: 12, subject: "Crop Physiology", date: "05/07/2026", time: "5:00 PM" },
+    { no: 13, subject: "Food Science and Nutrition", date: "07/07/2026", time: "5:00 PM" },
+    { no: 14, subject: "Forestry and Environmental Science", date: "10/07/2026", time: "5:00 PM" },
+    { no: 15, subject: "Genetics and Plant Breeding", date: "13/07/2026", time: "5:00 PM" },
+    { no: 16, subject: "Horticulture", date: "15/07/2026", time: "5:00 PM" },
+    { no: 17, subject: "Plant Pathology", date: "17/07/2026", time: "5:00 PM" },
+    { no: 18, subject: "Seed Science and Technology", date: "18/07/2026", time: "5:00 PM" },
+    { no: 19, subject: "Sericulture", date: "20/07/2026", time: "5:00 PM" },
+    { no: 20, subject: "Soil Science and Agricultural Chemistry", date: "22/07/2026", time: "5:00 PM" },
+];
+
+export function ExamPurchaseView({ tests, price, onBack, onPay, isAoAao }: ExamPurchaseViewProps) {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [utrNumber, setUtrNumber] = useState("");
     const [userEmail, setUserEmail] = useState("");
@@ -101,7 +125,9 @@ export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseVi
                     </Button>
                     <div>
                         <h1 className="text-lg font-bold text-gray-900">Unlock Full Access</h1>
-                        <p className="text-xs text-gray-500">20 Premium Tests included</p>
+                        <p className="text-xs text-gray-500">
+                            {isAoAao ? "Subjectwise paper release timetable" : "20 Premium Tests included"}
+                        </p>
                     </div>
                 </div>
                 <div className="flex flex-row items-center justify-end gap-3 relative">
@@ -132,8 +158,30 @@ export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseVi
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-6">
                 
-                {/* Value Props */}
-                <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 space-y-4">
+                {/* Value Props / Timetable */}
+                {isAoAao ? (
+                    <div className="bg-white border-2 border-green-900 rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#113f1c] text-[#fffae6] font-bold">
+                                <tr>
+                                    <th className="px-4 py-3 border-b-2 border-green-950">SUBJECT / TOPIC</th>
+                                    <th className="px-4 py-3 border-b-2 border-green-950 border-l border-green-800 text-center whitespace-nowrap">DATE</th>
+                                    <th className="px-4 py-3 border-b-2 border-green-950 border-l border-green-800 text-center whitespace-nowrap">TIME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {aoAaoTimetable.map((row, i) => (
+                                    <tr key={i} className={i % 2 === 0 ? 'bg-[#fffae6]/60' : 'bg-white'}>
+                                        <td className="px-4 py-2.5 border-b border-gray-200 font-bold text-gray-900">{row.no}. {row.subject}</td>
+                                        <td className="px-4 py-2.5 border-b border-gray-200 border-l border-gray-200 text-center font-bold text-gray-900 whitespace-nowrap">{row.date}</td>
+                                        <td className="px-4 py-2.5 border-b border-gray-200 border-l border-gray-200 text-center font-bold text-gray-900 whitespace-nowrap">{row.time}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 space-y-4">
                     <div className="flex items-center gap-2 text-yellow-900 font-bold text-base flex-wrap">
                         <ShieldCheck className="w-5 h-5 text-yellow-700" />
                         Complete Practice Access – 
@@ -169,6 +217,7 @@ export function ExamPurchaseView({ tests, price, onBack, onPay }: ExamPurchaseVi
                         </p>
                     </div>
                 </div>
+                )}
 
                 {/* Test List */}
                 <div>

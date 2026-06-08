@@ -283,20 +283,27 @@ export default async function handler(req, res) {
 
         // ---- save-mock-test (admin) ----
         if (action === 'save-mock-test') {
-            const { id, title, description, category, price } = payload || {};
+            const { id, title, description, category, price, landingPageUrl, popupMessage, bannerImageUrl } = payload || {};
             const imageUrl = payload.imageUrl || payload.image_url;
             const isActive = payload.isActive !== undefined ? payload.isActive : payload.is_active;
+
+            // Ensure columns exist
+            try {
+                await client.query(`ALTER TABLE mock_tests ADD COLUMN IF NOT EXISTS landing_page_url TEXT`);
+                await client.query(`ALTER TABLE mock_tests ADD COLUMN IF NOT EXISTS popup_message TEXT`);
+                await client.query(`ALTER TABLE mock_tests ADD COLUMN IF NOT EXISTS banner_image_url TEXT`);
+            } catch (e) { /* ignore */ }
             
             if (id) {
                 const r = await client.query(
-                    `UPDATE mock_tests SET title=$1, description=$2, category=$3, price=$4, image_url=$5, is_active=$6 WHERE id=$7 RETURNING *`,
-                    [title, description, category, price ?? 0, imageUrl, isActive ?? true, id]
+                    `UPDATE mock_tests SET title=$1, description=$2, category=$3, price=$4, image_url=$5, is_active=$6, landing_page_url=$7, popup_message=$8, banner_image_url=$9 WHERE id=$10 RETURNING *`,
+                    [title, description, category, price ?? 0, imageUrl, isActive ?? true, landingPageUrl || null, popupMessage || null, bannerImageUrl || null, id]
                 );
                 return res.status(200).json(r.rows[0]);
             } else {
                 const r = await client.query(
-                    `INSERT INTO mock_tests (title, description, category, price, image_url, is_active) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-                    [title, description, category, price ?? 0, imageUrl, isActive ?? true]
+                    `INSERT INTO mock_tests (title, description, category, price, image_url, is_active, landing_page_url, popup_message, banner_image_url) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+                    [title, description, category, price ?? 0, imageUrl, isActive ?? true, landingPageUrl || null, popupMessage || null, bannerImageUrl || null]
                 );
                 return res.status(200).json(r.rows[0]);
             }

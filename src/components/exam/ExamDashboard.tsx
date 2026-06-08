@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X, MapPin } from "lucide-react";
+import { CheckCircle2, Crown, LogOut, Lock, Clock, HelpCircle, ArrowRight, BookOpen, Star, Trophy, TrendingUp, BarChart3, Layers, ChevronLeft, UserCircle, Pencil, X, MapPin, Award } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +32,7 @@ interface ExamDashboardProps {
     onBuyBundle: () => void;
     onOpenPremium: () => void;
     userId?: string;
+    hidePerformanceAnalysis?: boolean;
 }
 
 export function ExamDashboard({ 
@@ -45,7 +46,8 @@ export function ExamDashboard({
     onViewResult,
     onBuyBundle,
     onOpenPremium,
-    userId
+    userId,
+    hidePerformanceAnalysis = false
 }: ExamDashboardProps) {
     const [profileOpen, setProfileOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -53,6 +55,20 @@ export function ExamDashboard({
     const [performanceStats, setPerformanceStats] = useState<any>(null);
     const profileRef = useRef<HTMLDivElement>(null);
     const hasBundleAccess = examDataService.hasBundleAccess(purchases);
+
+    const featuredTest = activeTests.find(t => t.bannerImageUrl || t.popupMessage);
+    const [showFeaturedPopup, setShowFeaturedPopup] = useState(false);
+    
+    useEffect(() => {
+        if (featuredTest?.popupMessage) {
+            const popupKey = `popup_shown_${featuredTest.id}`;
+            if (!sessionStorage.getItem(popupKey)) {
+                // slight delay to let dashboard render first
+                setTimeout(() => setShowFeaturedPopup(true), 500);
+                sessionStorage.setItem(popupKey, 'true');
+            }
+        }
+    }, [featuredTest]);
 
     useEffect(() => {
         examDataService.getOfflineCoachingCenters().then(setOfflineCenters);
@@ -213,6 +229,46 @@ export function ExamDashboard({
             {/* Dashboard Content */}
             <main className="flex-1 container-magazine py-8 space-y-8">
                 
+                {/* Featured Test Popup */}
+                <AlertDialog open={showFeaturedPopup} onOpenChange={setShowFeaturedPopup}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Important Update</AlertDialogTitle>
+                            <AlertDialogDescription className="whitespace-pre-wrap text-base text-gray-700">
+                                {featuredTest?.popupMessage}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            {featuredTest?.landingPageUrl && (
+                                <AlertDialogAction onClick={() => window.open(featuredTest.landingPageUrl, '_blank')} className="bg-blue-600 hover:bg-blue-700">
+                                    Learn More
+                                </AlertDialogAction>
+                            )}
+                            <AlertDialogCancel>Close</AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+                {/* Featured Banner */}
+                {featuredTest?.bannerImageUrl && (
+                    <div 
+                        className="w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 cursor-pointer transition-transform hover:scale-[1.01]"
+                        onClick={() => {
+                            if (featuredTest.landingPageUrl) {
+                                window.open(featuredTest.landingPageUrl, '_blank');
+                            } else {
+                                onSelectTest(featuredTest);
+                            }
+                        }}
+                    >
+                        <img 
+                            src={featuredTest.bannerImageUrl} 
+                            alt="Featured Exam Banner" 
+                            className="w-full h-auto object-cover max-h-[300px]"
+                        />
+                    </div>
+                )}
+
                 {/* 1. Compact Welcome Banner */}
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
                     <div className="space-y-1">
@@ -226,10 +282,10 @@ export function ExamDashboard({
                     {/* Status Section Removed */}
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8 items-start">
+                <div className={cn("grid gap-8 items-start", !hidePerformanceAnalysis && "lg:grid-cols-3")}>
                     
                     {/* Left Column: Test Selection (2/3 width) */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className={cn("space-y-6", !hidePerformanceAnalysis && "lg:col-span-2")}>
                          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                             <BookOpen className="w-5 h-5 text-green-600" /> Available Tests
                          </h2>
@@ -249,10 +305,12 @@ export function ExamDashboard({
                                         <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1" title={test.title}>{test.title}</h3>
                                         <p className="text-gray-500 text-xs mb-4 line-clamp-1">{test.description || "Essential practice for beginners."}</p>
                                         
-                                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 200 Marks</span>
-                                             <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 50 Qs</span>
-                                        </div>
+                                        {!hidePerformanceAnalysis && (
+                                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                 <span className="flex items-center gap-1"><Award className="w-3 h-3" /> 200 Marks</span>
+                                                 <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 50 Qs</span>
+                                            </div>
+                                        )}
                                     </CardContent>
                                     <CardFooter className="p-4 pt-0">
                                         <TestActionButton 
@@ -283,10 +341,12 @@ export function ExamDashboard({
                                             <h3 className="font-bold text-gray-900 text-lg mb-1">All Practical Exams</h3>
                                             <p className="text-gray-500 text-xs mb-4">You have access to 20+ full-length exams.</p>
                                             
-                                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                 <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> 20+ Tests</span>
-                                                 <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 1000+ Qs</span>
-                                            </div>
+                                            {!hidePerformanceAnalysis && (
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                     <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> 20+ Tests</span>
+                                                     <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 1000+ Qs</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                         <CardFooter className="p-4 pt-0">
                                             <Button 
@@ -311,10 +371,12 @@ export function ExamDashboard({
                                         <h3 className="font-bold text-gray-900 text-lg mb-1">Practical Exam Access</h3>
                                         <p className="text-gray-500 text-xs mb-4">Access 20+ mock tests & 1000+ questions.</p>
                                         
-                                         <div className="flex items-center gap-3 text-xs text-gray-500">
-                                            <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Expert</span>
-                                            <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 1000+ Qs</span>
-                                        </div>
+                                         {!hidePerformanceAnalysis && (
+                                             <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Expert</span>
+                                                <span className="flex items-center gap-1"><HelpCircle className="w-3 h-3" /> 1000+ Qs</span>
+                                            </div>
+                                         )}
                                     </CardContent>
                                     <CardFooter className="p-4 pt-0">
                                         <Button className="w-full bg-blue-600 text-white hover:bg-blue-700" onClick={onBuyBundle}>Unlock</Button>
@@ -353,8 +415,9 @@ export function ExamDashboard({
                     </div>
 
                     {/* Right Column: Performance Analysis (New!) */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    {!hidePerformanceAnalysis && (
+                        <div className="space-y-6">
+                            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-blue-600" /> Performance Analysis
                         </h2>
                         
@@ -441,6 +504,7 @@ export function ExamDashboard({
                         </div>
 
                     </div>
+                    )}
                 </div>
 
             </main>
