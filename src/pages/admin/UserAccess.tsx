@@ -197,7 +197,7 @@ export default function UserAccess() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'lookup-user',
+                    action: 'lookup-user-by-email',
                     payload: { email: email.trim() }
                 })
             });
