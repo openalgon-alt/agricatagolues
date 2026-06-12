@@ -263,7 +263,29 @@ export default function AuthPage() {
       toast.success("Account created and signed in.");
       navigate(redirectPath, { replace: true });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create account");
+      let errorMessage = "Failed to create account";
+      if (error instanceof Error) {
+        try {
+          // If the error message is a raw JSON array from Zod, parse it to extract a readable message
+          const parsedError = JSON.parse(error.message);
+          if (Array.isArray(parsedError) && parsedError[0]) {
+            const err = parsedError[0];
+            if (err.path?.includes("password") && err.code === "too_small") {
+              errorMessage = "Password is too small (minimum 6 characters)";
+            } else if (err.message) {
+              errorMessage = err.message;
+            } else {
+              errorMessage = error.message;
+            }
+          } else {
+            errorMessage = error.message;
+          }
+        } catch {
+          // If it's not JSON, use the message directly
+          errorMessage = error.message;
+        }
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
