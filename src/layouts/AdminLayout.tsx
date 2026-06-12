@@ -42,6 +42,7 @@ export const AdminLayout = () => {
         { title: "Exam Submissions", url: "/admin/exam-submissions", icon: GraduationCap },
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
         { title: "Students", url: "/admin/students", icon: Users },
+        { title: "AO/AAO Portal", url: "/admin/ao-aao", icon: Settings },
         { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
     ];
 

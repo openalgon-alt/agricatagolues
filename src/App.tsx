@@ -15,7 +15,21 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import ExamPage from "./pages/ExamPage";
-import AoAaoExamPage from "./pages/AoAaoExamPage";
+
+// AO/AAO Exam Portal Imports
+import LandingPage from "./pages/ao-aao-portal/LandingPage";
+import AuthPage from "./pages/ao-aao-portal/AuthPage";
+import AoAaoPortalLayout from "./pages/ao-aao-portal/AoAaoPortalLayout";
+import DashboardPage from "./pages/ao-aao-portal/DashboardPage";
+import SubjectsPage from "./pages/ao-aao-portal/SubjectsPage";
+import TestsPage from "./pages/ao-aao-portal/TestsPage";
+import TestSessionPage from "./pages/ao-aao-portal/TestSessionPage";
+import ResultsPage from "./pages/ao-aao-portal/ResultsPage";
+import BillingPage from "./pages/ao-aao-portal/BillingPage";
+import ProfilePage from "./pages/ao-aao-portal/ProfilePage";
+import FreeTestPage from "./pages/ao-aao-portal/FreeTestPage";
+import AnalyticsPage from "./pages/ao-aao-portal/AnalyticsPage";
+
 import { AuthProvider } from "./context/AuthContext";
 import { ExamAuthProvider } from "./context/ExamAuthContext";
 import Login from "./pages/admin/Login";
@@ -38,6 +52,12 @@ import UserAccess from "./pages/admin/UserAccess";
 import StudentList from "./pages/admin/StudentList";
 import OfflineCoachingList from "./pages/admin/OfflineCoachingList";
 import { SiteSettingsProvider, useSiteSettings } from "./context/SiteSettingsContext";
+
+// AO/AAO Admin Imports
+import AoAaoControlCenter from "./pages/admin/ao-aao/ControlCenter";
+import AoAaoPapersPage from "./pages/admin/ao-aao/PapersPage";
+import AoAaoFreeTestPage from "./pages/admin/ao-aao/FreeTestPage";
+import AoAaoAccessPage from "./pages/admin/ao-aao/AccessPage";
 
 const queryClient = new QueryClient();
 
@@ -64,7 +84,21 @@ const App = () => (
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/exam" element={<ExamPage />} />
-            <Route path="/exam/ao-aao" element={<AoAaoExamPage />} />
+
+            {/* AO/AAO Portal Routes */}
+            <Route path="/exam/ao-aao" element={<LandingPage />} />
+            <Route path="/exam/ao-aao/auth" element={<AuthPage />} />
+            <Route path="/exam/ao-aao" element={<AoAaoPortalLayout />}>
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="subjects" element={<SubjectsPage />} />
+              <Route path="subjects/:subjectId/tests" element={<TestsPage />} />
+              <Route path="subjects/:subjectId/tests/:paperNumber/session" element={<TestSessionPage />} />
+              <Route path="results" element={<ResultsPage />} />
+              <Route path="billing" element={<BillingPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="free-test" element={<FreeTestPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+            </Route>
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<Login />} />
@@ -90,6 +124,12 @@ const App = () => (
               <Route path="user-access" element={<UserAccess />} />
               <Route path="students" element={<StudentList />} />
               <Route path="offline-coaching" element={<OfflineCoachingList />} />
+              
+              {/* AO/AAO Admin Routes */}
+              <Route path="ao-aao" element={<AoAaoControlCenter />} />
+              <Route path="ao-aao/papers" element={<AoAaoPapersPage />} />
+              <Route path="ao-aao/free-test" element={<AoAaoFreeTestPage />} />
+              <Route path="ao-aao/access" element={<AoAaoAccessPage />} />
             </Route>
 
               <Route path="*" element={<NotFound />} />
