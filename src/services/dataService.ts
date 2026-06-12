@@ -4,7 +4,9 @@ import Fuse from 'fuse.js';
 
 const isLocalhost = typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+    ? import.meta.env.VITE_API_BASE_URL
+    : (isLocalhost ? '' : 'https://agricatagolues.vercel.app');
 
 export type IssueStatus = 'Current' | 'Archived' | 'Draft';
 

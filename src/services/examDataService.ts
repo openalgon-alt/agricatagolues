@@ -51,11 +51,14 @@ export interface ExamSubmission {
     answers?: Record<string, number>;
 }
 
+// Use VITE_API_BASE_URL env var if explicitly set (recommended for production).
 // On localhost, use relative URLs (Vite proxy handles them).
 // On any other domain (e.g. Hostinger), fetch from the Vercel backend directly.
 const isLocalhost = typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-export const API_BASE_URL = isLocalhost ? '' : 'https://agri-backend-plux.vercel.app';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+    ? import.meta.env.VITE_API_BASE_URL
+    : (isLocalhost ? '' : 'https://agricatagolues.vercel.app');
 
 class ExamDataService {
     public readonly BUNDLE_PRICE = 2000;
