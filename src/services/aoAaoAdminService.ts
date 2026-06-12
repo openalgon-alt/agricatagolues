@@ -91,6 +91,19 @@ class AoAaoAdminService {
     return this.request("ao-aao-admin-add-question", token, params);
   }
 
+  async editQuestion(token: string, params: {
+    questionId: string;
+    questionText: string;
+    optionA: string;
+    optionB: string;
+    optionC: string;
+    optionD: string;
+    correctOption: "A" | "B" | "C" | "D";
+    explanation?: string;
+  }): Promise<{ ok: boolean }> {
+    return this.request("ao-aao-admin-edit-question", token, params);
+  }
+
   async deleteQuestion(token: string, questionId: string): Promise<{ ok: boolean }> {
     return this.request("ao-aao-admin-delete-question", token, { questionId });
   }

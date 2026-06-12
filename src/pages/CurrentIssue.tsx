@@ -180,7 +180,21 @@ const CurrentIssue = () => {
                             <div className="flex gap-3 mt-4">
                               {article.pdfUrl ? (
                                 <Button size="sm" variant="ghost" className="text-xs h-8" asChild>
-                                  <a href={article.pdfUrl} target="_blank" rel="noopener noreferrer">
+                                  <a href={
+                                    (() => {
+                                      if (!article.pdfUrl) return '#';
+                                      if (!article.pdfUrl.includes('/pdfs/')) return article.pdfUrl;
+                                      try {
+                                        const parts = article.pdfUrl.split('/');
+                                        const filename = decodeURIComponent(parts.pop() || '');
+                                        const sanitized = filename.replace(/[^a-zA-Z0-9\._-]/g, "");
+                                        parts.push(sanitized);
+                                        return parts.join('/');
+                                      } catch (e) {
+                                        return article.pdfUrl;
+                                      }
+                                    })()
+                                  } target="_blank" rel="noopener noreferrer">
                                     <Download className="w-3 h-3 mr-1" />
                                     PDF
                                   </a>

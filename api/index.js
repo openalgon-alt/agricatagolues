@@ -1216,6 +1216,22 @@ export default async function handler(req, res) {
                 return res.status(200).json({ ok: true });
             }
 
+            if (action === 'ao-aao-admin-edit-question') {
+                const isAdmin = await verifyAdminToken(db, payload.token);
+                if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });
+                const { error } = await db.from('questions').update({
+                    question_text: payload.questionText,
+                    option_a: payload.optionA,
+                    option_b: payload.optionB,
+                    option_c: payload.optionC,
+                    option_d: payload.optionD,
+                    correct_option: payload.correctOption,
+                    explanation: payload.explanation || ""
+                }).eq('id', payload.questionId);
+                if (error) throw error;
+                return res.status(200).json({ ok: true });
+            }
+
             if (action === 'ao-aao-admin-delete-question') {
                 const isAdmin = await verifyAdminToken(db, payload.token);
                 if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });

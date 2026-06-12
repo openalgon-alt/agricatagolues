@@ -90,6 +90,7 @@ export default function PapersPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Single MCQ Form State
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [formQuestion, setFormQuestion] = useState("");
   const [formOptionA, setFormOptionA] = useState("");
   const [formOptionB, setFormOptionB] = useState("");
@@ -201,6 +202,7 @@ export default function PapersPage() {
   }
 
   function resetForm() {
+    setEditingQuestionId(null);
     setFormQuestion("");
     setFormOptionA("");
     setFormOptionB("");
@@ -208,6 +210,18 @@ export default function PapersPage() {
     setFormOptionD("");
     setFormCorrect("A");
     setFormExplanation("");
+  }
+
+  function handleEditClick(q: Question) {
+    setEditingQuestionId(q.id);
+    setFormQuestion(q.question_text);
+    setFormOptionA(q.option_a);
+    setFormOptionB(q.option_b);
+    setFormOptionC(q.option_c);
+    setFormOptionD(q.option_d);
+    setFormCorrect(q.correct_option);
+    setFormExplanation(q.explanation || "");
+    setActiveTab("add");
   }
 
   function resetBulkState() {
@@ -249,26 +263,40 @@ export default function PapersPage() {
 
     setSubmitting(true);
     try {
-      const result = await aoAaoAdminService.addQuestion(token, {
-        subjectId: subject.id,
-        paperNumber: selectedPaper,
-        questionText: formQuestion.trim(),
-        optionA: formOptionA.trim(),
-        optionB: formOptionB.trim(),
-        optionC: formOptionC.trim(),
-        optionD: formOptionD.trim(),
-        correctOption: formCorrect,
-        explanation: formExplanation.trim(),
-      });
+      let result;
+      if (editingQuestionId) {
+        result = await aoAaoAdminService.editQuestion(token, {
+          questionId: editingQuestionId,
+          questionText: formQuestion.trim(),
+          optionA: formOptionA.trim(),
+          optionB: formOptionB.trim(),
+          optionC: formOptionC.trim(),
+          optionD: formOptionD.trim(),
+          correctOption: formCorrect,
+          explanation: formExplanation.trim(),
+        });
+      } else {
+        result = await aoAaoAdminService.addQuestion(token, {
+          subjectId: subject.id,
+          paperNumber: selectedPaper,
+          questionText: formQuestion.trim(),
+          optionA: formOptionA.trim(),
+          optionB: formOptionB.trim(),
+          optionC: formOptionC.trim(),
+          optionD: formOptionD.trim(),
+          correctOption: formCorrect,
+          explanation: formExplanation.trim(),
+        });
+      }
 
       if (result.ok) {
-        toast.success("MCQ question added successfully!");
+        toast.success(editingQuestionId ? "MCQ question updated successfully!" : "MCQ question added successfully!");
         resetForm();
         await fetchQuestions();
         setActiveTab("list");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add question");
+      toast.error(err instanceof Error ? err.message : (editingQuestionId ? "Failed to update question" : "Failed to add question"));
     } finally {
       setSubmitting(false);
     }
@@ -722,7 +750,7 @@ export default function PapersPage() {
                     value="add"
                     className="border-b-2 border-transparent data-[state=active]:border-green-600 data-[state=active]:text-green-700 rounded-none px-1 py-2 font-semibold text-xs tracking-wide bg-transparent cursor-pointer shadow-none"
                   >
-                    Add Question Manually
+                    {editingQuestionId ? "Edit Question" : "Add Question Manually"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="bulk"
@@ -783,15 +811,26 @@ export default function PapersPage() {
                                 Answer: Option {q.correct_option}
                               </span>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteQuestion(q.id)}
-                              className="h-8 w-8 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
-                              title="Delete Question"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditClick(q)}
+                                className="h-8 w-8 text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                                title="Edit Question"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteQuestion(q.id)}
+                                className="h-8 w-8 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                                title="Delete Question"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
 
                           <p className="text-sm font-semibold leading-relaxed text-gray-900">
@@ -862,7 +901,7 @@ export default function PapersPage() {
                   className="space-y-5 max-w-2xl bg-white border p-6 rounded-2xl shadow-soft"
                 >
                   <h4 className="font-bold text-sm text-gray-900 mb-4">
-                    New Question Input Form
+                    {editingQuestionId ? "Edit Question" : "New Question Input Form"}
                   </h4>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -1003,6 +1042,8 @@ export default function PapersPage() {
                   >
                     {submitting ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : editingQuestionId ? (
+                      "Update MCQ Question"
                     ) : (
                       "Save MCQ Question"
                     )}
