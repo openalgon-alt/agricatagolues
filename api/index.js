@@ -1159,11 +1159,26 @@ export default async function handler(req, res) {
             if (action === 'ao-aao-admin-list-questions') {
                 const isAdmin = await verifyAdminToken(db, payload.token);
                 if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });
-                const { data: questions, error } = await db.from('questions').select('id, paper_number, question_text, option_a, option_b, option_c, option_d, correct_option, explanation').eq('subject_id', payload.subjectId).order('created_at', { ascending: false });
-                if (error) throw error;
-                const normalQuestions = (questions || []).filter((q) => !q.question_text.startsWith("__PAPER_NAME__:"));
+                
+                let allQuestions = [];
+                let offset = 0;
+                const limit = 1000;
+                while (true) {
+                    const { data: questionsBatch, error } = await db.from('questions')
+                        .select('id, paper_number, question_text, option_a, option_b, option_c, option_d, correct_option, explanation')
+                        .eq('subject_id', payload.subjectId)
+                        .order('created_at', { ascending: false })
+                        .range(offset, offset + limit - 1);
+                    if (error) throw error;
+                    if (!questionsBatch || questionsBatch.length === 0) break;
+                    allQuestions.push(...questionsBatch);
+                    if (questionsBatch.length < limit) break;
+                    offset += limit;
+                }
+
+                const normalQuestions = allQuestions.filter((q) => !q.question_text.startsWith("__PAPER_NAME__:"));
                 const paperNames = {};
-                (questions || []).filter((q) => q.question_text.startsWith("__PAPER_NAME__:")).forEach((r) => {
+                allQuestions.filter((q) => q.question_text.startsWith("__PAPER_NAME__:")).forEach((r) => {
                     paperNames[r.paper_number] = r.question_text.substring("__PAPER_NAME__:".length);
                 });
                 return res.status(200).json({ questions: normalQuestions, paperNames });
