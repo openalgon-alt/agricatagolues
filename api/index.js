@@ -982,14 +982,28 @@ export default async function handler(req, res) {
                 const { data: subject, error } = await db.from('subjects').select('*').eq('id', subjectId).maybeSingle();
                 if (error) throw error;
                 if (!subject) throw new Error("Subject not found");
-                const { data: questionCounts, error: qError } = await db.from('questions').select('paper_number, question_text').eq('subject_id', subjectId);
-                if (qError) throw qError;
+                
+                let allQuestionCounts = [];
+                let offset = 0;
+                const limit = 1000;
+                while (true) {
+                    const { data: questionsBatch, error: qError } = await db.from('questions')
+                        .select('paper_number, question_text')
+                        .eq('subject_id', subjectId)
+                        .range(offset, offset + limit - 1);
+                    if (qError) throw qError;
+                    if (!questionsBatch || questionsBatch.length === 0) break;
+                    allQuestionCounts.push(...questionsBatch);
+                    if (questionsBatch.length < limit) break;
+                    offset += limit;
+                }
+
                 const counts = {};
                 const paperNames = {};
                 for (let i = 1; i <= subject.papers; i++) {
                     counts[i] = 0;
                 }
-                (questionCounts || []).forEach((q) => {
+                allQuestionCounts.forEach((q) => {
                     const qText = q.question_text || "";
                     if (qText.startsWith("__PAPER_NAME__:")) {
                         paperNames[q.paper_number] = qText.substring("__PAPER_NAME__:".length);
