@@ -1211,26 +1211,42 @@ export default async function handler(req, res) {
                     explanation: q.explanation || ""
                 }));
 
-                // Determine which paper numbers are being uploaded
+                // Only operate on the specific paper number(s) being uploaded
                 const paperNumbers = [...new Set(rows.map(r => r.paper_number))];
 
-                // Delete only existing NORMAL questions (not __PAPER_NAME__ metadata rows)
-                // for each paper number being replaced
                 for (const paperNum of paperNumbers) {
+                    // Step 1: Save any __PAPER_NAME__ metadata rows so we can restore them
+                    const { data: allExisting } = await db
+                        .from('questions')
+                        .select('subject_id, paper_number, question_text, option_a, option_b, option_c, option_d, correct_option, explanation')
+                        .eq('subject_id', payload.subjectId)
+                        .eq('paper_number', paperNum);
+
+                    const metaRows = (allExisting || []).filter(r =>
+                        typeof r.question_text === 'string' && r.question_text.startsWith('__PAPER_NAME__:')
+                    );
+
+                    // Step 2: Delete ALL rows for this specific paper_number (safe — scoped to paperNum only)
                     const { error: delErr } = await db
                         .from('questions')
                         .delete()
                         .eq('subject_id', payload.subjectId)
-                        .eq('paper_number', paperNum)
-                        .not('question_text', 'like', '__PAPER_NAME__%');
+                        .eq('paper_number', paperNum);
                     if (delErr) throw delErr;
+
+                    // Step 3: Re-insert preserved metadata rows (paper name)
+                    if (metaRows.length > 0) {
+                        const { error: metaErr } = await db.from('questions').insert(metaRows);
+                        if (metaErr) throw metaErr;
+                    }
                 }
 
-                // Insert the new questions
+                // Step 4: Insert the new questions
                 const { error } = await db.from('questions').insert(rows);
                 if (error) throw error;
                 return res.status(200).json({ ok: true, count: rows.length });
             }
+
 
 
             if (action === 'ao-aao-admin-edit-paper-name') {
