@@ -94,7 +94,7 @@ export default function SubjectsPage() {
               </div>
               
               {available ? (
-                <Link to={`/exam/ao-aao/tests?subjectId=${s.id}`}>
+                <Link to={`/exam/ao-aao/subjects/${s.id}/tests`}>
                   <Button
                     variant="default"
                     size="sm"

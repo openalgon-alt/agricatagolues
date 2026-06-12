@@ -126,7 +126,7 @@ export default function BillingPage() {
 
   const handleOpenSubject = (subject: Subject) => {
     if (unlocked) {
-      void navigate(`/exam/ao-aao/tests?subjectId=${subject.id}`);
+      void navigate(`/exam/ao-aao/subjects/${subject.id}/tests`);
     } else if (isPending) {
       toast.info(`Verification is already pending for UTR ${pendingUtr}. Access will be unlocked soon.`);
     } else {
