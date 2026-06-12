@@ -1,33 +1,39 @@
-import pkg from 'pg';
-const { Client } = pkg;
+const URL = "https://ghjzaplzvbezwejopvfq.supabase.co/rest/v1/questions";
+const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoanphcGx6dmJlendlam9wdmZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDkyMTA4NSwiZXhwIjoyMDk2NDk3MDg1fQ.oUQzZIIc4IrqzF8dSCo8q05f9Ptz0TID1oMzg6VPIxM";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+async function main() {
+  let allRows = [];
+  let offset = 0;
+  const limit = 1000;
 
-// Decode the URL to see the actual password
-const raw = "postgresql://postgres:H%7BL6j%7C7kds%5BgbBRt@34.93.188.35:5432/postgres?sslmode=require";
-console.log("Decoded URL:", decodeURIComponent(raw));
-
-// Try connecting to different database names common in these setups
-const dbNames = ['postgres', 'agricatalogues', 'agri', 'neondb', 'mydb', 'app', 'main'];
-
-async function tryDb(dbName) {
-  const url = `postgresql://postgres:H%7BL6j%7C7kds%5BgbBRt@34.93.188.35:5432/${dbName}?sslmode=require`;
-  const client = new Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
-  try {
-    await client.connect();
-    const tables = await client.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name");
-    if (tables.rows.length > 0) {
-      console.log(`\n✅ DB "${dbName}" has tables:`, tables.rows.map(r => r.table_name));
-    } else {
-      console.log(`   DB "${dbName}": empty (no tables)`);
+  console.log("Fetching all questions...");
+  while (true) {
+    const res = await fetch(`${URL}?select=id,paper_number,question_text,created_at&offset=${offset}&limit=${limit}`, {
+      headers: {
+        "apikey": KEY,
+        "Authorization": `Bearer ${KEY}`
+      }
+    });
+    if (!res.ok) {
+      console.error("Fetch failed", await res.text());
+      return;
     }
-  } catch(e) {
-    console.log(`   DB "${dbName}": ERROR - ${e.message.split('\n')[0]}`);
-  } finally {
-    await client.end();
+    const data = await res.json();
+    allRows.push(...data);
+    if (data.length < limit) break;
+    offset += limit;
   }
+
+  console.log(`Total rows in DB: ${allRows.length}`);
+
+  const countsByPaper = {};
+  for (const row of allRows) {
+    const p = row.paper_number;
+    countsByPaper[p] = (countsByPaper[p] || 0) + 1;
+  }
+  
+  console.log("Counts per paper:");
+  console.log(countsByPaper);
 }
 
-for (const db of dbNames) {
-  await tryDb(db);
-}
+main().catch(console.error);

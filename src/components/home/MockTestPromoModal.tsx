@@ -1,32 +1,23 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, ArrowRight, BrainCircuit, Users, GraduationCap, BookOpen } from 'lucide-react';
+import { X, GraduationCap, Trophy, ArrowRight, Clock, Users, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSiteSettings } from '@/context/SiteSettingsContext';
-import { examDataService, MockTest } from '@/services/examDataService';
 
 export function MockTestPromoModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [freeTests, setFreeTests] = useState<MockTest[]>([]);
   const navigate = useNavigate();
   const { activeExam, isLoading } = useSiteSettings();
 
-  useEffect(() => {
-    examDataService.getMockTests().then(tests => {
-      setFreeTests(tests.filter(t => Number(t.price) === 0 && Number(t.id) !== -1));
-    });
-  }, []);
 
   useEffect(() => {
     if (isLoading || !activeExam) return;
-    
     const promoKey = `mockTestPromoSeen_${activeExam}`;
     const hasSeenPromo = sessionStorage.getItem(promoKey);
-    
     if (!hasSeenPromo) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         sessionStorage.setItem(promoKey, 'true');
-      }, 1500);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [isLoading, activeExam]);
@@ -35,111 +26,106 @@ export function MockTestPromoModal() {
 
   const isPractical = activeExam === 'practical';
 
+  const handleTakeTest = () => {
+    setIsOpen(false);
+    navigate(isPractical ? '/exam' : '/exam/ao-aao');
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 transition-all">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
         onClick={() => setIsOpen(false)}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+      <div
+        className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl animate-in fade-in zoom-in-90 duration-500"
+        style={{ background: 'linear-gradient(145deg, #0f0c29, #302b63, #24243e)' }}
+      >
+        {/* Decorative glowing orbs */}
+        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full opacity-30 blur-3xl"
+          style={{ background: isPractical ? '#22c55e' : '#6366f1' }} />
+        <div className="absolute -bottom-12 -left-12 w-40 h-40 rounded-full opacity-20 blur-3xl"
+          style={{ background: isPractical ? '#16a34a' : '#4f46e5' }} />
+
+        {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 z-20 bg-black/20 hover:bg-black/40 text-white rounded-full p-2 transition-colors"
+          className="absolute top-4 right-4 z-30 text-white/50 hover:text-white/90 hover:bg-white/10 rounded-full p-1.5 transition-all duration-200"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        <div className="grid md:grid-cols-2">
-          {/* Left graphic */}
-          <div className={`p-8 flex-col items-center justify-center text-white text-center relative overflow-hidden hidden md:flex ${
-            isPractical
-              ? 'bg-gradient-to-br from-green-500 to-green-700'
-              : 'bg-gradient-to-br from-blue-500 to-blue-800'
-          }`}>
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_white_10%,_transparent_20%)] bg-[length:24px_24px]" />
-            {isPractical ? (
-              <>
-                <Trophy className="w-24 h-24 mb-6 drop-shadow-lg text-yellow-300 relative z-10" />
-                <h3 className="text-3xl font-black tracking-tight mb-2 relative z-10 leading-tight">
-                  Crack Your Ag-B.Sc Exam
-                </h3>
-                <p className="text-green-50 text-base max-w-[250px] mx-auto relative z-10">
-                  Prepare effectively for the state-level agricultural practicals.
-                </p>
-              </>
-            ) : (
-              <>
-                <GraduationCap className="w-24 h-24 mb-6 drop-shadow-lg text-yellow-300 relative z-10" />
-                <h3 className="text-3xl font-black tracking-tight mb-2 relative z-10 leading-tight">
-                  Ace the AO / AAO Exam
-                </h3>
-                <p className="text-blue-50 text-base max-w-[250px] mx-auto relative z-10">
-                  Karnataka Agriculture Officer & Assistant Agriculture Officer preparation.
-                </p>
-              </>
-            )}
+        {/* Top spacing */}
+        <div className="pt-8" />
+
+        {/* Hero section */}
+        <div className="relative z-10 px-7 pt-4 pb-5 text-white text-center">
+          {/* Big icon */}
+          <div className="mb-4 relative inline-block mx-auto">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${isPractical ? 'bg-green-500/20 border border-green-400/30' : 'bg-indigo-500/20 border border-indigo-400/30'}`}>
+              {isPractical
+                ? <Trophy className="w-9 h-9 text-yellow-400 drop-shadow" />
+                : <GraduationCap className="w-9 h-9 text-indigo-300 drop-shadow" />
+              }
+            </div>
+            {/* Pulse ring */}
+            <div className={`absolute inset-0 rounded-2xl animate-ping opacity-20 ${isPractical ? 'bg-green-400' : 'bg-indigo-400'}`} style={{ animationDuration: '2s' }} />
           </div>
 
-          {/* Right content */}
-          <div className="p-8 flex flex-col justify-center bg-white relative">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-green-100 p-2 rounded-lg text-green-700 shrink-0">
-                  <BookOpen className="w-6 h-6" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 leading-tight">
-                Try a Free Mock Test
-              </h2>
+          <h2 className="text-2xl font-black leading-tight mb-1 tracking-tight">
+            {isPractical ? (
+              <>Crack Your<br /><span className="text-green-400">Practical Exam</span> 🌱</>
+            ) : (
+              <>Ace the<br /><span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">AO / AAO Exam</span> 🎓</>
+            )}
+          </h2>
+          <p className="text-white/50 text-sm leading-relaxed">
+            {isPractical
+              ? 'Start with a free mock test. No payment, no signup.'
+              : 'Try a free mock test and get exam-ready today.'}
+          </p>
+        </div>
+
+        {/* Stats row */}
+        <div className="relative z-10 mx-7 mb-5 grid grid-cols-3 gap-2">
+          {[
+            { icon: <Star className="w-3 h-3 text-yellow-400" />, label: 'Top Rated' },
+            { icon: <Users className="w-3 h-3 text-blue-300" />, label: '1000+ Users' },
+            { icon: <Clock className="w-3 h-3 text-green-400" />, label: 'Instant Access' },
+          ].map((s, i) => (
+            <div key={i} className="flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-xl py-2 px-1">
+              {s.icon}
+              <span className="text-[9px] text-white/60 font-semibold text-center leading-tight">{s.label}</span>
             </div>
-            
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              {freeTests.length > 0 ? freeTests.map((test) => (
-                <div key={test.id} className="border border-green-200 shadow-sm hover:shadow-md transition-all group bg-white rounded-xl overflow-hidden cursor-pointer" onClick={() => { setIsOpen(false); navigate(isPractical ? '/exam' : '/exam/ao-aao'); }}>
-                    <div className="h-2 bg-green-500 w-full"></div>
-                    <div className="p-5">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="bg-green-100 p-2 rounded-lg text-green-700">
-                                <BookOpen className="w-5 h-5" />
-                            </div>
-                            <span className="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Free</span>
-                        </div>
-                        <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1" title={test.title}>{test.title}</h3>
-                        <p className="text-gray-500 text-xs mb-4">{test.description || "Essential practice for beginners."}</p>
-                    </div>
-                    <div className="p-4 pt-0">
-                        <button 
-                            className="w-full bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 font-bold py-2.5 px-4 rounded-lg transition-colors"
-                        >
-                            Take Test
-                        </button>
-                    </div>
-                </div>
-              )) : (
-                <div className="border border-green-200 shadow-sm hover:shadow-md transition-all group bg-white rounded-xl overflow-hidden cursor-pointer" onClick={() => { setIsOpen(false); navigate(isPractical ? '/exam' : '/exam/ao-aao'); }}>
-                    <div className="h-2 bg-green-500 w-full"></div>
-                    <div className="p-5">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="bg-green-100 p-2 rounded-lg text-green-700">
-                                <BookOpen className="w-5 h-5" />
-                            </div>
-                            <span className="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Free</span>
-                        </div>
-                        <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1">Mock Test 1</h3>
-                        <p className="text-gray-500 text-xs mb-4">Free introductory mock test covering agricultural specimen identification. Includes 50 practical questions.</p>
-                    </div>
-                    <div className="p-4 pt-0">
-                        <button 
-                            className="w-full bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 font-bold py-2.5 px-4 rounded-lg transition-colors"
-                        >
-                            Take Test
-                        </button>
-                    </div>
-                </div>
-              )}
-            </div>
-          </div>
+          ))}
+        </div>
+
+
+
+        {/* CTA Button */}
+        <div className="relative z-10 px-7 pb-7">
+          <button
+            onClick={handleTakeTest}
+            className={`w-full py-4 rounded-2xl font-black text-white text-sm tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group ${
+              isPractical
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400'
+                : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:from-indigo-400 hover:via-purple-400 hover:to-indigo-500'
+            }`}
+          >
+            {/* Shine sweep */}
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="relative flex items-center justify-center gap-2">
+              Start Free Test Now
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+            </span>
+          </button>
+
+          <p className="text-center text-[11px] text-white/30 mt-3 font-medium">
+            ✦ No signup required &nbsp;·&nbsp; Completely free &nbsp;·&nbsp; Instant access ✦
+          </p>
         </div>
       </div>
     </div>

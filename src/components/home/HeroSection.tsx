@@ -6,10 +6,10 @@ import heroImage from '@/assets/hero-wheat.jpg';
 import { useSiteSettings } from '@/context/SiteSettingsContext';
 
 export const HeroSection = () => {
-  const { activeExam, isLoading } = useSiteSettings();
+  const { activeExam } = useSiteSettings();
 
-  // Banner config driven by global setting
-  const bannerConfig = !isLoading && activeExam === 'ao-aao'
+  // Banner renders immediately — no isLoading wait, uses localStorage-cached value
+  const bannerConfig = activeExam === 'ao-aao'
     ? {
         href: '/exam/ao-aao',
         text: 'AO / AAO Agriculture Officer Mock Test Series - 2026 is Now Live!',

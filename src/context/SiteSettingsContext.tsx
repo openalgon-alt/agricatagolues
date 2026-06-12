@@ -68,8 +68,12 @@ async function saveActiveExamToApi(exam: ActiveExam): Promise<boolean> {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [activeExam, setActiveExamState] = useState<ActiveExam>(DEFAULT_EXAM);
-    const [isLoading, setIsLoading] = useState(true);
+    // Pre-read from localStorage synchronously so first render is instant
+    const cachedExam = localStorage.getItem(LOCAL_STORAGE_KEY) as ActiveExam | null;
+    const validCache = cachedExam === 'practical' || cachedExam === 'ao-aao';
+
+    const [activeExam, setActiveExamState] = useState<ActiveExam>(validCache ? cachedExam : DEFAULT_EXAM);
+    const [isLoading, setIsLoading] = useState(!validCache); // already resolved if cache exists
 
     // On mount: try API → fallback to localStorage → fallback to default
     useEffect(() => {
