@@ -1198,6 +1198,7 @@ export default async function handler(req, res) {
             if (action === 'ao-aao-admin-bulk-add-questions') {
                 const isAdmin = await verifyAdminToken(db, payload.token);
                 if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });
+
                 const rows = payload.questions.map((q) => ({
                     subject_id: payload.subjectId,
                     paper_number: q.paperNumber,
@@ -1209,10 +1210,28 @@ export default async function handler(req, res) {
                     correct_option: q.correctOption,
                     explanation: q.explanation || ""
                 }));
+
+                // Determine which paper numbers are being uploaded
+                const paperNumbers = [...new Set(rows.map(r => r.paper_number))];
+
+                // Delete only existing NORMAL questions (not __PAPER_NAME__ metadata rows)
+                // for each paper number being replaced
+                for (const paperNum of paperNumbers) {
+                    const { error: delErr } = await db
+                        .from('questions')
+                        .delete()
+                        .eq('subject_id', payload.subjectId)
+                        .eq('paper_number', paperNum)
+                        .not('question_text', 'like', '__PAPER_NAME__%');
+                    if (delErr) throw delErr;
+                }
+
+                // Insert the new questions
                 const { error } = await db.from('questions').insert(rows);
                 if (error) throw error;
                 return res.status(200).json({ ok: true, count: rows.length });
             }
+
 
             if (action === 'ao-aao-admin-edit-paper-name') {
                 const isAdmin = await verifyAdminToken(db, payload.token);
