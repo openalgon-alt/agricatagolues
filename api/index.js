@@ -1199,9 +1199,10 @@ export default async function handler(req, res) {
                 const isAdmin = await verifyAdminToken(db, payload.token);
                 if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });
 
+                // Build new rows — force paper_number to integer
                 const rows = payload.questions.map((q) => ({
-                    subject_id: payload.subjectId,
-                    paper_number: q.paperNumber,
+                    subject_id: String(payload.subjectId),
+                    paper_number: Number(q.paperNumber),
                     question_text: q.questionText,
                     option_a: q.optionA,
                     option_b: q.optionB,
@@ -1211,41 +1212,45 @@ export default async function handler(req, res) {
                     explanation: q.explanation || ""
                 }));
 
-                // Only operate on the specific paper number(s) being uploaded
+                // Only operate on the distinct paper numbers in this upload
                 const paperNumbers = [...new Set(rows.map(r => r.paper_number))];
+                console.log(`[bulk-upload] subject=${payload.subjectId} papers=${JSON.stringify(paperNumbers)} count=${rows.length}`);
 
                 for (const paperNum of paperNumbers) {
-                    // Step 1: Save any __PAPER_NAME__ metadata rows so we can restore them
-                    const { data: allExisting } = await db
+                    // Step 1: Fetch exact IDs of all rows for this subject+paper
+                    const { data: existingRows, error: fetchErr } = await db
                         .from('questions')
-                        .select('subject_id, paper_number, question_text, option_a, option_b, option_c, option_d, correct_option, explanation')
+                        .select('id, question_text')
                         .eq('subject_id', payload.subjectId)
                         .eq('paper_number', paperNum);
+                    if (fetchErr) throw fetchErr;
 
-                    const metaRows = (allExisting || []).filter(r =>
-                        typeof r.question_text === 'string' && r.question_text.startsWith('__PAPER_NAME__:')
-                    );
+                    const all = existingRows || [];
+                    console.log(`[bulk-upload] paper=${paperNum} found ${all.length} existing rows`);
 
-                    // Step 2: Delete ALL rows for this specific paper_number (safe — scoped to paperNum only)
-                    const { error: delErr } = await db
-                        .from('questions')
-                        .delete()
-                        .eq('subject_id', payload.subjectId)
-                        .eq('paper_number', paperNum);
-                    if (delErr) throw delErr;
+                    // Step 2: Separate normal questions vs __PAPER_NAME__ metadata (JS string check, no LIKE)
+                    const normalIds = all
+                        .filter(r => !String(r.question_text).startsWith('__PAPER_NAME__:'))
+                        .map(r => r.id);
 
-                    // Step 3: Re-insert preserved metadata rows (paper name)
-                    if (metaRows.length > 0) {
-                        const { error: metaErr } = await db.from('questions').insert(metaRows);
-                        if (metaErr) throw metaErr;
+                    // Step 3: Delete ONLY the normal question IDs (metadata rows untouched)
+                    if (normalIds.length > 0) {
+                        const { error: delErr } = await db
+                            .from('questions')
+                            .delete()
+                            .in('id', normalIds);
+                        if (delErr) throw delErr;
+                        console.log(`[bulk-upload] Deleted ${normalIds.length} normal questions for paper=${paperNum}`);
                     }
                 }
 
-                // Step 4: Insert the new questions
+                // Step 4: Insert the fresh questions
                 const { error } = await db.from('questions').insert(rows);
                 if (error) throw error;
+                console.log(`[bulk-upload] Inserted ${rows.length} new questions`);
                 return res.status(200).json({ ok: true, count: rows.length });
             }
+
 
 
 
