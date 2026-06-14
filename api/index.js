@@ -76,7 +76,9 @@ export default async function handler(req, res) {
 
     let client;
     try {
-        client = await getClient();
+        if (!action.startsWith('ao-aao-')) {
+            client = await getClient();
+        }
 
         if (action === 'get-profile') {
             const { firebase_uid } = payload || {};

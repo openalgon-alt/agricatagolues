@@ -71,13 +71,43 @@ class DataService {
     }
 
     private mapArticleFromDB(dbArticle: any): Article {
+        let pdfUrl = dbArticle.pdf_url;
+        
+        // Auto-fix specific known broken URLs from DB where the physical file had spaces removed
+        if (pdfUrl) {
+            const knownFixes: Record<string, string> = {
+                '/pdfs/THE FALL ARMYWORM INVASION GLOBAL SPREAD, IMPACT, AND MANAGEMENT STRATEGIES.pdf': '/pdfs/THEFALLARMYWORMINVASIONGLOBALSPREADIMPACTANDMANAGEMENTSTRATEGIES.pdf',
+                '/pdfs/EFFECT OF PACLOBUTRAZOL ON LODGING RESISTANCE IN MAIZE.pdf': '/pdfs/EFFECTOFPACLOBUTRAZOLONLODGINGRESISTANCEINMAIZE.pdf',
+                '/pdfs/Soilless Cultivation and Its Role in Sustainable and Profitable Farming.pdf': '/pdfs/SoillessCultivationandItsRoleinSustainableandProfitableFarming.pdf',
+                '/pdfs/vol-1-issue-3/From-Blossom-to-Basket-The-Science-Behind-High‑Quality-Fruits.pdf': '/pdfs/vol-1-issue-3/From-Blossom-to-Basket-The-Science-Behind-HighQuality-Fruits.pdf',
+                // This one was saved without spaces in DB but physically has spaces on Hostinger
+                '/pdfs/ProbioticsasaDoubleShieldManagingWaterandSoilQualityinAquaculturePonds.pdf': '/pdfs/Probiotics as a Double Shield Managing Water and Soil Quality in Aquaculture Ponds.pdf'
+            };
+            
+            // Check if the URL ends with any of the known broken ones
+            for (const [broken, fixed] of Object.entries(knownFixes)) {
+                if (pdfUrl.endsWith(broken) || pdfUrl.endsWith(encodeURI(broken))) {
+                    // Replace the broken part with the fixed part
+                    const urlObj = new URL(pdfUrl, window.location.origin);
+                    urlObj.pathname = fixed;
+                    pdfUrl = urlObj.pathname === fixed ? fixed : urlObj.toString(); 
+                    
+                    // Keep the host if it was absolute
+                    if (dbArticle.pdf_url.startsWith('http')) {
+                        pdfUrl = new URL(fixed, dbArticle.pdf_url).toString();
+                    }
+                    break;
+                }
+            }
+        }
+
         return {
             id: dbArticle.id,
             issueId: dbArticle.issue_id,
             title: dbArticle.title,
             authors: dbArticle.authors,
             affiliation: dbArticle.affiliation,
-            pdfUrl: dbArticle.pdf_url,
+            pdfUrl: pdfUrl,
             abstract: dbArticle.abstract,
             keywords: dbArticle.keywords
         };
