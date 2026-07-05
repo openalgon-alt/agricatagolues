@@ -1,7 +1,7 @@
 import pkg from 'pg';
 const { Client } = pkg;
 
-const connectionString = "postgresql://postgres:H%7BL6j%7C7kds%5BgbBRt@34.93.188.35:5432/postgres?sslmode=require";
+const connectionString = "postgresql://postgres.tqssenyemstlqpionqyp:Combride%40123@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres";
 
 async function updateQuestions() {
   const client = new Client({ 

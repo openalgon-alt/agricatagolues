@@ -3,7 +3,7 @@ const { Pool } = pkg;
 
 // Use the backend DB url directly
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:H%7BL6j%7C7kds%5BgbBRt@34.93.188.35:5432/postgres',
+  connectionString: 'postgresql://postgres.tqssenyemstlqpionqyp:Combride%40123@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres',
   ssl: { rejectUnauthorized: false }
 });
 
