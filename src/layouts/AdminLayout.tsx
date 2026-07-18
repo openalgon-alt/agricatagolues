@@ -43,16 +43,16 @@ export const AdminLayout = () => {
         { title: "User Access", url: "/admin/user-access", icon: KeyRound },
         { title: "Students", url: "/admin/students", icon: Users },
         { title: "AO/AAO Portal", url: "/admin/ao-aao", icon: Settings },
+        { title: "AO/AAO Users", url: "/admin/ao-aao/access", icon: Users },
         { title: "Offline Coaching", url: "/admin/offline-coaching", icon: MapPin },
     ];
 
-    const menuItems = isMasterUser 
-        ? allMenuItems 
-        : allMenuItems.filter(item => 
-            ["Dashboard", "Issues", "Editorial Board", "Shop Products"].includes(item.title)
-        );
+    const menuItems = allMenuItems;
 
     const isLinkActive = (itemUrl: string) => {
+        if (itemUrl === '/admin/ao-aao') {
+            return location.pathname === '/admin/ao-aao';
+        }
         if (itemUrl.includes('?')) {
             return location.pathname + location.search === itemUrl;
         }
