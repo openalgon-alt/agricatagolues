@@ -14,7 +14,7 @@ interface FileUploadProps {
 export const FileUpload = ({
     onFileSelect,
     accept = "application/pdf",
-    maxSizeMB = 10,
+    maxSizeMB = 50,
     label = "Upload PDF"
 }: FileUploadProps) => {
     const [dragActive, setDragActive] = useState(false);

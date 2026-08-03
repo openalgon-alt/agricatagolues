@@ -992,6 +992,8 @@ export default async function handler(req, res) {
                     const { data: questionsBatch, error: qError } = await db.from('questions')
                         .select('paper_number, question_text')
                         .eq('subject_id', subjectId)
+                        .order('paper_number', { ascending: true })
+                        .order('id', { ascending: true })
                         .range(offset, offset + limit - 1);
                     if (qError) throw qError;
                     if (!questionsBatch || questionsBatch.length === 0) break;
@@ -1184,6 +1186,7 @@ export default async function handler(req, res) {
                         .select('id, paper_number, question_text, option_a, option_b, option_c, option_d, correct_option, explanation')
                         .eq('subject_id', payload.subjectId)
                         .order('created_at', { ascending: false })
+                        .order('id', { ascending: false })
                         .range(offset, offset + limit - 1);
                     if (error) throw error;
                     if (!questionsBatch || questionsBatch.length === 0) break;
